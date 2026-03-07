@@ -1,0 +1,92 @@
+name: nounou_express
+description: "Application de mise en relation nounous / familles - Nounou Express."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # ── Fonts ────────────────────────────────────────────────────────────────────
+  google_fonts: ^6.2.1
+
+  # ── State management ─────────────────────────────────────────────────────────
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # ── Navigation ───────────────────────────────────────────────────────────────
+  go_router: ^14.6.2
+
+  # ── UI / Animations ──────────────────────────────────────────────────────────
+  flutter_svg: ^2.0.10+1
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+  flutter_animate: ^4.5.0
+  lottie: ^3.1.3                    # Animations Lottie (splash, empty states)
+  pinput: ^5.0.0                    # Champs OTP stylisés
+  flutter_rating_bar: ^4.0.1        # Étoiles de notation interactive
+
+  # ── Firebase ─────────────────────────────────────────────────────────────────
+  firebase_core: ^3.15.2
+  firebase_auth: ^5.5.4             # Auth téléphone (OTP), Google Sign-In
+  cloud_firestore: ^5.6.9           # Base de données temps réel
+  firebase_storage: ^12.4.5        # Upload photos de profil
+  firebase_messaging: ^15.2.5      # Notifications push
+  firebase_analytics: ^11.4.5      # Analytics
+
+  # ── Stockage local ───────────────────────────────────────────────────────────
+  shared_preferences: ^2.5.3       # Préférences utilisateur (thème, langue)
+  flutter_secure_storage: ^9.2.4   # Token JWT sécurisé
+
+  # ── Médias & Fichiers ─────────────────────────────────────────────────────────
+  image_picker: ^1.1.2             # Sélection photo de profil / CNI
+  image_cropper: ^9.1.0            # Recadrage photo de profil
+
+  # ── Géolocalisation & Cartes ─────────────────────────────────────────────────
+  geolocator: ^13.0.4              # GPS position actuelle
+  geocoding: ^3.0.0                # Adresse ↔ coordonnées GPS
+  google_maps_flutter: ^2.12.1     # Carte interactive (écran map)
+
+  # ── Réseau ───────────────────────────────────────────────────────────────────
+  dio: ^5.8.0+1                    # Client HTTP avancé (interceptors, retry)
+  connectivity_plus: ^6.1.4       # Détection connexion réseau
+
+  # ── Notifications locales ────────────────────────────────────────────────────
+  flutter_local_notifications: ^18.0.1
+
+  # ── Utilitaires ──────────────────────────────────────────────────────────────
+  intl: ^0.19.0                    # Dates, monnaie (fr_FR)
+  url_launcher: ^6.3.1             # Ouvrir liens, appels téléphone
+  share_plus: ^10.1.4              # Partager profil nounou
+  package_info_plus: ^8.3.0        # Version de l'app (écran À propos)
+  permission_handler: ^11.4.0      # Gérer permissions runtime (caméra, GPS)
+  uuid: ^4.5.1                     # Générer IDs uniques
+  equatable: ^2.0.7                # Égalité des modèles de données
+
+  # ── Auth Google ──────────────────────────────────────────────────────────────
+  google_sign_in: ^6.2.2           # Connexion avec Google
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.4
+  build_runner: ^2.4.15            # Génération de code (Riverpod, json_serializable)
+  riverpod_generator: ^2.6.5       # Génération providers Riverpod
+  json_serializable: ^6.9.5        # Sérialisation JSON automatique
+  json_annotation: ^4.9.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/logo.png
+    - assets/images/                # Dossier images générales
+    - assets/icons/                 # Icônes SVG custom
+    - assets/animations/            # Fichiers Lottie (.json)

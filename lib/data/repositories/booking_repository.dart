@@ -1,0 +1,3 @@
+class BookingRepository {
+  // Implementation here
+}
