@@ -1,1 +1,37 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"nounou-express-2112b","appId":"1:552440032442:android:09111215d25ebae630a683","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"nounou-express-2112b","configurations":{"android":"1:552440032442:android:09111215d25ebae630a683","ios":"1:552440032442:ios:73fec98e3d44a4fc30a683","web":"1:552440032442:web:efa6f7ae25a81f9330a683"}}}}}}
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "nounou-express-2112b",
+          "appId": "1:552440032442:android:09111215d25ebae630a683",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "nounou-express-2112b",
+          "configurations": {
+            "android": "1:552440032442:android:09111215d25ebae630a683",
+            "ios": "1:552440032442:ios:73fec98e3d44a4fc30a683",
+            "web": "1:552440032442:web:efa6f7ae25a81f9330a683"
+          }
+        }
+      }
+    }
+  }
+}
