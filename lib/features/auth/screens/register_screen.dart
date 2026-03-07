@@ -227,8 +227,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       icon: const Icon(Icons.remove_circle_outline),
                       color: const Color(0xFFFF6B35),
                       onPressed: () {
-                        if (_childrenCount > 0)
+                        if (_childrenCount > 0) {
                           setState(() => _childrenCount--);
+                        }
                       },
                     ),
                     Text(

@@ -55,8 +55,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
       // Quartier filter
       if (_filters.quartiers.isNotEmpty &&
-          !_filters.quartiers.contains(quartier))
+          !_filters.quartiers.contains(quartier)) {
         return false;
+      }
 
       // Price range
       if (n.hourlyRate < _filters.priceRange.start ||
@@ -69,11 +70,15 @@ class _SearchScreenState extends State<SearchScreen> {
 
       // Experience
       final exp = n.experience;
-      if (_filters.experienceFilter == '1-2 ans' && (exp < 1 || exp > 2))
+      if (_filters.experienceFilter == '1-2 ans' && (exp < 1 || exp > 2)) {
         return false;
-      if (_filters.experienceFilter == '3-5 ans' && (exp < 3 || exp > 5))
+      }
+      if (_filters.experienceFilter == '3-5 ans' && (exp < 3 || exp > 5)) {
         return false;
-      if (_filters.experienceFilter == '5+ ans' && exp < 5) return false;
+      }
+      if (_filters.experienceFilter == '5+ ans' && exp < 5) {
+        return false;
+      }
 
       // Availability
       if (_filters.onlyAvailable &&

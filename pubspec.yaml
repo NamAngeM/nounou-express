@@ -88,5 +88,3 @@ flutter:
   assets:
     - assets/images/logo.png
     - assets/images/                # Dossier images générales
-    - assets/icons/                 # Icônes SVG custom
-    - assets/animations/            # Fichiers Lottie (.json)

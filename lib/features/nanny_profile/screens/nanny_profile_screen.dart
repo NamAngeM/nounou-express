@@ -64,8 +64,9 @@ _SkillStyle _skillStyle(String skill) {
   if (s.contains('secours') || s.contains('secourisme')) {
     return _SkillStyle(Colors.red.shade50, Colors.red.shade700);
   }
-  if (s.contains('cuisine'))
+  if (s.contains('cuisine')) {
     return _SkillStyle(Colors.orange.shade50, Colors.orange.shade700);
+  }
   if (s.contains('devoir') || s.contains('scolaire')) {
     return _SkillStyle(Colors.blue.shade50, Colors.blue.shade700);
   }
@@ -210,12 +211,6 @@ class _NannyProfileScreenState extends State<NannyProfileScreen> {
 class _HeaderBackground extends StatelessWidget {
   final NannyModel nanny;
   const _HeaderBackground({required this.nanny});
-
-  String get _initials {
-    final parts = nanny.name.trim().split(' ');
-    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    return nanny.name[0].toUpperCase();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -398,12 +393,15 @@ class _BadgeChip extends StatelessWidget {
   const _BadgeChip({required this.label});
 
   Color get _bg {
-    if (label.contains('Vérifié'))
+    if (label.contains('Vérifié')) {
       return AppColors.accent.withValues(alpha: 0.15);
-    if (label.contains('Super'))
+    }
+    if (label.contains('Super')) {
       return AppColors.warning.withValues(alpha: 0.2);
-    if (label.contains('Disponible'))
+    }
+    if (label.contains('Disponible')) {
       return AppColors.success.withValues(alpha: 0.15);
+    }
     return AppColors.primary.withValues(alpha: 0.12);
   }
 

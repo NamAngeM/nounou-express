@@ -123,17 +123,25 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
   int get _resultCount {
     return MockData.nannies.where((n) {
       if (n.hourlyRate < _f.priceRange.start ||
-          n.hourlyRate > _f.priceRange.end)
+          n.hourlyRate > _f.priceRange.end) {
         return false;
-      if (n.rating < _f.minRating) return false;
+      }
+      if (n.rating < _f.minRating) {
+        return false;
+      }
       final exp = n.experience;
-      if (_f.experienceFilter == '1-2 ans' && (exp < 1 || exp > 2))
+      if (_f.experienceFilter == '1-2 ans' && (exp < 1 || exp > 2)) {
         return false;
-      if (_f.experienceFilter == '3-5 ans' && (exp < 3 || exp > 5))
+      }
+      if (_f.experienceFilter == '3-5 ans' && (exp < 3 || exp > 5)) {
         return false;
-      if (_f.experienceFilter == '5+ ans' && exp < 5) return false;
-      if (_f.onlyAvailable && !n.isVerified && !n.badges.contains('Disponible'))
+      }
+      if (_f.experienceFilter == '5+ ans' && exp < 5) {
         return false;
+      }
+      if (_f.onlyAvailable && !n.isVerified && !n.badges.contains('Disponible')) {
+        return false;
+      }
       for (final badge in _f.badges) {
         if (!n.badges.contains(badge)) return false;
       }

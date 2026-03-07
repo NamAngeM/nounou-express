@@ -40,7 +40,7 @@ class RatingStars extends StatelessWidget {
           return GestureDetector(
             onTap: () => onRatingChanged?.call(starValue.toDouble()),
             child: star
-                .animate(key: ValueKey('star_$index\_$rating'))
+                .animate(key: ValueKey('star_${index}_$rating'))
                 .scale(duration: 200.ms, curve: Curves.easeOutBack),
           );
         }
