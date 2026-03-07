@@ -23,7 +23,7 @@ jobs:
         run: flutter pub get
 
       - name: Build web (release)
-        run: flutter build web --release --web-renderer canvaskit
+        run: flutter build web --release
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
