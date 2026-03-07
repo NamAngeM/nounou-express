@@ -93,14 +93,25 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
   late SearchFilters _f;
 
   static const _quartierOptions = [
-    'Akanda', 'Angondjé', 'Nzeng-Ayong', 'Owendo', 'Glass',
-    'Nombakélé', 'Alibandeng', 'PK8', 'Louis', 'Batterie IV',
+    'Akanda',
+    'Angondjé',
+    'Nzeng-Ayong',
+    'Owendo',
+    'Glass',
+    'Nombakélé',
+    'Alibandeng',
+    'PK8',
+    'Louis',
+    'Batterie IV',
   ];
 
   static const _expOptions = ['Toute', '1-2 ans', '3-5 ans', '5+ ans'];
 
   static const _badgeOptions = [
-    'Vérifiée', 'Super Nounou', 'Gold', 'Premiers secours',
+    'Vérifiée',
+    'Super Nounou',
+    'Gold',
+    'Premiers secours',
   ];
 
   @override
@@ -111,13 +122,18 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
 
   int get _resultCount {
     return MockData.nannies.where((n) {
-      if (n.hourlyRate < _f.priceRange.start || n.hourlyRate > _f.priceRange.end) return false;
+      if (n.hourlyRate < _f.priceRange.start ||
+          n.hourlyRate > _f.priceRange.end)
+        return false;
       if (n.rating < _f.minRating) return false;
       final exp = n.experience;
-      if (_f.experienceFilter == '1-2 ans' && (exp < 1 || exp > 2)) return false;
-      if (_f.experienceFilter == '3-5 ans' && (exp < 3 || exp > 5)) return false;
+      if (_f.experienceFilter == '1-2 ans' && (exp < 1 || exp > 2))
+        return false;
+      if (_f.experienceFilter == '3-5 ans' && (exp < 3 || exp > 5))
+        return false;
       if (_f.experienceFilter == '5+ ans' && exp < 5) return false;
-      if (_f.onlyAvailable && !n.isVerified && !n.badges.contains('Disponible')) return false;
+      if (_f.onlyAvailable && !n.isVerified && !n.badges.contains('Disponible'))
+        return false;
       for (final badge in _f.badges) {
         if (!n.badges.contains(badge)) return false;
       }
@@ -130,7 +146,9 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.9,
@@ -189,7 +207,10 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: AppSpacing.md,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -198,7 +219,9 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
             onPressed: _reset,
             child: Text(
               'Réinitialiser',
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.primary),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.primary,
+              ),
             ),
           ),
         ],
@@ -208,13 +231,18 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
 
   Widget _buildSection(String title, Widget content) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: AppSpacing.md,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           content,
@@ -233,9 +261,12 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
       children: _quartierOptions.map((q) {
         final selected = _f.quartiers.contains(q);
         return FilterChip(
-          label: Text(q, style: AppTypography.caption.copyWith(
-            color: selected ? Colors.white : AppColors.textPrimary,
-          )),
+          label: Text(
+            q,
+            style: AppTypography.caption.copyWith(
+              color: selected ? Colors.white : AppColors.textPrimary,
+            ),
+          ),
           selected: selected,
           onSelected: (v) {
             setState(() {
@@ -283,7 +314,10 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
 
   Widget _priceTag(int value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(6),
@@ -303,8 +337,11 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
         final star = index + 1;
         final active = star <= _f.minRating;
         return GestureDetector(
-          onTap: () => setState(() =>
-            _f = _f.copyWith(minRating: _f.minRating == star.toDouble() ? 0 : star.toDouble())),
+          onTap: () => setState(
+            () => _f = _f.copyWith(
+              minRating: _f.minRating == star.toDouble() ? 0 : star.toDouble(),
+            ),
+          ),
           child: Padding(
             padding: const EdgeInsets.only(right: 6),
             child: Icon(
@@ -326,14 +363,20 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
       children: _expOptions.map((exp) {
         final selected = _f.experienceFilter == exp;
         return ChoiceChip(
-          label: Text(exp, style: AppTypography.caption.copyWith(
-            color: selected ? Colors.white : AppColors.textPrimary,
-          )),
+          label: Text(
+            exp,
+            style: AppTypography.caption.copyWith(
+              color: selected ? Colors.white : AppColors.textPrimary,
+            ),
+          ),
           selected: selected,
-          onSelected: (_) => setState(() => _f = _f.copyWith(experienceFilter: exp)),
+          onSelected: (_) =>
+              setState(() => _f = _f.copyWith(experienceFilter: exp)),
           selectedColor: AppColors.primary,
           backgroundColor: AppColors.background,
-          side: BorderSide(color: selected ? AppColors.primary : AppColors.border),
+          side: BorderSide(
+            color: selected ? AppColors.primary : AppColors.border,
+          ),
           showCheckmark: false,
         );
       }).toList(),
@@ -353,7 +396,8 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
               value: _f.onlyAvailable,
               activeThumbColor: AppColors.primary,
               activeTrackColor: AppColors.primary.withValues(alpha: 0.4),
-              onChanged: (v) => setState(() => _f = _f.copyWith(onlyAvailable: v)),
+              onChanged: (v) =>
+                  setState(() => _f = _f.copyWith(onlyAvailable: v)),
             ),
           ],
         ),

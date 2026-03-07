@@ -86,7 +86,11 @@ class NannyCard extends StatelessWidget {
                   // Location
                   Row(
                     children: [
-                      const Icon(Icons.location_on_rounded, size: 13, color: AppColors.primary),
+                      const Icon(
+                        Icons.location_on_rounded,
+                        size: 13,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(width: 3),
                       Flexible(
                         child: Text(
@@ -117,7 +121,9 @@ class NannyCard extends StatelessWidget {
                       if (reviewCount != null) ...[
                         Text(
                           ' ($reviewCount)',
-                          style: AppTypography.small.copyWith(color: AppColors.textTertiary),
+                          style: AppTypography.small.copyWith(
+                            color: AppColors.textTertiary,
+                          ),
                         ),
                       ],
                     ],
@@ -168,7 +174,12 @@ class NannyCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text('/heure', style: AppTypography.small.copyWith(color: AppColors.textTertiary)),
+                Text(
+                  '/heure',
+                  style: AppTypography.small.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 // Book button
                 _BookButton(nannyId: nannyId),
@@ -190,7 +201,10 @@ class _BookButton extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.push('/nanny/$nannyId'),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs + 2),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs + 2,
+        ),
         decoration: BoxDecoration(
           color: AppColors.primarySurface,
           borderRadius: AppSpacing.chipBorderRadius,

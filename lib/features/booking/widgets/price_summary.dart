@@ -35,14 +35,24 @@ class PriceSummary extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildPriceRow("Tarif de base ($hours h × ${baseRate.toInt()} FCFA)", baseTotal),
+        _buildPriceRow(
+          "Tarif de base ($hours h × ${baseRate.toInt()} FCFA)",
+          baseTotal,
+        ),
         if (isNight) _buildPriceRow("Majoration nuit (+20%)", nightSurcharge),
-        if (isWeekend) _buildPriceRow("Majoration week-end (+10%)", weekendSurcharge),
+        if (isWeekend)
+          _buildPriceRow("Majoration week-end (+10%)", weekendSurcharge),
         const Divider(height: AppSpacing.xl),
         _buildPriceRow("Sous-total", subtotal, isBold: true),
         _buildPriceRow("Commission Nounou Express (15%)", commission),
         const SizedBox(height: AppSpacing.md),
-        _buildPriceRow("TOTAL", total, isBold: true, isLarge: true, color: AppColors.primary),
+        _buildPriceRow(
+          "TOTAL",
+          total,
+          isBold: true,
+          isLarge: true,
+          color: AppColors.primary,
+        ),
         const SizedBox(height: AppSpacing.xl),
         Text(
           "Mode de paiement",
@@ -56,7 +66,13 @@ class PriceSummary extends StatelessWidget {
     );
   }
 
-  Widget _buildPriceRow(String label, double amount, {bool isBold = false, bool isLarge = false, Color? color}) {
+  Widget _buildPriceRow(
+    String label,
+    double amount, {
+    bool isBold = false,
+    bool isLarge = false,
+    Color? color,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       child: Row(
@@ -64,16 +80,31 @@ class PriceSummary extends StatelessWidget {
         children: [
           Text(
             label,
-            style: isBold 
-              ? AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w700, color: color)
-              : AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+            style: isBold
+                ? AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  )
+                : AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
           ),
           Text(
             "${amount.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]} ')} FCFA",
-            style: (isLarge ? AppTypography.h3 : (isBold ? AppTypography.bodyLarge : AppTypography.bodyMedium)).copyWith(
-              fontWeight: FontWeight.w700,
-              color: color ?? (isBold ? AppColors.textPrimary : AppColors.textSecondary),
-            ),
+            style:
+                (isLarge
+                        ? AppTypography.h3
+                        : (isBold
+                              ? AppTypography.bodyLarge
+                              : AppTypography.bodyMedium))
+                    .copyWith(
+                      fontWeight: FontWeight.w700,
+                      color:
+                          color ??
+                          (isBold
+                              ? AppColors.textPrimary
+                              : AppColors.textSecondary),
+                    ),
           ),
         ],
       ),
@@ -86,22 +117,35 @@ class PriceSummary extends StatelessWidget {
       onTap: () => onPaymentMethodChanged(value),
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
-          border: Border.all(color: isSelected ? AppColors.primary : AppColors.border, width: isSelected ? 2 : 1),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 2 : 1,
+          ),
           borderRadius: BorderRadius.circular(AppSpacing.md),
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : Colors.transparent,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.05)
+              : Colors.transparent,
         ),
         child: Row(
           children: [
-            Icon(icon, color: isSelected ? AppColors.primary : AppColors.textSecondary),
+            Icon(
+              icon,
+              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+            ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
                 label,
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  color: isSelected ? AppColors.textPrimary : AppColors.textSecondary,
+                  color: isSelected
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
                 ),
               ),
             ),

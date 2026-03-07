@@ -7,8 +7,10 @@ import '../theme/app_spacing.dart';
 class NannyCardShimmer extends StatelessWidget {
   const NannyCardShimmer({super.key});
 
-  BoxDecoration _pill(double radius) =>
-      BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(radius));
+  BoxDecoration _pill(double radius) => BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(radius),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,10 @@ class NannyCardShimmer extends StatelessWidget {
             Container(
               width: 56,
               height: 56,
-              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
             ),
             const SizedBox(width: AppSpacing.md),
 

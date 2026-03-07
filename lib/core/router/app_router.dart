@@ -55,10 +55,11 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   observers: [AppRouterObserver()],
   redirect: (context, state) {
-    final bool isAuthPath = state.uri.path.startsWith('/auth') || 
-                           state.uri.path == '/splash' || 
-                           state.uri.path == '/onboarding';
-    
+    final bool isAuthPath =
+        state.uri.path.startsWith('/auth') ||
+        state.uri.path == '/splash' ||
+        state.uri.path == '/onboarding';
+
     if (!_isAuthenticated && !isAuthPath) {
       return '/onboarding';
     }
@@ -68,7 +69,7 @@ final GoRouter appRouter = GoRouter(
     // --- Public Routes ---
     GoRoute(path: '/', builder: (c, s) => const SplashScreen()),
     GoRoute(path: '/onboarding', builder: (c, s) => const OnboardingScreen()),
-    
+
     // --- Auth Routes ---
     GoRoute(path: '/auth/role', builder: (c, s) => const RoleSelectionScreen()),
     GoRoute(path: '/auth/login', builder: (c, s) => const LoginScreen()),
@@ -77,41 +78,94 @@ final GoRouter appRouter = GoRouter(
 
     // --- Shell View (Bottom Navigation) ---
     StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) => MainShell(navigationShell: navigationShell),
+      builder: (context, state, navigationShell) =>
+          MainShell(navigationShell: navigationShell),
       branches: [
-        StatefulShellBranch(routes: [
-          GoRoute(path: '/home', pageBuilder: (c, s) => _fadeTransition(const HomeScreen())),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(path: '/search', pageBuilder: (c, s) => _fadeTransition(const SearchScreen())),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(path: '/bookings', pageBuilder: (c, s) => _fadeTransition(const BookingsListScreen())),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(path: '/chat', pageBuilder: (c, s) => _fadeTransition(const ConversationsScreen())),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/profile', 
-            pageBuilder: (c, s) {
-              final bool isNanny = _userRole == 'nanny';
-              return _fadeTransition(isNanny ? const NannyDashboardScreen() : const ParentProfileScreen());
-            }
-          ),
-        ]),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/home',
+              pageBuilder: (c, s) => _fadeTransition(const HomeScreen()),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/search',
+              pageBuilder: (c, s) => _fadeTransition(const SearchScreen()),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/bookings',
+              pageBuilder: (c, s) =>
+                  _fadeTransition(const BookingsListScreen()),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/chat',
+              pageBuilder: (c, s) =>
+                  _fadeTransition(const ConversationsScreen()),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/profile',
+              pageBuilder: (c, s) {
+                final bool isNanny = _userRole == 'nanny';
+                return _fadeTransition(
+                  isNanny
+                      ? const NannyDashboardScreen()
+                      : const ParentProfileScreen(),
+                );
+              },
+            ),
+          ],
+        ),
       ],
     ),
 
     // --- Full Screen Routes (Push / Slide) ---
     GoRoute(path: '/search/map', builder: (c, s) => const MapScreen()),
-    GoRoute(path: '/nanny/:id', builder: (c, s) => NannyProfileScreen(nannyId: s.pathParameters['id']!)),
-    GoRoute(path: '/booking/new/:nannyId', builder: (c, s) => BookingScreen(nannyId: s.pathParameters['nannyId']!)),
-    GoRoute(path: '/booking/:id', builder: (c, s) => BookingDetailScreen(bookingId: s.pathParameters['id']!)),
-    GoRoute(path: '/booking/confirmation/:id', builder: (c, s) => BookingConfirmationScreen(bookingId: s.pathParameters['id']!)),
-    GoRoute(path: '/chat/:conversationId', builder: (c, s) => ChatScreen(nannyId: s.pathParameters['conversationId'])),
-    GoRoute(path: '/profile/edit', builder: (c, s) => const EditProfileScreen()),
-    GoRoute(path: '/notifications', builder: (c, s) => const NotificationsScreen()),
+    GoRoute(
+      path: '/nanny/:id',
+      builder: (c, s) => NannyProfileScreen(nannyId: s.pathParameters['id']!),
+    ),
+    GoRoute(
+      path: '/booking/new/:nannyId',
+      builder: (c, s) => BookingScreen(nannyId: s.pathParameters['nannyId']!),
+    ),
+    GoRoute(
+      path: '/booking/:id',
+      builder: (c, s) =>
+          BookingDetailScreen(bookingId: s.pathParameters['id']!),
+    ),
+    GoRoute(
+      path: '/booking/confirmation/:id',
+      builder: (c, s) =>
+          BookingConfirmationScreen(bookingId: s.pathParameters['id']!),
+    ),
+    GoRoute(
+      path: '/chat/:conversationId',
+      builder: (c, s) =>
+          ChatScreen(nannyId: s.pathParameters['conversationId']),
+    ),
+    GoRoute(
+      path: '/profile/edit',
+      builder: (c, s) => const EditProfileScreen(),
+    ),
+    GoRoute(
+      path: '/notifications',
+      builder: (c, s) => const NotificationsScreen(),
+    ),
     GoRoute(path: '/sos', builder: (c, s) => const SosScreen()),
   ],
 );

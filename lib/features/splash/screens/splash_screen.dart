@@ -47,59 +47,65 @@ class _SplashScreenState extends State<SplashScreen> {
             const Spacer(flex: 3),
             // Logo Container
             Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 30,
-                    spreadRadius: 5,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 100,
-                height: 100,
-                color: Colors.white,
-              ),
-            )
-            .animate()
-            .fadeIn(duration: 800.ms)
-            .scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack),
-            
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: 100,
+                    height: 100,
+                    color: Colors.white,
+                  ),
+                )
+                .animate()
+                .fadeIn(duration: 800.ms)
+                .scale(
+                  begin: const Offset(0.8, 0.8),
+                  curve: Curves.easeOutBack,
+                ),
+
             const SizedBox(height: 32),
-            
+
             // App Name
             Column(
-              children: [
-                Text(
-                  'NOUNOU',
-                  style: AppTypography.h1.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 4,
-                  ),
-                ),
-                Text(
-                  'EXPRESS',
-                  style: AppTypography.h3.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontWeight: FontWeight.w300,
-                    letterSpacing: 8,
-                  ),
-                ),
-              ],
-            )
-            .animate()
-            .fadeIn(delay: 400.ms, duration: 800.ms)
-            .slideY(begin: 0.2, end: 0),
+                  children: [
+                    Text(
+                      'NOUNOU',
+                      style: AppTypography.h1.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 4,
+                      ),
+                    ),
+                    Text(
+                      'EXPRESS',
+                      style: AppTypography.h3.copyWith(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 8,
+                      ),
+                    ),
+                  ],
+                )
+                .animate()
+                .fadeIn(delay: 400.ms, duration: 800.ms)
+                .slideY(begin: 0.2, end: 0),
 
             const Spacer(flex: 2),
-            
+
             // Tagline
             Text(
               'Confiance • Sécurité • Proximité',
@@ -107,10 +113,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.white.withValues(alpha: 0.7),
                 letterSpacing: 1.5,
               ),
-            )
-            .animate()
-            .fadeIn(delay: 800.ms, duration: 1.seconds),
-            
+            ).animate().fadeIn(delay: 800.ms, duration: 1.seconds),
+
             const SizedBox(height: 48),
           ],
         ),

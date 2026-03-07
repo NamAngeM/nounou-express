@@ -27,15 +27,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   void _markAllAsRead() {
     setState(() {
-      _notifications = _notifications.map((n) => NotificationModel(
-            id: n.id,
-            userId: n.userId,
-            title: n.title,
-            body: n.body,
-            type: n.type,
-            isRead: true,
-            createdAt: n.createdAt,
-          )).toList();
+      _notifications = _notifications
+          .map(
+            (n) => NotificationModel(
+              id: n.id,
+              userId: n.userId,
+              title: n.title,
+              body: n.body,
+              type: n.type,
+              isRead: true,
+              createdAt: n.createdAt,
+            ),
+          )
+          .toList();
     });
   }
 
@@ -57,7 +61,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     };
 
     for (final n in _notifications) {
-      final date = DateTime(n.createdAt.year, n.createdAt.month, n.createdAt.day);
+      final date = DateTime(
+        n.createdAt.year,
+        n.createdAt.month,
+        n.createdAt.day,
+      );
       if (date == today) {
         groups["Aujourd'hui"]!.add(n);
       } else if (date == yesterday) {
@@ -91,10 +99,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             gradientColors: const [AppColors.primaryDark, AppColors.primary],
             actions: [
               if (_notifications.any((n) => !n.isRead))
-                _HeaderTextAction(
-                  label: 'Tout lire',
-                  onTap: _markAllAsRead,
-                ),
+                _HeaderTextAction(label: 'Tout lire', onTap: _markAllAsRead),
             ],
           ),
 
@@ -106,7 +111,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: _notifications.isEmpty
                   ? SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics()),
+                        parent: BouncingScrollPhysics(),
+                      ),
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height * 0.6,
                         child: _buildEmptyState(),
@@ -122,8 +128,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Widget _buildList(Map<String, List<NotificationModel>> groups) {
     return ListView.builder(
-      physics:
-          const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       itemCount: groups.length,
       itemBuilder: (context, index) {
         final title = groups.keys.elementAt(index);
@@ -133,13 +140,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
+                AppSpacing.lg,
+                AppSpacing.lg,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
               child: Text(
                 title.toUpperCase(),
                 style: AppTypography.caption.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textSecondary,
-                    letterSpacing: 1.2),
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textSecondary,
+                  letterSpacing: 1.2,
+                ),
               ),
             ),
             ...items.asMap().entries.map((e) => _buildTile(e.value, e.key)),
@@ -160,10 +172,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: const Icon(Icons.delete_outline, color: Colors.white),
       ),
       onDismissed: (_) => _deleteNotification(n.id),
-      child: NotificationTile(
-        notification: n,
-        onTap: () => _handleTap(n),
-      )
+      child: NotificationTile(notification: n, onTap: () => _handleTap(n))
           .animate()
           .fadeIn(delay: (index * 80).ms, duration: 350.ms)
           .slideX(begin: 0.08, end: 0),
@@ -197,17 +206,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 color: AppColors.primarySurface,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.notifications_none_rounded,
-                  size: 48, color: AppColors.primary),
+              child: const Icon(
+                Icons.notifications_none_rounded,
+                size: 48,
+                color: AppColors.primary,
+              ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            Text('Aucune notification',
-                style: AppTypography.h2, textAlign: TextAlign.center),
+            Text(
+              'Aucune notification',
+              style: AppTypography.h2,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'C\'est ici que vous recevrez vos mises à jour importantes.',
-              style: AppTypography.bodyMedium
-                  .copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -228,7 +244,9 @@ class _HeaderTextAction extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.18),
           borderRadius: BorderRadius.circular(10),
@@ -236,7 +254,10 @@ class _HeaderTextAction extends StatelessWidget {
         child: const Text(
           'Tout lire',
           style: TextStyle(
-              color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

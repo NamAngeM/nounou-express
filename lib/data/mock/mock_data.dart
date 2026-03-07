@@ -20,7 +20,8 @@ class MockData {
       badges: ["Vérifiée", "Super Nounou"],
       skills: ["Premiers secours", "Cuisine", "Aide aux devoirs"],
       isVerified: true,
-      bio: "Nounou expérimentée avec 5 ans de pratique auprès d'enfants en bas âge.",
+      bio:
+          "Nounou expérimentée avec 5 ans de pratique auprès d'enfants en bas âge.",
       quartier: "Akanda",
     ),
     NannyModel(
@@ -54,7 +55,8 @@ class MockData {
       badges: ["Vérifiée", "Super Nounou"],
       skills: ["Nourrissons", "Cuisine", "Garde de nuit"],
       isVerified: true,
-      bio: "Ancienne puéricultrice, j'accompagne vos enfants avec bienveillance.",
+      bio:
+          "Ancienne puéricultrice, j'accompagne vos enfants avec bienveillance.",
       quartier: "Nzeng-Ayong",
     ),
     NannyModel(
@@ -71,7 +73,8 @@ class MockData {
       badges: ["Disponible"],
       skills: ["Jeux éducatifs", "Soutien scolaire"],
       isVerified: false,
-      bio: "Jeune étudiante dynamique, je propose du soutien scolaire et de la garde d'enfants.",
+      bio:
+          "Jeune étudiante dynamique, je propose du soutien scolaire et de la garde d'enfants.",
       quartier: "Owendo",
     ),
     NannyModel(
@@ -88,7 +91,8 @@ class MockData {
       badges: ["Vérifiée"],
       skills: ["Bilingue", "Animation"],
       isVerified: true,
-      bio: "J'organise des activités ludiques pour stimuler la créativité de vos enfants.",
+      bio:
+          "J'organise des activités ludiques pour stimuler la créativité de vos enfants.",
       quartier: "Glass",
     ),
     NannyModel(
@@ -105,7 +109,8 @@ class MockData {
       badges: ["Vérifiée", "Super Nounou"],
       skills: ["Cuisine", "Hygiène", "Secourisme"],
       isVerified: true,
-      bio: "Maman de 3 enfants, je sais gérer les situations imprévues avec calme.",
+      bio:
+          "Maman de 3 enfants, je sais gérer les situations imprévues avec calme.",
       quartier: "Nombakélé",
     ),
     NannyModel(
@@ -173,13 +178,20 @@ class MockData {
       badges: ["Vérifiée", "Super Nounou"],
       skills: ["Premiers secours", "Soutien scolaire"],
       isVerified: true,
-      bio: "Rigoureuse et ponctuelle, je propose un accompagnement personnalisé.",
+      bio:
+          "Rigoureuse et ponctuelle, je propose un accompagnement personnalisé.",
       quartier: "Nzeng-Ayong",
     ),
   ];
 
   static final List<String> quartiers = [
-    "Akanda", "Angondjé", "Nzeng-Ayong", "Owendo", "Glass", "Nombakélé", "Alibandeng"
+    "Akanda",
+    "Angondjé",
+    "Nzeng-Ayong",
+    "Owendo",
+    "Glass",
+    "Nombakélé",
+    "Alibandeng",
   ];
 
   static final List<ConversationModel> conversations = [
@@ -212,7 +224,9 @@ class MockData {
       otherUserName: "Francine Mba",
       otherUserAvatar: "https://i.pravatar.cc/150?u=n3",
       lastMessage: "Merci pour votre confiance !",
-      lastMessageTime: DateTime.now().subtract(const Duration(days: 1, hours: 3)),
+      lastMessageTime: DateTime.now().subtract(
+        const Duration(days: 1, hours: 3),
+      ),
       unreadCount: 0,
       isLastMessageRead: true,
     ),

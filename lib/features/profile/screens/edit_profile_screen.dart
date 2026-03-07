@@ -20,21 +20,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _phoneController;
   late TextEditingController _bioController;
   late TextEditingController _rateController;
-  
+
   bool _isNanny = false; // This would normally come from an auth provider
 
   @override
   void initState() {
     super.initState();
     // Pre-fill with mock data
-    final user = MockData.nannies.first; // Mocking a nanny for testing dynamic fields
+    final user =
+        MockData.nannies.first; // Mocking a nanny for testing dynamic fields
     _isNanny = user.role == "nanny";
-    
+
     _nameController = TextEditingController(text: user.name);
     _emailController = TextEditingController(text: user.email);
     _phoneController = TextEditingController(text: user.phone);
     _bioController = TextEditingController(text: user.bio);
-    _rateController = TextEditingController(text: user.hourlyRate.toInt().toString());
+    _rateController = TextEditingController(
+      text: user.hourlyRate.toInt().toString(),
+    );
   }
 
   @override
@@ -64,7 +67,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         actions: [
           TextButton(
             onPressed: _saveProfile,
-            child: const Text("Enregistrer", style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              "Enregistrer",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -80,7 +86,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 controller: _nameController,
                 label: "Nom complet",
                 icon: Icons.person_outline,
-                validator: (val) => val == null || val.isEmpty ? "Champ requis" : null,
+                validator: (val) =>
+                    val == null || val.isEmpty ? "Champ requis" : null,
               ),
               const SizedBox(height: AppSpacing.md),
               _buildTextField(
@@ -105,7 +112,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   label: "Tarif horaire (FCFA)",
                   icon: Icons.payments_outlined,
                   keyboardType: TextInputType.number,
-                  validator: (val) => val == null || val.isEmpty ? "Champ requis" : null,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? "Champ requis" : null,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 _buildTextField(
@@ -148,7 +156,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
               ),
-              child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+              child: const Icon(
+                Icons.camera_alt,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
           ),
         ],
@@ -167,7 +179,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,

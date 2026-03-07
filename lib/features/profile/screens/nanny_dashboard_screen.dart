@@ -57,13 +57,12 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Bonjour, Marie 👋",
-          style: AppTypography.h1,
-        ),
+        Text("Bonjour, Marie 👋", style: AppTypography.h1),
         Text(
           "Voici un résumé de votre activité ce mois-ci.",
-          style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
       ],
     );
@@ -73,9 +72,13 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: _isAvailable ? Colors.green.withValues(alpha: 0.1) : AppColors.border.withValues(alpha: 0.3),
+        color: _isAvailable
+            ? Colors.green.withValues(alpha: 0.1)
+            : AppColors.border.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _isAvailable ? Colors.green : AppColors.border),
+        border: Border.all(
+          color: _isAvailable ? Colors.green : AppColors.border,
+        ),
       ),
       child: Row(
         children: [
@@ -89,11 +92,17 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isAvailable ? "Vous êtes disponible" : "Vous êtes indisponible",
-                  style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                  _isAvailable
+                      ? "Vous êtes disponible"
+                      : "Vous êtes indisponible",
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
-                  _isAvailable ? "Les parents peuvent vous réserver." : "Vous ne recevez pas de nouvelles demandes.",
+                  _isAvailable
+                      ? "Les parents peuvent vous réserver."
+                      : "Vous ne recevez pas de nouvelles demandes.",
                   style: AppTypography.caption,
                 ),
               ],
@@ -119,26 +128,41 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
       crossAxisSpacing: AppSpacing.md,
       childAspectRatio: 1.2,
       children: [
-        StatsCard(value: stats["missionsMonth"], label: "Missions / mois", icon: Icons.calendar_today, iconColor: Colors.blue),
-        StatsCard(value: stats["earningsMonth"], label: "Revenus / mois", icon: Icons.payments_outlined, iconColor: Colors.green),
-        StatsCard(value: stats["avgRating"], label: "Note moyenne", icon: Icons.star_border, iconColor: Colors.orange),
-        StatsCard(value: stats["acceptanceRate"], label: "Taux d'acceptation", icon: Icons.check_circle_outline, iconColor: Colors.teal),
+        StatsCard(
+          value: stats["missionsMonth"],
+          label: "Missions / mois",
+          icon: Icons.calendar_today,
+          iconColor: Colors.blue,
+        ),
+        StatsCard(
+          value: stats["earningsMonth"],
+          label: "Revenus / mois",
+          icon: Icons.payments_outlined,
+          iconColor: Colors.green,
+        ),
+        StatsCard(
+          value: stats["avgRating"],
+          label: "Note moyenne",
+          icon: Icons.star_border,
+          iconColor: Colors.orange,
+        ),
+        StatsCard(
+          value: stats["acceptanceRate"],
+          label: "Taux d'acceptation",
+          icon: Icons.check_circle_outline,
+          iconColor: Colors.teal,
+        ),
       ],
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTypography.h3,
-    );
+    return Text(title, style: AppTypography.h3);
   }
 
   Widget _buildUpcomingMissions() {
     final missions = MockData.upcomingMissions;
-    return Column(
-      children: missions.map((m) => _buildMissionCard(m)).toList(),
-    );
+    return Column(children: missions.map((m) => _buildMissionCard(m)).toList());
   }
 
   Widget _buildMissionCard(Map<String, dynamic> mission) {
@@ -157,11 +181,19 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(mission["date"], style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary)),
+              Text(
+                mission["date"],
+                style: AppTypography.caption.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isPending ? Colors.orange.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
+                  color: isPending
+                      ? Colors.orange.withValues(alpha: 0.1)
+                      : Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -175,13 +207,29 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(mission["parentName"], style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            mission["parentName"],
+            style: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textSecondary),
+              const Icon(
+                Icons.location_on_outlined,
+                size: 14,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 4),
-              Expanded(child: Text(mission["address"], style: AppTypography.caption, maxLines: 1, overflow: TextOverflow.ellipsis)),
+              Expanded(
+                child: Text(
+                  mission["address"],
+                  style: AppTypography.caption,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
@@ -191,7 +239,10 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () {},
-                    style: OutlinedButton.styleFrom(foregroundColor: AppColors.danger, side: const BorderSide(color: AppColors.danger)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.danger,
+                      side: const BorderSide(color: AppColors.danger),
+                    ),
                     child: const Text("Refuser"),
                   ),
                 ),
@@ -199,7 +250,9 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
                     child: const Text("Accepter"),
                   ),
                 ),
@@ -220,9 +273,7 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
 
   Widget _buildRecentReviews() {
     final reviews = MockData.recentReviews;
-    return Column(
-      children: reviews.map((r) => _buildReviewCard(r)).toList(),
-    );
+    return Column(children: reviews.map((r) => _buildReviewCard(r)).toList());
   }
 
   Widget _buildReviewCard(Map<String, dynamic> review) {
@@ -240,18 +291,31 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(review["author"], style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                review["author"],
+                style: AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               Row(
-                children: List.generate(5, (index) => Icon(
-                  Icons.star,
-                  size: 14,
-                  color: index < review["rating"] ? Colors.orange : AppColors.border,
-                )),
+                children: List.generate(
+                  5,
+                  (index) => Icon(
+                    Icons.star,
+                    size: 14,
+                    color: index < review["rating"]
+                        ? Colors.orange
+                        : AppColors.border,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          Text(review["date"], style: AppTypography.small.copyWith(color: AppColors.textSecondary)),
+          Text(
+            review["date"],
+            style: AppTypography.small.copyWith(color: AppColors.textSecondary),
+          ),
           const SizedBox(height: AppSpacing.sm),
           Text(review["comment"], style: AppTypography.caption),
         ],

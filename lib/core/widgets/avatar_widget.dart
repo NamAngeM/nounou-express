@@ -32,10 +32,26 @@ class AppAvatar extends StatelessWidget {
   LinearGradient get _avatarGradient {
     final gradients = [
       AppColors.primaryGradientH,
-      const LinearGradient(colors: [Color(0xFF00A896), Color(0xFF00CDB8)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF7C3AED), Color(0xFFA78BFA)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFF1B2B3A), Color(0xFF2D4A6B)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-      const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+      const LinearGradient(
+        colors: [Color(0xFF00A896), Color(0xFF00CDB8)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
+        colors: [Color(0xFF7C3AED), Color(0xFFA78BFA)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
+        colors: [Color(0xFF1B2B3A), Color(0xFF2D4A6B)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
+        colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
     ];
     final index = name.codeUnits.fold(0, (a, b) => a + b) % gradients.length;
     return gradients[index];
@@ -85,10 +101,8 @@ class AppAvatar extends StatelessWidget {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: imageUrl!,
-        imageBuilder: (context, imageProvider) => CircleAvatar(
-          radius: size / 2,
-          backgroundImage: imageProvider,
-        ),
+        imageBuilder: (context, imageProvider) =>
+            CircleAvatar(radius: size / 2, backgroundImage: imageProvider),
         placeholder: (context, url) => _initialsAvatar(),
         errorWidget: (context, url, error) => _initialsAvatar(),
       );

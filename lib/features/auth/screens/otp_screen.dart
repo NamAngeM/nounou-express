@@ -19,8 +19,10 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen>
     with SingleTickerProviderStateMixin {
-  final List<TextEditingController> _controllers =
-      List.generate(4, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(
+    4,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
   int _secondsRemaining = 59;
@@ -35,7 +37,9 @@ class _OtpScreenState extends State<OtpScreen>
     super.initState();
     _startTimer();
     _shakeController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 450));
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
   }
 
   @override
@@ -145,25 +149,30 @@ class _OtpScreenState extends State<OtpScreen>
                           color: AppColors.surfaceVariant,
                           borderRadius: BorderRadius.circular(AppSpacing.md),
                         ),
-                        child: const Icon(Icons.arrow_back_ios_new_rounded,
-                            size: 18, color: AppColors.textPrimary),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 18,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   ).animate().fadeIn(duration: 300.ms),
 
                   const SizedBox(height: AppSpacing.xxl),
 
-                  Text('Vérification', style: AppTypography.h1)
-                      .animate()
-                      .fadeIn(delay: 100.ms)
-                      .slideY(begin: 0.1, end: 0),
+                  Text(
+                    'Vérification',
+                    style: AppTypography.h1,
+                  ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1, end: 0),
 
                   const SizedBox(height: AppSpacing.xs),
 
                   Text(
                     'Entrez le code à 4 chiffres envoyé au\n$_formattedPhone',
-                    style: AppTypography.bodyMedium
-                        .copyWith(color: AppColors.textSecondary, height: 1.5),
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
                   ).animate().fadeIn(delay: 150.ms),
 
                   const SizedBox(height: AppSpacing.xxxl),
@@ -179,12 +188,15 @@ class _OtpScreenState extends State<OtpScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: List.generate(
                         4,
-                        (i) => _OtpBox(
-                          controller: _controllers[i],
-                          focusNode: _focusNodes[i],
-                          hasError: _hasError,
-                          onChanged: (v) => _onDigitChanged(i, v),
-                        ).animate().fadeIn(delay: Duration(milliseconds: 200 + i * 60)),
+                        (i) =>
+                            _OtpBox(
+                              controller: _controllers[i],
+                              focusNode: _focusNodes[i],
+                              hasError: _hasError,
+                              onChanged: (v) => _onDigitChanged(i, v),
+                            ).animate().fadeIn(
+                              delay: Duration(milliseconds: 200 + i * 60),
+                            ),
                       ),
                     ),
                   ),
@@ -196,8 +208,9 @@ class _OtpScreenState extends State<OtpScreen>
                     Center(
                       child: Text(
                         'Code incorrect. Vérifiez et réessayez.',
-                        style: AppTypography.bodySmall
-                            .copyWith(color: AppColors.danger),
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.danger,
+                        ),
                       ),
                     ).animate().fadeIn(duration: 200.ms),
 
@@ -209,8 +222,9 @@ class _OtpScreenState extends State<OtpScreen>
                         ? RichText(
                             text: TextSpan(
                               text: 'Renvoyer le code dans ',
-                              style: AppTypography.bodySmall
-                                  .copyWith(color: AppColors.textSecondary),
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
                               children: [
                                 TextSpan(
                                   text:
@@ -251,7 +265,9 @@ class _OtpScreenState extends State<OtpScreen>
                   Center(
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.sm,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.accentSurface,
                         borderRadius: AppSpacing.chipBorderRadius,
@@ -259,13 +275,17 @@ class _OtpScreenState extends State<OtpScreen>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.info_outline_rounded,
-                              size: 14, color: AppColors.accent),
+                          Icon(
+                            Icons.info_outline_rounded,
+                            size: 14,
+                            color: AppColors.accent,
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             'Mode demo : entrez n\'importe quel code',
-                            style: AppTypography.small
-                                .copyWith(color: AppColors.accentDark),
+                            style: AppTypography.small.copyWith(
+                              color: AppColors.accentDark,
+                            ),
                           ),
                         ],
                       ),
@@ -292,7 +312,12 @@ class _HeroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 56, AppSpacing.xl, AppSpacing.xxxl),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        56,
+        AppSpacing.xl,
+        AppSpacing.xxxl,
+      ),
       decoration: const BoxDecoration(
         gradient: AppColors.heroGradient,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),

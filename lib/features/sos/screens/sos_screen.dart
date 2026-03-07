@@ -13,7 +13,8 @@ class SosScreen extends StatefulWidget {
   State<SosScreen> createState() => _SosScreenState();
 }
 
-class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMixin {
+class _SosScreenState extends State<SosScreen>
+    with SingleTickerProviderStateMixin {
   bool _isSent = false;
   double _progress = 0;
   Timer? _timer;
@@ -68,15 +69,20 @@ class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMix
                   const SizedBox(height: AppSpacing.xl),
                   Text(
                     "URGENCE SOS",
-                    style: AppTypography.h1.copyWith(color: Colors.white, fontSize: 32),
+                    style: AppTypography.h1.copyWith(
+                      color: Colors.white,
+                      fontSize: 32,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    _isSent 
-                      ? "Alerte envoyée !" 
-                      : "Appuyez longuement pour envoyer une alerte",
-                    style: AppTypography.bodyLarge.copyWith(color: Colors.white.withValues(alpha: 0.9)),
+                    _isSent
+                        ? "Alerte envoyée !"
+                        : "Appuyez longuement pour envoyer une alerte",
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.xl * 2),
@@ -109,9 +115,14 @@ class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMix
 
   Widget _buildPulseIcon() {
     return const Icon(Icons.security, color: Colors.white, size: 80)
-      .animate(onPlay: (controller) => controller.repeat())
-      .scale(duration: 1.2.seconds, begin: const Offset(1, 1), end: const Offset(1.2, 1.2), curve: Curves.easeInOut)
-      .fadeOut(duration: 1.2.seconds, curve: Curves.easeInOut);
+        .animate(onPlay: (controller) => controller.repeat())
+        .scale(
+          duration: 1.2.seconds,
+          begin: const Offset(1, 1),
+          end: const Offset(1.2, 1.2),
+          curve: Curves.easeInOut,
+        )
+        .fadeOut(duration: 1.2.seconds, curve: Curves.easeInOut);
   }
 
   Widget _buildSosButton() {
@@ -127,7 +138,10 @@ class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMix
             height: 160,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 8),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.3),
+                width: 8,
+              ),
             ),
           ),
           // Progress indicator
@@ -149,7 +163,11 @@ class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMix
               color: Colors.white,
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(color: Colors.black26, blurRadius: 20, spreadRadius: 5),
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 20,
+                  spreadRadius: 5,
+                ),
               ],
             ),
             child: Icon(
@@ -158,10 +176,7 @@ class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMix
               size: 60,
             ),
           ),
-          if (_isSent)
-            const Positioned.fill(
-              child: OndeAnimation(),
-            ),
+          if (_isSent) const Positioned.fill(child: OndeAnimation()),
         ],
       ),
     );
@@ -172,7 +187,10 @@ class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMix
       children: [
         Text(
           "Les parents et les secours ont été prévenus",
-          style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+          style: AppTypography.caption.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -184,7 +202,9 @@ class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMix
             backgroundColor: Colors.white,
             foregroundColor: const Color(0xFFE63946),
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            textStyle: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+            textStyle: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -196,7 +216,9 @@ class _SosScreenState extends State<SosScreen> with SingleTickerProviderStateMix
       padding: const EdgeInsets.only(bottom: AppSpacing.lg),
       child: Text(
         "Cette fonctionnalité est réservée aux situations d'urgence",
-        style: AppTypography.small.copyWith(color: Colors.white.withValues(alpha: 0.7)),
+        style: AppTypography.small.copyWith(
+          color: Colors.white.withValues(alpha: 0.7),
+        ),
         textAlign: TextAlign.center,
       ),
     );
@@ -209,12 +231,18 @@ class OndeAnimation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
-      ),
-    ).animate(onPlay: (controller) => controller.repeat())
-     .scale(duration: 2.seconds, begin: const Offset(1, 1), end: const Offset(2.5, 2.5), curve: Curves.easeOut)
-     .fadeOut(duration: 2.seconds);
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+        )
+        .animate(onPlay: (controller) => controller.repeat())
+        .scale(
+          duration: 2.seconds,
+          begin: const Offset(1, 1),
+          end: const Offset(2.5, 2.5),
+          curve: Curves.easeOut,
+        )
+        .fadeOut(duration: 2.seconds);
   }
 }

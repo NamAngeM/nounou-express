@@ -92,17 +92,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onTap: () => context.go('/auth/role'),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.18),
                       borderRadius: AppSpacing.chipBorderRadius,
                       border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.25)),
+                        color: Colors.white.withValues(alpha: 0.25),
+                      ),
                     ),
                     child: Text(
                       'Passer',
-                      style: AppTypography.labelMd
-                          .copyWith(color: Colors.white, letterSpacing: 0.3),
+                      style: AppTypography.labelMd.copyWith(
+                        color: Colors.white,
+                        letterSpacing: 0.3,
+                      ),
                     ),
                   ),
                 ),
@@ -160,7 +165,11 @@ class _OnboardingPage extends StatelessWidget {
               ),
             ),
             child: const Center(
-              child: Icon(Icons.child_care_rounded, size: 100, color: Colors.white30),
+              child: Icon(
+                Icons.child_care_rounded,
+                size: 100,
+                color: Colors.white30,
+              ),
             ),
           ),
         ),
@@ -218,54 +227,60 @@ class _BottomControls extends StatelessWidget {
         children: [
           // Tag pill
           Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md, vertical: 5),
-            decoration: BoxDecoration(
-              color: data.gradientColors.last.withValues(alpha: 0.85),
-              borderRadius: AppSpacing.chipBorderRadius,
-            ),
-            child: Text(
-              data.tag,
-              style: AppTypography.overline.copyWith(
-                color: Colors.white,
-                letterSpacing: 1.5,
-                fontSize: 10,
-              ),
-            ),
-          ).animate(key: ValueKey('tag_$currentPage'))
-           .fadeIn(duration: 400.ms).slideY(begin: 0.15, end: 0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: data.gradientColors.last.withValues(alpha: 0.85),
+                  borderRadius: AppSpacing.chipBorderRadius,
+                ),
+                child: Text(
+                  data.tag,
+                  style: AppTypography.overline.copyWith(
+                    color: Colors.white,
+                    letterSpacing: 1.5,
+                    fontSize: 10,
+                  ),
+                ),
+              )
+              .animate(key: ValueKey('tag_$currentPage'))
+              .fadeIn(duration: 400.ms)
+              .slideY(begin: 0.15, end: 0),
 
           const SizedBox(height: AppSpacing.md),
 
           // Title
           Text(
-            data.title,
-            style: AppTypography.h1.copyWith(
-              color: Colors.white,
-              fontSize: 34,
-              height: 1.15,
-              shadows: [
-                Shadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 8,
+                data.title,
+                style: AppTypography.h1.copyWith(
+                  color: Colors.white,
+                  fontSize: 34,
+                  height: 1.15,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ).animate(key: ValueKey('title_$currentPage'))
-           .fadeIn(delay: 100.ms, duration: 400.ms)
-           .slideY(begin: 0.1, end: 0),
+              )
+              .animate(key: ValueKey('title_$currentPage'))
+              .fadeIn(delay: 100.ms, duration: 400.ms)
+              .slideY(begin: 0.1, end: 0),
 
           const SizedBox(height: AppSpacing.md),
 
           // Description
           Text(
-            data.description,
-            style: AppTypography.bodyMedium.copyWith(
-              color: Colors.white.withValues(alpha: 0.80),
-              height: 1.6,
-            ),
-          ).animate(key: ValueKey('desc_$currentPage'))
-           .fadeIn(delay: 200.ms, duration: 400.ms),
+                data.description,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: Colors.white.withValues(alpha: 0.80),
+                  height: 1.6,
+                ),
+              )
+              .animate(key: ValueKey('desc_$currentPage'))
+              .fadeIn(delay: 200.ms, duration: 400.ms),
 
           const SizedBox(height: AppSpacing.xxxl),
 
@@ -323,11 +338,16 @@ class _BottomControls extends StatelessWidget {
                     child: isLast
                         ? Text(
                             'Commencer',
-                            style: AppTypography.buttonLabel
-                                .copyWith(fontSize: 15, color: Colors.white),
+                            style: AppTypography.buttonLabel.copyWith(
+                              fontSize: 15,
+                              color: Colors.white,
+                            ),
                           )
-                        : const Icon(Icons.arrow_forward_rounded,
-                            color: Colors.white, size: 22),
+                        : const Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 22,
+                          ),
                   ),
                 ),
               ),

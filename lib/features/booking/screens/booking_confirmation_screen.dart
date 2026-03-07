@@ -15,7 +15,8 @@ class BookingConfirmationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // We expect the booking details to be passed in the extra
-    final Map<String, dynamic> extra = GoRouterState.of(context).extra as Map<String, dynamic>;
+    final Map<String, dynamic> extra =
+        GoRouterState.of(context).extra as Map<String, dynamic>;
     final NannyModel nanny = extra['nanny'] as NannyModel;
     final DateTime date = extra['date'] as DateTime;
     final TimeOfDay startTime = extra['startTime'] as TimeOfDay;
@@ -32,42 +33,49 @@ class BookingConfirmationScreen extends StatelessWidget {
               const Spacer(),
               // Success Animation
               const Icon(
-                Icons.check_circle_rounded,
-                size: 100,
-                color: Color(0xFF4ECDC4), // Turquoise color from user requirement
-              ).animate()
-               .scale(duration: 600.ms, curve: Curves.elasticOut)
-               .fadeIn(duration: 400.ms),
-              
+                    Icons.check_circle_rounded,
+                    size: 100,
+                    color: Color(
+                      0xFF4ECDC4,
+                    ), // Turquoise color from user requirement
+                  )
+                  .animate()
+                  .scale(duration: 600.ms, curve: Curves.elasticOut)
+                  .fadeIn(duration: 400.ms),
+
               const SizedBox(height: AppSpacing.xl),
-              
+
               Text(
                 "Réservation confirmée ! 🎉",
                 style: AppTypography.h2,
                 textAlign: TextAlign.center,
               ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
-              
+
               const SizedBox(height: AppSpacing.md),
-              
+
               Text(
                 "${nanny.name} a été notifiée",
-                style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary),
+                style: AppTypography.bodyLarge.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ).animate().fadeIn(delay: 400.ms),
-              
+
               const SizedBox(height: AppSpacing.xl * 2),
-              
+
               _buildRecapCard(context, date, startTime, endTime, address),
-              
+
               const SizedBox(height: AppSpacing.lg),
-              
+
               Text(
                 "Numéro de réservation : #$bookingId",
-                style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600),
+                style: AppTypography.caption.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              
+
               const Spacer(),
-              
+
               Column(
                 children: [
                   OutlinedButton(
@@ -81,11 +89,13 @@ class BookingConfirmationScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: AppSpacing.xl),
               Text(
                 "Vous recevrez une notification quand la nounou confirmera",
-                style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -95,7 +105,13 @@ class BookingConfirmationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecapCard(BuildContext context, DateTime date, TimeOfDay startTime, TimeOfDay endTime, String address) {
+  Widget _buildRecapCard(
+    BuildContext context,
+    DateTime date,
+    TimeOfDay startTime,
+    TimeOfDay endTime,
+    String address,
+  ) {
     return Card(
       elevation: 0,
       color: AppColors.surface,
@@ -107,9 +123,15 @@ class BookingConfirmationScreen extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           children: [
-            _buildRecapItem(Icons.calendar_today, DateFormat('EEEE d MMMM y', 'fr_FR').format(date)),
+            _buildRecapItem(
+              Icons.calendar_today,
+              DateFormat('EEEE d MMMM y', 'fr_FR').format(date),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            _buildRecapItem(Icons.access_time, "${startTime.format(context)} → ${endTime.format(context)}"),
+            _buildRecapItem(
+              Icons.access_time,
+              "${startTime.format(context)} → ${endTime.format(context)}",
+            ),
             const SizedBox(height: AppSpacing.sm),
             _buildRecapItem(Icons.location_on_outlined, address),
           ],
@@ -126,7 +148,9 @@ class BookingConfirmationScreen extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
+            style: AppTypography.bodyMedium.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

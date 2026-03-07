@@ -10,8 +10,16 @@ import '../../../data/mock/mock_data.dart';
 import '../../../data/models/nanny_model.dart';
 
 const _mockQuartiers = [
-  'Akanda', 'Angondjé', 'Nzeng-Ayong', 'Owendo', 'Glass',
-  'Nombakélé', 'Alibandeng', 'PK8', 'Louis', 'Batterie IV',
+  'Akanda',
+  'Angondjé',
+  'Nzeng-Ayong',
+  'Owendo',
+  'Glass',
+  'Nombakélé',
+  'Alibandeng',
+  'PK8',
+  'Louis',
+  'Batterie IV',
 ];
 
 const _mockDistances = [1.2, 0.8, 2.5, 1.9, 3.1, 0.5, 4.2, 2.1, 1.7, 3.8];
@@ -36,7 +44,9 @@ class MapScreen extends StatelessWidget {
                 children: [
                   // Back / Liste button
                   GestureDetector(
-                    onTap: () => context.canPop() ? context.pop() : context.go('/search'),
+                    onTap: () => context.canPop()
+                        ? context.pop()
+                        : context.go('/search'),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.lg,
@@ -44,7 +54,9 @@ class MapScreen extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(AppSpacing.badgeRadius),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.badgeRadius,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.secondary.withValues(alpha: 0.12),
@@ -56,11 +68,17 @@ class MapScreen extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.list_rounded, size: 18, color: AppColors.textPrimary),
+                          const Icon(
+                            Icons.list_rounded,
+                            size: 18,
+                            color: AppColors.textPrimary,
+                          ),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             'Liste',
-                            style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                            style: AppTypography.bodyMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
@@ -75,7 +93,9 @@ class MapScreen extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(AppSpacing.badgeRadius),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.badgeRadius,
+                      ),
                     ),
                     child: Text(
                       '${MockData.nannies.length} nounous',
@@ -114,7 +134,10 @@ class MapScreen extends StatelessWidget {
                   children: [
                     // Handle
                     Padding(
-                      padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.sm),
+                      padding: const EdgeInsets.only(
+                        top: AppSpacing.md,
+                        bottom: AppSpacing.sm,
+                      ),
                       child: Center(
                         child: Container(
                           width: 40,
@@ -128,13 +151,17 @@ class MapScreen extends StatelessWidget {
                     ),
                     // Header
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                      ),
                       child: Row(
                         children: [
                           Text('Nounous à proximité', style: AppTypography.h3),
                           const Spacer(),
-                          const Icon(Icons.keyboard_arrow_up_rounded,
-                              color: AppColors.textSecondary),
+                          const Icon(
+                            Icons.keyboard_arrow_up_rounded,
+                            color: AppColors.textSecondary,
+                          ),
                         ],
                       ),
                     ),
@@ -150,11 +177,20 @@ class MapScreen extends StatelessWidget {
                           AppSpacing.xxxl,
                         ),
                         itemCount: MockData.nannies.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
+                        separatorBuilder: (_, _) =>
+                            const SizedBox(height: AppSpacing.sm),
                         itemBuilder: (context, index) {
                           final n = MockData.nannies[index];
-                          final quartier = _mockQuartiers[index.clamp(0, _mockQuartiers.length - 1)];
-                          final distance = _mockDistances[index.clamp(0, _mockDistances.length - 1)];
+                          final quartier =
+                              _mockQuartiers[index.clamp(
+                                0,
+                                _mockQuartiers.length - 1,
+                              )];
+                          final distance =
+                              _mockDistances[index.clamp(
+                                0,
+                                _mockDistances.length - 1,
+                              )];
                           return _NannyMapCard(
                             nanny: n,
                             quartier: quartier,
@@ -185,10 +221,7 @@ class _MapPlaceholder extends StatelessWidget {
       child: Stack(
         children: [
           // Grid lines to suggest a map
-          CustomPaint(
-            size: Size.infinite,
-            painter: _GridPainter(),
-          ),
+          CustomPaint(size: Size.infinite, painter: _GridPainter()),
           // Center icon + text
           Center(
             child: Column(
@@ -207,17 +240,25 @@ class _MapPlaceholder extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.map_rounded, size: 40, color: AppColors.primary),
+                  child: const Icon(
+                    Icons.map_rounded,
+                    size: 40,
+                    color: AppColors.primary,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
                   'Vue carte',
-                  style: AppTypography.h3.copyWith(color: AppColors.textSecondary),
+                  style: AppTypography.h3.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   'Bientôt disponible',
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -361,14 +402,20 @@ class _NannyMapCard extends StatelessWidget {
                 children: [
                   Text(
                     nanny.name,
-                    style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 12, color: AppColors.textSecondary),
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 12,
+                        color: AppColors.textSecondary,
+                      ),
                       const SizedBox(width: 2),
                       Text(
                         '$quartier · ${distance.toStringAsFixed(1)} km',
@@ -392,10 +439,17 @@ class _NannyMapCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Text('FCFA/h', style: AppTypography.small.copyWith(color: AppColors.primary)),
+                Text(
+                  'FCFA/h',
+                  style: AppTypography.small.copyWith(color: AppColors.primary),
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 if (nanny.isVerified)
-                  const Icon(Icons.verified_rounded, size: 16, color: AppColors.accent),
+                  const Icon(
+                    Icons.verified_rounded,
+                    size: 16,
+                    color: AppColors.accent,
+                  ),
               ],
             ),
           ],

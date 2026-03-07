@@ -7,11 +7,7 @@ class PhoneInput extends StatefulWidget {
   final TextEditingController controller;
   final ValueChanged<String>? onChanged;
 
-  const PhoneInput({
-    super.key,
-    required this.controller,
-    this.onChanged,
-  });
+  const PhoneInput({super.key, required this.controller, this.onChanged});
 
   @override
   State<PhoneInput> createState() => _PhoneInputState();
@@ -40,9 +36,7 @@ class _PhoneInputState extends State<PhoneInput> {
             color: Colors.grey.shade50,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: hasError
-                  ? AppColors.danger
-                  : AppColors.border,
+              color: hasError ? AppColors.danger : AppColors.border,
               width: hasError ? 2 : 1,
             ),
             boxShadow: hasError ? [] : AppColors.cardShadow,
@@ -65,13 +59,16 @@ class _PhoneInputState extends State<PhoneInput> {
                     Text(
                       '+241',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                     const SizedBox(width: 4),
-                    Icon(Icons.arrow_drop_down_rounded,
-                        color: AppColors.textSecondary, size: 18),
+                    Icon(
+                      Icons.arrow_drop_down_rounded,
+                      color: AppColors.textSecondary,
+                      size: 18,
+                    ),
                   ],
                 ),
               ),
@@ -94,8 +91,7 @@ class _PhoneInputState extends State<PhoneInput> {
                   ),
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     hintText: '066 85 18 18',
                     hintStyle: TextStyle(
                       color: Colors.grey.shade400,
@@ -107,7 +103,8 @@ class _PhoneInputState extends State<PhoneInput> {
                 ),
               ),
               // Valid indicator
-              if (!hasError && widget.controller.text.replaceAll(' ', '').length == 9)
+              if (!hasError &&
+                  widget.controller.text.replaceAll(' ', '').length == 9)
                 Padding(
                   padding: const EdgeInsets.only(right: 16),
                   child: Container(
@@ -117,8 +114,11 @@ class _PhoneInputState extends State<PhoneInput> {
                       color: AppColors.success,
                       shape: BoxShape.circle,
                     ),
-                    child:
-                        const Icon(Icons.check, color: Colors.white, size: 14),
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 14,
+                    ),
                   ),
                 ),
             ],

@@ -43,11 +43,19 @@ class _BottomNavBar extends StatelessWidget {
   const _BottomNavBar({required this.currentIndex, required this.onTap});
 
   static const _items = [
-    _NavItem(Icons.home_outlined,     Icons.home_rounded,          'Accueil'),
-    _NavItem(Icons.search_outlined,   Icons.search_rounded,         'Recherche'),
-    _NavItem(Icons.event_note_outlined, Icons.event_note_rounded,   'Réservations'),
-    _NavItem(Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded, 'Messages'),
-    _NavItem(Icons.person_outline_rounded, Icons.person_rounded,    'Profil'),
+    _NavItem(Icons.home_outlined, Icons.home_rounded, 'Accueil'),
+    _NavItem(Icons.search_outlined, Icons.search_rounded, 'Recherche'),
+    _NavItem(
+      Icons.event_note_outlined,
+      Icons.event_note_rounded,
+      'Réservations',
+    ),
+    _NavItem(
+      Icons.chat_bubble_outline_rounded,
+      Icons.chat_bubble_rounded,
+      'Messages',
+    ),
+    _NavItem(Icons.person_outline_rounded, Icons.person_rounded, 'Profil'),
   ];
 
   @override
@@ -55,7 +63,9 @@ class _BottomNavBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        border: const Border(top: BorderSide(color: AppColors.border, width: 0.8)),
+        border: const Border(
+          top: BorderSide(color: AppColors.border, width: 0.8),
+        ),
         boxShadow: [
           BoxShadow(
             color: AppColors.secondary.withValues(alpha: 0.06),
@@ -88,9 +98,14 @@ class _BottomNavBar extends StatelessWidget {
                         // Icon with indicator pill
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.primarySurface : Colors.transparent,
+                            color: isSelected
+                                ? AppColors.primarySurface
+                                : Colors.transparent,
                             borderRadius: AppSpacing.chipBorderRadius,
                           ),
                           child: Stack(
@@ -98,7 +113,9 @@ class _BottomNavBar extends StatelessWidget {
                             children: [
                               Icon(
                                 isSelected ? item.selectedIcon : item.icon,
-                                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
                                 size: 22,
                               ),
                               if (hasBadge && !isSelected)
@@ -123,8 +140,12 @@ class _BottomNavBar extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 10,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                            color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w400,
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.textSecondary,
                           ),
                           child: Text(item.label),
                         ),

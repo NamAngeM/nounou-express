@@ -42,15 +42,12 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
           // ── Styled header ────────────────────────────────────────────────
           AppPageHeader(
             title: 'Messages',
-            subtitle: unread > 0 ? '$unread non lu${unread > 1 ? 's' : ''}' : 'Toutes vos conversations',
+            subtitle: unread > 0
+                ? '$unread non lu${unread > 1 ? 's' : ''}'
+                : 'Toutes vos conversations',
             icon: Icons.chat_bubble_rounded,
             gradientColors: const [Color(0xFF006D62), AppColors.accent],
-            actions: [
-              _HeaderAction(
-                icon: Icons.edit_rounded,
-                onTap: () {},
-              ),
-            ],
+            actions: [_HeaderAction(icon: Icons.edit_rounded, onTap: () {})],
           ),
 
           // ── Content ──────────────────────────────────────────────────────
@@ -61,7 +58,8 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
               child: _conversations.isEmpty
                   ? SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics()),
+                        parent: BouncingScrollPhysics(),
+                      ),
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height * 0.6,
                         child: _buildEmptyState(context),
@@ -77,8 +75,9 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
 
   Widget _buildConversationsList() {
     return ListView.separated(
-      physics:
-          const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       itemCount: _conversations.length,
       separatorBuilder: (context, index) => Divider(
         height: 1,
@@ -89,10 +88,10 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
       itemBuilder: (context, index) {
         final conversation = _conversations[index];
         return ConversationTile(
-          conversation: conversation,
-          onDelete: () => _removeConversation(conversation.id),
-          onArchive: () => _removeConversation(conversation.id),
-        )
+              conversation: conversation,
+              onDelete: () => _removeConversation(conversation.id),
+              onArchive: () => _removeConversation(conversation.id),
+            )
             .animate()
             .fadeIn(delay: (index * 80).ms, duration: 350.ms)
             .slideX(begin: 0.08, end: 0);
@@ -114,17 +113,24 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                 color: AppColors.accentSurface,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.chat_bubble_outline_rounded,
-                  size: 48, color: AppColors.accent),
+              child: const Icon(
+                Icons.chat_bubble_outline_rounded,
+                size: 48,
+                color: AppColors.accent,
+              ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            Text('Aucune conversation', style: AppTypography.h2,
-                textAlign: TextAlign.center),
+            Text(
+              'Aucune conversation',
+              style: AppTypography.h2,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Réservez une nounou pour commencer à discuter',
-              style: AppTypography.bodyMedium
-                  .copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xxxl),

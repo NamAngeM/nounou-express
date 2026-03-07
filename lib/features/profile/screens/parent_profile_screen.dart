@@ -38,8 +38,11 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                     color: Colors.white.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.edit_rounded,
-                      size: 18, color: Colors.white),
+                  child: const Icon(
+                    Icons.edit_rounded,
+                    size: 18,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],
@@ -88,20 +91,23 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                  child: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               ),
             ),
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        Text(
-          "Alice Mengome",
-          style: AppTypography.h2,
-        ),
+        Text("Alice Mengome", style: AppTypography.h2),
         Text(
           "alice.mengome@gmail.com",
-          style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
       ],
     );
@@ -112,24 +118,15 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     return Row(
       children: [
         Expanded(
-          child: StatsCard(
-            value: stats["bookings"],
-            label: "Réservations",
-          ),
+          child: StatsCard(value: stats["bookings"], label: "Réservations"),
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
-          child: StatsCard(
-            value: stats["avgRating"],
-            label: "Note donnée",
-          ),
+          child: StatsCard(value: stats["avgRating"], label: "Note donnée"),
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
-          child: StatsCard(
-            value: stats["favorites"],
-            label: "Favorites",
-          ),
+          child: StatsCard(value: stats["favorites"], label: "Favorites"),
         ),
       ],
     );
@@ -138,28 +135,67 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
   Widget _buildMenuSection() {
     return Column(
       children: [
-        _buildMenuItem(Icons.person_outline, "Modifier mon profil", Colors.blue, 
-          onTap: () => context.push('/profile/edit')),
+        _buildMenuItem(
+          Icons.person_outline,
+          "Modifier mon profil",
+          Colors.blue,
+          onTap: () => context.push('/profile/edit'),
+        ),
         _buildMenuItem(Icons.child_care, "Mes enfants", Colors.orange),
-        _buildMenuItem(Icons.calendar_today, "Mes réservations", Colors.green,
-          onTap: () => context.go('/bookings')),
+        _buildMenuItem(
+          Icons.calendar_today,
+          "Mes réservations",
+          Colors.green,
+          onTap: () => context.go('/bookings'),
+        ),
         _buildMenuItem(Icons.favorite_border, "Mes favorites", Colors.red),
         _buildMenuItem(Icons.credit_card, "Paiements", Colors.teal),
-        _buildMenuItem(Icons.notifications_none, "Notifications", Colors.purple),
-        _buildMenuSwitch(Icons.dark_mode_outlined, "Mode sombre", Colors.indigo, _isDarkMode, (val) {
-          setState(() => _isDarkMode = val);
-        }),
-        _buildMenuItem(Icons.language, "Langue", Colors.blueGrey, trailingText: "Français"),
+        _buildMenuItem(
+          Icons.notifications_none,
+          "Notifications",
+          Colors.purple,
+        ),
+        _buildMenuSwitch(
+          Icons.dark_mode_outlined,
+          "Mode sombre",
+          Colors.indigo,
+          _isDarkMode,
+          (val) {
+            setState(() => _isDarkMode = val);
+          },
+        ),
+        _buildMenuItem(
+          Icons.language,
+          "Langue",
+          Colors.blueGrey,
+          trailingText: "Français",
+        ),
         _buildMenuItem(Icons.help_outline, "Aide & FAQ", Colors.amber),
-        _buildMenuItem(Icons.description_outlined, "Conditions d'utilisation", Colors.grey),
+        _buildMenuItem(
+          Icons.description_outlined,
+          "Conditions d'utilisation",
+          Colors.grey,
+        ),
         const SizedBox(height: AppSpacing.md),
-        _buildMenuItem(Icons.logout, "Déconnexion", AppColors.danger, isDestructive: true, 
-          onTap: () => context.go('/auth/login')),
+        _buildMenuItem(
+          Icons.logout,
+          "Déconnexion",
+          AppColors.danger,
+          isDestructive: true,
+          onTap: () => context.go('/auth/login'),
+        ),
       ],
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String label, Color color, {VoidCallback? onTap, String? trailingText, bool isDestructive = false}) {
+  Widget _buildMenuItem(
+    IconData icon,
+    String label,
+    Color color, {
+    VoidCallback? onTap,
+    String? trailingText,
+    bool isDestructive = false,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
@@ -184,20 +220,34 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
             fontWeight: isDestructive ? FontWeight.w600 : FontWeight.w500,
           ),
         ),
-        trailing: trailingText != null 
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(trailingText, style: AppTypography.caption),
-                const Icon(Icons.chevron_right, size: 20, color: AppColors.textSecondary),
-              ],
-            )
-          : const Icon(Icons.chevron_right, size: 20, color: AppColors.textSecondary),
+        trailing: trailingText != null
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(trailingText, style: AppTypography.caption),
+                  const Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: AppColors.textSecondary,
+                  ),
+                ],
+              )
+            : const Icon(
+                Icons.chevron_right,
+                size: 20,
+                color: AppColors.textSecondary,
+              ),
       ),
     );
   }
 
-  Widget _buildMenuSwitch(IconData icon, String label, Color color, bool value, ValueChanged<bool> onChanged) {
+  Widget _buildMenuSwitch(
+    IconData icon,
+    String label,
+    Color color,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(

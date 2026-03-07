@@ -44,7 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: AppSpacing.cardBorderRadius),
+          shape: RoundedRectangleBorder(
+            borderRadius: AppSpacing.cardBorderRadius,
+          ),
           margin: const EdgeInsets.all(AppSpacing.lg),
         ),
       );
@@ -81,8 +83,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: AppColors.surfaceVariant,
                           borderRadius: BorderRadius.circular(AppSpacing.md),
                         ),
-                        child: const Icon(Icons.arrow_back_ios_new_rounded,
-                            size: 18, color: AppColors.textPrimary),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 18,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   ).animate().fadeIn(duration: 300.ms),
@@ -98,14 +103,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   Text(
                     'Entrez votre numéro de téléphone\npour recevoir un code de vérification.',
-                    style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ).animate().fadeIn(delay: 150.ms),
 
                   const SizedBox(height: AppSpacing.xxxl),
 
                   // Phone input
-                  PhoneInput(controller: _phoneController)
-                      .animate().fadeIn(delay: 200.ms).slideY(begin: 0.07, end: 0),
+                  PhoneInput(
+                    controller: _phoneController,
+                  ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.07, end: 0),
 
                   const SizedBox(height: AppSpacing.xxl),
 
@@ -123,7 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Expanded(child: Divider(color: AppColors.border)),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
                         child: Text('ou', style: AppTypography.caption),
                       ),
                       Expanded(child: Divider(color: AppColors.border)),
@@ -133,19 +143,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: AppSpacing.xl),
 
                   // Google button
-                  _GoogleButton()
-                      .animate().fadeIn(delay: 340.ms),
+                  _GoogleButton().animate().fadeIn(delay: 340.ms),
 
                   const SizedBox(height: AppSpacing.xxxl),
 
                   // Register link
                   Center(
                     child: GestureDetector(
-                      onTap: () => context.push('/auth/register?role=${role ?? ''}'),
+                      onTap: () =>
+                          context.push('/auth/register?role=${role ?? ''}'),
                       child: RichText(
                         text: TextSpan(
                           text: 'Pas encore inscrit ? ',
-                          style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                           children: [
                             TextSpan(
                               text: "S'inscrire",
@@ -165,7 +177,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Center(
                     child: Text(
                       "En continuant, vous acceptez nos Conditions d'utilisation",
-                      style: AppTypography.small.copyWith(color: AppColors.textTertiary),
+                      style: AppTypography.small.copyWith(
+                        color: AppColors.textTertiary,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ).animate().fadeIn(delay: 400.ms),
@@ -190,7 +204,12 @@ class _TopSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 56, AppSpacing.xl, AppSpacing.xxxl),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        56,
+        AppSpacing.xl,
+        AppSpacing.xxxl,
+      ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.secondary, AppColors.secondaryLight],
@@ -208,7 +227,11 @@ class _TopSection extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.child_care_rounded, size: 36, color: Colors.white),
+            child: const Icon(
+              Icons.child_care_rounded,
+              size: 36,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
@@ -217,7 +240,10 @@ class _TopSection extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xs),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 4,
+            ),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.25),
               borderRadius: AppSpacing.chipBorderRadius,
@@ -260,7 +286,11 @@ class _GoogleButton extends StatelessWidget {
                 color: const Color(0xFF4285F4),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Icon(Icons.g_mobiledata, color: Colors.white, size: 20),
+              child: const Icon(
+                Icons.g_mobiledata,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
             const SizedBox(width: AppSpacing.md),
             Text(

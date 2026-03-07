@@ -11,5 +11,22 @@ class NannyModel extends UserModel {
   final String bio;
   final String quartier;
 
-  NannyModel({required super.id, required super.name, required super.email, required super.phone, required super.role, super.avatar, required super.createdAt, required this.experience, required this.hourlyRate, required this.rating, required this.totalMissions, required this.badges, required this.skills, required this.isVerified, required this.bio, this.quartier = ''});
+  NannyModel({
+    required super.id,
+    required super.name,
+    required super.email,
+    required super.phone,
+    required super.role,
+    super.avatar,
+    required super.createdAt,
+    required this.experience,
+    required this.hourlyRate,
+    required this.rating,
+    required this.totalMissions,
+    required this.badges,
+    required this.skills,
+    required this.isVerified,
+    required this.bio,
+    this.quartier = '',
+  });
 }

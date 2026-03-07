@@ -60,7 +60,9 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
           children: [
             Text(
               "Nombre d'enfants",
-              style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+              style: AppTypography.bodyLarge.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Row(
               children: [
@@ -69,11 +71,10 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
                   onPressed: _count > 1 ? () => _updateCount(_count - 1) : null,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  child: Text(
-                    "$_count",
-                    style: AppTypography.h3,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
                   ),
+                  child: Text("$_count", style: AppTypography.h3),
                 ),
                 _buildCounterButton(
                   icon: Icons.add,
@@ -89,14 +90,24 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
     );
   }
 
-  Widget _buildCounterButton({required IconData icon, VoidCallback? onPressed}) {
+  Widget _buildCounterButton({
+    required IconData icon,
+    VoidCallback? onPressed,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: onPressed == null ? AppColors.border.withValues(alpha: 0.5) : AppColors.primary.withValues(alpha: 0.1),
+        color: onPressed == null
+            ? AppColors.border.withValues(alpha: 0.5)
+            : AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.sm),
       ),
       child: IconButton(
-        icon: Icon(icon, color: onPressed == null ? AppColors.textSecondary : AppColors.primary),
+        icon: Icon(
+          icon,
+          color: onPressed == null
+              ? AppColors.textSecondary
+              : AppColors.primary,
+        ),
         onPressed: onPressed,
         constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
         padding: EdgeInsets.zero,
@@ -121,7 +132,10 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
             child: DropdownButtonFormField<int>(
               initialValue: _ages[index],
               decoration: const InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 0),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: 0,
+                ),
               ),
               items: List.generate(13, (i) => i).map((age) {
                 return DropdownMenuItem<int>(

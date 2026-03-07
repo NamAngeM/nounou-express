@@ -84,8 +84,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                           borderRadius: BorderRadius.circular(AppSpacing.md),
                           boxShadow: AppColors.cardShadow,
                         ),
-                        child: const Icon(Icons.arrow_back_ios_new_rounded,
-                            size: 18, color: AppColors.textPrimary),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 18,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   ),
@@ -94,17 +97,27 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
 
                   // App logo
                   Center(
-                    child: Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        gradient: AppColors.primaryGradientH,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: AppColors.primaryShadow,
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryGradientH,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: AppColors.primaryShadow,
+                          ),
+                          child: const Icon(
+                            Icons.child_care_rounded,
+                            size: 40,
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 400.ms)
+                      .scale(
+                        begin: const Offset(0.8, 0.8),
+                        end: const Offset(1, 1),
                       ),
-                      child: const Icon(Icons.child_care_rounded, size: 40, color: Colors.white),
-                    ),
-                  ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
 
                   const SizedBox(height: AppSpacing.xl),
 
@@ -118,7 +131,9 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
 
                   Text(
                     'Choisissez votre profil pour personaliser\nvotre expérience',
-                    style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                     textAlign: TextAlign.center,
                   ).animate().fadeIn(delay: 220.ms),
 
@@ -128,7 +143,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   _RoleCard(
                     icon: Icons.family_restroom_rounded,
                     title: 'Je suis Parent',
-                    description: 'Je cherche une nounou de confiance pour mes enfants',
+                    description:
+                        'Je cherche une nounou de confiance pour mes enfants',
                     accentColor: AppColors.primary,
                     badgeText: 'FAMILLE',
                     isSelected: selectedRole == 'parent',
@@ -141,7 +157,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   _RoleCard(
                     icon: Icons.child_care_rounded,
                     title: 'Je suis Nounou',
-                    description: 'Je propose mes services de garde d\'enfants professionnels',
+                    description:
+                        'Je propose mes services de garde d\'enfants professionnels',
                     accentColor: AppColors.accent,
                     badgeText: 'PROFESSIONNEL',
                     isSelected: selectedRole == 'nanny',
@@ -152,12 +169,20 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
 
                   Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.xxxl),
-                    child: AppButton(
-                      label: 'Continuer',
-                      icon: Icons.arrow_forward_rounded,
-                      onPressed: selectedRole == null ? null : _onContinue,
-                    ).animate(target: selectedRole != null ? 1 : 0)
-                     .scaleXY(end: 1.02, duration: 200.ms, curve: Curves.easeOut),
+                    child:
+                        AppButton(
+                              label: 'Continuer',
+                              icon: Icons.arrow_forward_rounded,
+                              onPressed: selectedRole == null
+                                  ? null
+                                  : _onContinue,
+                            )
+                            .animate(target: selectedRole != null ? 1 : 0)
+                            .scaleXY(
+                              end: 1.02,
+                              duration: 200.ms,
+                              curve: Curves.easeOut,
+                            ),
                   ),
                 ],
               ),
@@ -209,7 +234,7 @@ class _RoleCard extends StatelessWidget {
                     color: accentColor.withValues(alpha: 0.18),
                     blurRadius: 24,
                     offset: const Offset(0, 8),
-                  )
+                  ),
                 ]
               : AppColors.cardShadow,
         ),
@@ -226,7 +251,10 @@ class _RoleCard extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: isSelected
                     ? LinearGradient(
-                        colors: [accentColor, accentColor.withValues(alpha: 0.70)],
+                        colors: [
+                          accentColor,
+                          accentColor.withValues(alpha: 0.70),
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       )
@@ -234,7 +262,13 @@ class _RoleCard extends StatelessWidget {
                 color: isSelected ? null : AppColors.surfaceVariant,
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: isSelected
-                    ? [BoxShadow(color: accentColor.withValues(alpha: 0.30), blurRadius: 12, offset: const Offset(0, 4))]
+                    ? [
+                        BoxShadow(
+                          color: accentColor.withValues(alpha: 0.30),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
                     : null,
               ),
               child: Icon(
@@ -252,9 +286,14 @@ class _RoleCard extends StatelessWidget {
                 children: [
                   // Badge
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: accentColor.withValues(alpha: isSelected ? 0.12 : 0.07),
+                      color: accentColor.withValues(
+                        alpha: isSelected ? 0.12 : 0.07,
+                      ),
                       borderRadius: AppSpacing.chipBorderRadius,
                     ),
                     child: Text(
@@ -269,7 +308,9 @@ class _RoleCard extends StatelessWidget {
                   Text(
                     title,
                     style: AppTypography.h4.copyWith(
-                      color: isSelected ? AppColors.textPrimary : AppColors.textPrimary,
+                      color: isSelected
+                          ? AppColors.textPrimary
+                          : AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
@@ -289,7 +330,11 @@ class _RoleCard extends StatelessWidget {
                   color: accentColor,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
+                child: const Icon(
+                  Icons.check_rounded,
+                  size: 16,
+                  color: Colors.white,
+                ),
               ).animate().scale(duration: 250.ms, curve: Curves.easeOutBack),
           ],
         ),

@@ -62,7 +62,9 @@ class AppInput extends StatelessWidget {
           style: AppTypography.bodyMedium,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+            hintStyle: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
             prefixIcon: prefixIcon != null
                 ? Icon(prefixIcon, color: AppColors.textSecondary, size: 20)
                 : null,
@@ -80,7 +82,10 @@ class AppInput extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: AppSpacing.inputBorderRadius,
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: AppSpacing.inputBorderRadius,
@@ -92,7 +97,9 @@ class AppInput extends StatelessWidget {
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: AppSpacing.inputBorderRadius,
-              borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.5)),
+              borderSide: BorderSide(
+                color: AppColors.border.withValues(alpha: 0.5),
+              ),
             ),
             errorStyle: const TextStyle(fontSize: 12, color: AppColors.danger),
           ),

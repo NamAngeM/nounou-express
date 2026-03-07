@@ -17,11 +17,22 @@ class _Review {
   final double rating;
   final String comment;
   final DateTime date;
-  const _Review({required this.parentName, required this.rating, required this.comment, required this.date});
+  const _Review({
+    required this.parentName,
+    required this.rating,
+    required this.comment,
+    required this.date,
+  });
 }
 
 List<_Review> _mockReviews(NannyModel nanny) {
-  const parents = ['Aminata B.', 'Sylvie M.', 'Patricia N.', 'Rose O.', 'Claire E.'];
+  const parents = [
+    'Aminata B.',
+    'Sylvie M.',
+    'Patricia N.',
+    'Rose O.',
+    'Claire E.',
+  ];
   const comments = [
     'Excellente, mes enfants l\'adorent ! Toujours ponctuelle et pleine d\'énergie.',
     'Très professionnelle et attentionnée. Je la recommande vivement.',
@@ -30,12 +41,15 @@ List<_Review> _mockReviews(NannyModel nanny) {
     'Disponible et réactive. Les enfants réclament leur nounou !',
   ];
   final hash = nanny.id.codeUnits.fold(0, (a, b) => a + b);
-  return List.generate(3, (i) => _Review(
-    parentName: parents[(hash + i) % parents.length],
-    rating: [5.0, 4.0, 5.0, 4.0, 5.0][(hash + i) % 5],
-    comment: comments[(hash + i * 2) % comments.length],
-    date: DateTime.now().subtract(Duration(days: 10 + i * 20)),
-  ));
+  return List.generate(
+    3,
+    (i) => _Review(
+      parentName: parents[(hash + i) % parents.length],
+      rating: [5.0, 4.0, 5.0, 4.0, 5.0][(hash + i) % 5],
+      comment: comments[(hash + i * 2) % comments.length],
+      date: DateTime.now().subtract(Duration(days: 10 + i * 20)),
+    ),
+  );
 }
 
 Map<int, double> _ratingDistribution(double r) {
@@ -50,11 +64,15 @@ _SkillStyle _skillStyle(String skill) {
   if (s.contains('secours') || s.contains('secourisme')) {
     return _SkillStyle(Colors.red.shade50, Colors.red.shade700);
   }
-  if (s.contains('cuisine')) return _SkillStyle(Colors.orange.shade50, Colors.orange.shade700);
+  if (s.contains('cuisine'))
+    return _SkillStyle(Colors.orange.shade50, Colors.orange.shade700);
   if (s.contains('devoir') || s.contains('scolaire')) {
     return _SkillStyle(Colors.blue.shade50, Colors.blue.shade700);
   }
-  if (s.contains('éveil') || s.contains('musical') || s.contains('créati') || s.contains('animation')) {
+  if (s.contains('éveil') ||
+      s.contains('musical') ||
+      s.contains('créati') ||
+      s.contains('animation')) {
     return _SkillStyle(Colors.purple.shade50, Colors.purple.shade700);
   }
   if (s.contains('langue') || s.contains('bilingue')) {
@@ -96,7 +114,8 @@ class _NannyProfileScreenState extends State<NannyProfileScreen> {
     }
   }
 
-  String get _quartier => _nanny?.quartier.isNotEmpty == true ? _nanny!.quartier : 'Libreville';
+  String get _quartier =>
+      _nanny?.quartier.isNotEmpty == true ? _nanny!.quartier : 'Libreville';
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +128,9 @@ class _NannyProfileScreenState extends State<NannyProfileScreen> {
     }
 
     final reviews = _mockReviews(nanny);
-    final memberSince = DateTime.now().subtract(Duration(days: (nanny.experience * 365).round()));
+    final memberSince = DateTime.now().subtract(
+      Duration(days: (nanny.experience * 365).round()),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -120,18 +141,31 @@ class _NannyProfileScreenState extends State<NannyProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _InfoSection(nanny: nanny, quartier: _quartier, memberSince: memberSince)
-                    .animate().fadeIn(delay: 100.ms, duration: 400.ms).slideY(begin: 0.05, end: 0),
-                _TarifCard(hourlyRate: nanny.hourlyRate)
-                    .animate().fadeIn(delay: 150.ms, duration: 400.ms),
-                _BioSection(bio: nanny.bio)
-                    .animate().fadeIn(delay: 200.ms, duration: 400.ms),
-                _SkillsSection(skills: nanny.skills)
-                    .animate().fadeIn(delay: 250.ms, duration: 400.ms),
-                _AvailabilitySection()
-                    .animate().fadeIn(delay: 300.ms, duration: 400.ms),
-                _ReviewsSection(nanny: nanny, reviews: reviews)
-                    .animate().fadeIn(delay: 350.ms, duration: 400.ms),
+                _InfoSection(
+                      nanny: nanny,
+                      quartier: _quartier,
+                      memberSince: memberSince,
+                    )
+                    .animate()
+                    .fadeIn(delay: 100.ms, duration: 400.ms)
+                    .slideY(begin: 0.05, end: 0),
+                _TarifCard(
+                  hourlyRate: nanny.hourlyRate,
+                ).animate().fadeIn(delay: 150.ms, duration: 400.ms),
+                _BioSection(
+                  bio: nanny.bio,
+                ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
+                _SkillsSection(
+                  skills: nanny.skills,
+                ).animate().fadeIn(delay: 250.ms, duration: 400.ms),
+                _AvailabilitySection().animate().fadeIn(
+                  delay: 300.ms,
+                  duration: 400.ms,
+                ),
+                _ReviewsSection(
+                  nanny: nanny,
+                  reviews: reviews,
+                ).animate().fadeIn(delay: 350.ms, duration: 400.ms),
                 const SizedBox(height: 100),
               ],
             ),
@@ -154,7 +188,9 @@ class _NannyProfileScreenState extends State<NannyProfileScreen> {
       ),
       actions: [
         _CircleIconButton(
-          icon: _isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          icon: _isFavorite
+              ? Icons.favorite_rounded
+              : Icons.favorite_border_rounded,
           iconColor: _isFavorite ? AppColors.danger : Colors.white,
           onTap: () => setState(() => _isFavorite = !_isFavorite),
         ),
@@ -214,12 +250,20 @@ class _HeaderBackground extends StatelessWidget {
           left: 0,
           right: 0,
           child: Container(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, AppSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              AppSpacing.xxl,
+              AppSpacing.xl,
+              AppSpacing.lg,
+            ),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
-                colors: [Colors.black.withValues(alpha: 0.55), Colors.transparent],
+                colors: [
+                  Colors.black.withValues(alpha: 0.55),
+                  Colors.transparent,
+                ],
               ),
             ),
             child: Column(
@@ -237,7 +281,9 @@ class _HeaderBackground extends StatelessWidget {
                     const SizedBox(width: AppSpacing.sm),
                     Text(
                       '${nanny.rating} · ${nanny.totalMissions} avis',
-                      style: AppTypography.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.9)),
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
                     ),
                   ],
                 ),
@@ -286,12 +332,28 @@ class _InfoSection extends StatelessWidget {
   final String quartier;
   final DateTime memberSince;
 
-  const _InfoSection({required this.nanny, required this.quartier, required this.memberSince});
+  const _InfoSection({
+    required this.nanny,
+    required this.quartier,
+    required this.memberSince,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final months = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
-                    'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+    final months = [
+      'janv.',
+      'févr.',
+      'mars',
+      'avr.',
+      'mai',
+      'juin',
+      'juil.',
+      'août',
+      'sept.',
+      'oct.',
+      'nov.',
+      'déc.',
+    ];
     final sinceLabel = '${months[memberSince.month - 1]} ${memberSince.year}';
 
     return _Section(
@@ -307,16 +369,24 @@ class _InfoSection extends StatelessWidget {
             ),
           if (nanny.badges.isNotEmpty) const SizedBox(height: AppSpacing.lg),
           // Info rows
-          _InfoRow(icon: Icons.location_on_outlined, text: '$quartier, Libreville'),
+          _InfoRow(
+            icon: Icons.location_on_outlined,
+            text: '$quartier, Libreville',
+          ),
           _InfoRow(
             icon: Icons.work_outline_rounded,
-            text: '${nanny.experience} an${nanny.experience > 1 ? 's' : ''} d\'expérience',
+            text:
+                '${nanny.experience} an${nanny.experience > 1 ? 's' : ''} d\'expérience',
           ),
           _InfoRow(
             icon: Icons.check_circle_outline_rounded,
-            text: '${nanny.totalMissions} mission${nanny.totalMissions > 1 ? 's' : ''} réalisée${nanny.totalMissions > 1 ? 's' : ''}',
+            text:
+                '${nanny.totalMissions} mission${nanny.totalMissions > 1 ? 's' : ''} réalisée${nanny.totalMissions > 1 ? 's' : ''}',
           ),
-          _InfoRow(icon: Icons.calendar_today_outlined, text: 'Membre depuis $sinceLabel'),
+          _InfoRow(
+            icon: Icons.calendar_today_outlined,
+            text: 'Membre depuis $sinceLabel',
+          ),
         ],
       ),
     );
@@ -328,9 +398,12 @@ class _BadgeChip extends StatelessWidget {
   const _BadgeChip({required this.label});
 
   Color get _bg {
-    if (label.contains('Vérifié')) return AppColors.accent.withValues(alpha: 0.15);
-    if (label.contains('Super')) return AppColors.warning.withValues(alpha: 0.2);
-    if (label.contains('Disponible')) return AppColors.success.withValues(alpha: 0.15);
+    if (label.contains('Vérifié'))
+      return AppColors.accent.withValues(alpha: 0.15);
+    if (label.contains('Super'))
+      return AppColors.warning.withValues(alpha: 0.2);
+    if (label.contains('Disponible'))
+      return AppColors.success.withValues(alpha: 0.15);
     return AppColors.primary.withValues(alpha: 0.12);
   }
 
@@ -351,14 +424,26 @@ class _BadgeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-      decoration: BoxDecoration(color: _bg, borderRadius: AppSpacing.badgeBorderRadius),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: _bg,
+        borderRadius: AppSpacing.badgeBorderRadius,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(_icon, size: 13, color: _fg),
           const SizedBox(width: 4),
-          Text(label, style: AppTypography.small.copyWith(color: _fg, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: AppTypography.small.copyWith(
+              color: _fg,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -412,37 +497,54 @@ class _TarifCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Tarif horaire', style: AppTypography.caption.copyWith(color: Colors.white.withValues(alpha: 0.8))),
+                  Text(
+                    'Tarif horaire',
+                    style: AppTypography.caption.copyWith(
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
                   const SizedBox(height: 4),
                   RichText(
-                    text: TextSpan(children: [
-                      TextSpan(
-                        text: '${hourlyRate.toStringAsFixed(0)} FCFA',
-                        style: AppTypography.h2.copyWith(color: Colors.white),
-                      ),
-                      TextSpan(
-                        text: ' /h',
-                        style: AppTypography.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.8)),
-                      ),
-                    ]),
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '${hourlyRate.toStringAsFixed(0)} FCFA',
+                          style: AppTypography.h2.copyWith(color: Colors.white),
+                        ),
+                        TextSpan(
+                          text: ' /h',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: Colors.white.withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     'Tarif de nuit : $nightRate FCFA/h',
-                    style: AppTypography.small.copyWith(color: Colors.white.withValues(alpha: 0.85)),
+                    style: AppTypography.small.copyWith(
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
                   ),
                 ],
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(AppSpacing.sm),
               ),
               child: Text(
                 'Week-end\n+25%',
-                style: AppTypography.small.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                style: AppTypography.small.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -470,14 +572,19 @@ class _BioSectionState extends State<_BioSection> {
   @override
   Widget build(BuildContext context) {
     final isLong = widget.bio.length > _maxChars;
-    final displayed = _expanded || !isLong ? widget.bio : '${widget.bio.substring(0, _maxChars)}...';
+    final displayed = _expanded || !isLong
+        ? widget.bio
+        : '${widget.bio.substring(0, _maxChars)}...';
 
     return _Section(
       title: 'À propos',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(displayed, style: AppTypography.bodyMedium.copyWith(height: 1.6)),
+          Text(
+            displayed,
+            style: AppTypography.bodyMedium.copyWith(height: 1.6),
+          ),
           if (isLong) ...[
             const SizedBox(height: AppSpacing.sm),
             GestureDetector(
@@ -513,12 +620,21 @@ class _SkillsSection extends StatelessWidget {
         children: skills.map((s) {
           final style = _skillStyle(s);
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs + 2),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs + 2,
+            ),
             decoration: BoxDecoration(
               color: style.bg,
               borderRadius: BorderRadius.circular(AppSpacing.badgeRadius),
             ),
-            child: Text(s, style: AppTypography.caption.copyWith(color: style.fg, fontWeight: FontWeight.w600)),
+            child: Text(
+              s,
+              style: AppTypography.caption.copyWith(
+                color: style.fg,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           );
         }).toList(),
       ),
@@ -561,7 +677,11 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
               final isSelected = _selectedDay == i;
               final isAvail = _available[i];
               return GestureDetector(
-                onTap: isAvail ? () => setState(() => _selectedDay = _selectedDay == i ? null : i) : null,
+                onTap: isAvail
+                    ? () => setState(
+                        () => _selectedDay = _selectedDay == i ? null : i,
+                      )
+                    : null,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   width: 40,
@@ -570,11 +690,13 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
                     color: isSelected
                         ? AppColors.primary
                         : isAvail
-                            ? AppColors.success.withValues(alpha: 0.12)
-                            : AppColors.border.withValues(alpha: 0.5),
+                        ? AppColors.success.withValues(alpha: 0.12)
+                        : AppColors.border.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                     border: Border.all(
-                      color: isSelected ? AppColors.primary : Colors.transparent,
+                      color: isSelected
+                          ? AppColors.primary
+                          : Colors.transparent,
                     ),
                   ),
                   child: Column(
@@ -582,7 +704,11 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
                       Text(
                         _dayLabels[i],
                         style: AppTypography.small.copyWith(
-                          color: isSelected ? Colors.white : isAvail ? AppColors.success : AppColors.textSecondary,
+                          color: isSelected
+                              ? Colors.white
+                              : isAvail
+                              ? AppColors.success
+                              : AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -590,8 +716,14 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
                       Text(
                         '${day.day}',
                         style: AppTypography.caption.copyWith(
-                          color: isSelected ? Colors.white : isAvail ? AppColors.textPrimary : AppColors.textSecondary,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                          color: isSelected
+                              ? Colors.white
+                              : isAvail
+                              ? AppColors.textPrimary
+                              : AppColors.textSecondary,
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w400,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -614,21 +746,39 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
             const SizedBox(height: AppSpacing.lg),
             Text(
               'Créneaux disponibles — ${_dayLabels[_selectedDay!]}',
-              style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+              style: AppTypography.caption.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
-              children: _slots.map((slot) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.sm),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-                ),
-                child: Text(slot, style: AppTypography.caption.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600)),
-              )).toList(),
+              children: _slots
+                  .map(
+                    (slot) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.sm,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(AppSpacing.sm),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Text(
+                        slot,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ],
         ],
@@ -663,11 +813,17 @@ class _ReviewsSection extends StatelessWidget {
                 children: [
                   Text(
                     nanny.rating.toStringAsFixed(1),
-                    style: AppTypography.h1.copyWith(fontSize: 48, color: AppColors.primary),
+                    style: AppTypography.h1.copyWith(
+                      fontSize: 48,
+                      color: AppColors.primary,
+                    ),
                   ),
                   RatingStars(rating: nanny.rating, size: 18),
                   const SizedBox(height: 4),
-                  Text('${nanny.totalMissions} avis', style: AppTypography.small),
+                  Text(
+                    '${nanny.totalMissions} avis',
+                    style: AppTypography.small,
+                  ),
                 ],
               ),
               const SizedBox(width: AppSpacing.xl),
@@ -683,7 +839,11 @@ class _ReviewsSection extends StatelessWidget {
                         children: [
                           Text('$stars', style: AppTypography.small),
                           const SizedBox(width: 4),
-                          const Icon(Icons.star_rounded, size: 11, color: AppColors.warning),
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 11,
+                            color: AppColors.warning,
+                          ),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: ClipRRect(
@@ -691,7 +851,9 @@ class _ReviewsSection extends StatelessWidget {
                               child: LinearProgressIndicator(
                                 value: pct,
                                 backgroundColor: AppColors.border,
-                                valueColor: const AlwaysStoppedAnimation(AppColors.warning),
+                                valueColor: const AlwaysStoppedAnimation(
+                                  AppColors.warning,
+                                ),
                                 minHeight: 8,
                               ),
                             ),
@@ -726,12 +888,17 @@ class _ReviewsSection extends StatelessWidget {
               onPressed: () {},
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: AppColors.primary),
-                shape: RoundedRectangleBorder(borderRadius: AppSpacing.buttonBorderRadius),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppSpacing.buttonBorderRadius,
+                ),
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               ),
               child: Text(
                 'Voir tous les avis',
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -747,9 +914,22 @@ class _ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final months = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
-                    'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
-    final dateLabel = '${review.date.day} ${months[review.date.month - 1]} ${review.date.year}';
+    final months = [
+      'janv.',
+      'févr.',
+      'mars',
+      'avr.',
+      'mai',
+      'juin',
+      'juil.',
+      'août',
+      'sept.',
+      'oct.',
+      'nov.',
+      'déc.',
+    ];
+    final dateLabel =
+        '${review.date.day} ${months[review.date.month - 1]} ${review.date.year}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.lg),
@@ -775,7 +955,12 @@ class _ReviewCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(review.parentName, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+                    Text(
+                      review.parentName,
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     Text(dateLabel, style: AppTypography.small),
                   ],
                 ),
@@ -784,7 +969,13 @@ class _ReviewCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(review.comment, style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary, height: 1.5)),
+          Text(
+            review.comment,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+              height: 1.5,
+            ),
+          ),
           const SizedBox(height: AppSpacing.md),
           const Divider(),
         ],
@@ -826,12 +1017,16 @@ class _BottomBookingBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               RichText(
-                text: TextSpan(children: [
-                  TextSpan(
-                    text: '${nanny.hourlyRate.toStringAsFixed(0)} FCFA',
-                    style: AppTypography.h3.copyWith(color: AppColors.primary),
-                  ),
-                ]),
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${nanny.hourlyRate.toStringAsFixed(0)} FCFA',
+                      style: AppTypography.h3.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Text('/heure', style: AppTypography.small),
             ],
@@ -847,7 +1042,9 @@ class _BottomBookingBar extends StatelessWidget {
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: AppSpacing.buttonBorderRadius),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: AppSpacing.buttonBorderRadius,
+                  ),
                 ),
                 child: Text(
                   'Réserver maintenant',
@@ -873,7 +1070,12 @@ class _Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.xxl,
+        AppSpacing.xl,
+        0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

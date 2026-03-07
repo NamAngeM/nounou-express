@@ -9,18 +9,16 @@ class MessageBubble extends StatelessWidget {
   final MessageModel message;
   final bool isMe;
 
-  const MessageBubble({
-    super.key,
-    required this.message,
-    required this.isMe,
-  });
+  const MessageBubble({super.key, required this.message, required this.isMe});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
-        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isMe
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           Container(
             constraints: BoxConstraints(
@@ -60,7 +58,9 @@ class MessageBubble extends StatelessWidget {
                   Icon(
                     message.isRead ? Icons.done_all : Icons.check,
                     size: 14,
-                    color: message.isRead ? Colors.blue : AppColors.textSecondary,
+                    color: message.isRead
+                        ? Colors.blue
+                        : AppColors.textSecondary,
                   ),
                 ],
               ],

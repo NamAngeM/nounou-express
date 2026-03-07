@@ -24,23 +24,27 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategory = 0;
 
   static const _categories = [
-    ('Toutes',           Icons.apps_rounded),
-    ('Disponibles',      Icons.check_circle_outline_rounded),
-    ('Top Nounous',      Icons.star_rounded),
-    ('Proches',          Icons.location_on_rounded),
-    ('Moins chères',     Icons.savings_rounded),
+    ('Toutes', Icons.apps_rounded),
+    ('Disponibles', Icons.check_circle_outline_rounded),
+    ('Top Nounous', Icons.star_rounded),
+    ('Proches', Icons.location_on_rounded),
+    ('Moins chères', Icons.savings_rounded),
   ];
 
   List<NannyModel> get _filteredNannies {
     final all = MockData.nannies;
     switch (_selectedCategory) {
       case 1:
-        return all.where((n) => n.badges.contains('Disponible') || n.isVerified).toList();
+        return all
+            .where((n) => n.badges.contains('Disponible') || n.isVerified)
+            .toList();
       case 2:
         return all.where((n) => n.badges.contains('Super Nounou')).toList();
       case 3:
         final indexed = List.generate(all.length, (i) => (i, all[i]));
-        indexed.sort((a, b) => _mockDistances[a.$1].compareTo(_mockDistances[b.$1]));
+        indexed.sort(
+          (a, b) => _mockDistances[a.$1].compareTo(_mockDistances[b.$1]),
+        );
         return indexed.map((e) => e.$2).toList();
       case 4:
         return [...all]..sort((a, b) => a.hourlyRate.compareTo(b.hourlyRate));
@@ -62,7 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
           color: AppColors.primary,
           displacement: 60,
           child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
             slivers: [
               // ── Header ─────────────────────────────────────────────────────
               SliverToBoxAdapter(
@@ -75,7 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
               // ── Search ─────────────────────────────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: AppSpacing.screenPadding.copyWith(bottom: AppSpacing.lg),
+                  padding: AppSpacing.screenPadding.copyWith(
+                    bottom: AppSpacing.lg,
+                  ),
                   child: _SearchBar(),
                 ).animate().fadeIn(delay: 80.ms).slideY(begin: 0.08, end: 0),
               ),
@@ -128,9 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       onSeeAll: () => context.go('/search'),
                     ).animate().fadeIn(delay: 350.ms),
                     const SizedBox(height: AppSpacing.md),
-                    _TopRatedList(nannies: _topRated.take(4).toList())
-                        .animate()
-                        .fadeIn(delay: 400.ms),
+                    _TopRatedList(
+                      nannies: _topRated.take(4).toList(),
+                    ).animate().fadeIn(delay: 400.ms),
                     const SizedBox(height: 100),
                   ],
                 ),
@@ -148,28 +156,32 @@ class _HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: AppSpacing.screenPadding.copyWith(top: AppSpacing.lg, bottom: AppSpacing.xl),
-      decoration: const BoxDecoration(
-        gradient: AppColors.warmGradient,
+      padding: AppSpacing.screenPadding.copyWith(
+        top: AppSpacing.lg,
+        bottom: AppSpacing.xl,
       ),
+      decoration: const BoxDecoration(gradient: AppColors.warmGradient),
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Bonjour, Aminata',
-                  style: AppTypography.h2,
-                ),
+                Text('Bonjour, Aminata', style: AppTypography.h2),
                 const SizedBox(height: 3),
                 Row(
                   children: [
-                    const Icon(Icons.location_on_rounded, size: 14, color: AppColors.primary),
+                    const Icon(
+                      Icons.location_on_rounded,
+                      size: 14,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 3),
                     Text(
                       'Libreville · Gabon',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ],
                 ),
@@ -183,7 +195,11 @@ class _HomeHeader extends StatelessWidget {
           // Profile avatar
           GestureDetector(
             onTap: () => context.go('/profile'),
-            child: const AppAvatar(name: 'Aminata B.', size: 40, showRing: true),
+            child: const AppAvatar(
+              name: 'Aminata B.',
+              size: 40,
+              showRing: true,
+            ),
           ),
         ],
       ),
@@ -231,7 +247,11 @@ class _NotifButton extends StatelessWidget {
               child: const Center(
                 child: Text(
                   '3',
-                  style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
             ),
@@ -265,28 +285,44 @@ class _SearchBar extends StatelessWidget {
                 gradient: AppColors.primaryGradientH,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.search_rounded, color: Colors.white, size: 16),
+              child: const Icon(
+                Icons.search_rounded,
+                color: Colors.white,
+                size: 16,
+              ),
             ),
             const SizedBox(width: AppSpacing.md),
             Text(
               'Rechercher par nom, quartier...',
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.textTertiary),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textTertiary,
+              ),
             ),
             const Spacer(),
             Container(
               margin: const EdgeInsets.only(right: AppSpacing.sm),
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: 6,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.surfaceVariant,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.tune_rounded, size: 14, color: AppColors.textSecondary),
+                  const Icon(
+                    Icons.tune_rounded,
+                    size: 14,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     'Filtres',
-                    style: AppTypography.small.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                    style: AppTypography.small.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -328,14 +364,22 @@ class _CategoryChips extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
               decoration: BoxDecoration(
                 gradient: isActive ? AppColors.primaryGradientH : null,
                 color: isActive ? null : AppColors.surface,
                 borderRadius: AppSpacing.chipBorderRadius,
                 boxShadow: isActive
                     ? AppColors.primaryShadow
-                    : [BoxShadow(color: AppColors.secondary.withValues(alpha: 0.05), blurRadius: 4)],
+                    : [
+                        BoxShadow(
+                          color: AppColors.secondary.withValues(alpha: 0.05),
+                          blurRadius: 4,
+                        ),
+                      ],
                 border: isActive ? null : Border.all(color: AppColors.border),
               ),
               child: Row(
@@ -382,7 +426,10 @@ class _SectionHeader extends StatelessWidget {
           GestureDetector(
             onTap: onSeeAll,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.primarySurface,
                 borderRadius: AppSpacing.chipBorderRadius,
@@ -420,9 +467,16 @@ class _NearbyScroll extends StatelessWidget {
         itemBuilder: (context, index) {
           final nanny = nannies[index];
           final originalIndex = MockData.nannies.indexOf(nanny);
-          final quartier = nanny.quartier.isNotEmpty ? nanny.quartier : 'Libreville';
-          final distance = _mockDistances[originalIndex.clamp(0, _mockDistances.length - 1)];
-          return _NannyCompactCard(nanny: nanny, quartier: quartier, distance: distance)
+          final quartier = nanny.quartier.isNotEmpty
+              ? nanny.quartier
+              : 'Libreville';
+          final distance =
+              _mockDistances[originalIndex.clamp(0, _mockDistances.length - 1)];
+          return _NannyCompactCard(
+                nanny: nanny,
+                quartier: quartier,
+                distance: distance,
+              )
               .animate()
               .fadeIn(delay: (index * 70).ms, duration: 380.ms)
               .slideX(begin: 0.15, end: 0, curve: Curves.easeOutCubic);
@@ -467,7 +521,9 @@ class _NannyCompactCard extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.cardRadius)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(AppSpacing.cardRadius),
+                ),
               ),
               child: Center(
                 child: AppAvatar(
@@ -478,7 +534,12 @@ class _NannyCompactCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, AppSpacing.md),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.sm,
+                AppSpacing.sm,
+                AppSpacing.sm,
+                AppSpacing.md,
+              ),
               child: Column(
                 children: [
                   Text(
@@ -492,12 +553,18 @@ class _NannyCompactCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.location_on_rounded, size: 11, color: AppColors.primary),
+                      const Icon(
+                        Icons.location_on_rounded,
+                        size: 11,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(width: 2),
                       Flexible(
                         child: Text(
                           '$quartier · ${distance.toStringAsFixed(1)} km',
-                          style: AppTypography.small.copyWith(color: AppColors.textSecondary),
+                          style: AppTypography.small.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
@@ -509,7 +576,10 @@ class _NannyCompactCard extends StatelessWidget {
                   RatingStars(rating: nanny.rating, size: 12),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       gradient: AppColors.primaryGradientH,
                       borderRadius: AppSpacing.chipBorderRadius,
@@ -556,7 +626,10 @@ class _PromoBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.20),
                     borderRadius: AppSpacing.chipBorderRadius,
@@ -616,11 +689,18 @@ class _PromoBanner extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.white.withValues(alpha: 0.10),
                 ),
-                child: const Icon(Icons.child_care_rounded, size: 48, color: Colors.white),
+                child: const Icon(
+                  Icons.child_care_rounded,
+                  size: 48,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.success.withValues(alpha: 0.20),
                   borderRadius: AppSpacing.chipBorderRadius,
@@ -656,21 +736,27 @@ class _TopRatedList extends StatelessWidget {
           final index = entry.key;
           final nanny = entry.value;
           final originalIndex = MockData.nannies.indexOf(nanny);
-          final quartier = nanny.quartier.isNotEmpty ? nanny.quartier : 'Libreville';
-          final distance = _mockDistances[originalIndex.clamp(0, _mockDistances.length - 1)];
+          final quartier = nanny.quartier.isNotEmpty
+              ? nanny.quartier
+              : 'Libreville';
+          final distance =
+              _mockDistances[originalIndex.clamp(0, _mockDistances.length - 1)];
           return Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: NannyCard(
-              nannyId: nanny.id,
-              name: nanny.name,
-              quartier: quartier,
-              rating: nanny.rating,
-              hourlyRate: nanny.hourlyRate,
-              distanceKm: distance,
-              isVerified: nanny.isVerified,
-              reviewCount: 12 + index * 7,
-            ),
-          ).animate().fadeIn(delay: (index * 80).ms, duration: 380.ms).slideY(begin: 0.07, end: 0);
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: NannyCard(
+                  nannyId: nanny.id,
+                  name: nanny.name,
+                  quartier: quartier,
+                  rating: nanny.rating,
+                  hourlyRate: nanny.hourlyRate,
+                  distanceKm: distance,
+                  isVerified: nanny.isVerified,
+                  reviewCount: 12 + index * 7,
+                ),
+              )
+              .animate()
+              .fadeIn(delay: (index * 80).ms, duration: 380.ms)
+              .slideY(begin: 0.07, end: 0);
         }).toList(),
       ),
     );

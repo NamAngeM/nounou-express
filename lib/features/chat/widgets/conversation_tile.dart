@@ -60,14 +60,22 @@ class ConversationTile extends StatelessWidget {
                         Text(
                           conversation.otherUserName,
                           style: AppTypography.bodyLarge.copyWith(
-                            fontWeight: conversation.unreadCount > 0 ? FontWeight.bold : FontWeight.w600,
+                            fontWeight: conversation.unreadCount > 0
+                                ? FontWeight.bold
+                                : FontWeight.w600,
                           ),
                         ),
                         Text(
-                          AppFormatters.formatChatDate(conversation.lastMessageTime),
+                          AppFormatters.formatChatDate(
+                            conversation.lastMessageTime,
+                          ),
                           style: AppTypography.caption.copyWith(
-                            color: conversation.unreadCount > 0 ? AppColors.primary : AppColors.textSecondary,
-                            fontWeight: conversation.unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
+                            color: conversation.unreadCount > 0
+                                ? AppColors.primary
+                                : AppColors.textSecondary,
+                            fontWeight: conversation.unreadCount > 0
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                       ],
@@ -81,15 +89,23 @@ class ConversationTile extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.bodyMedium.copyWith(
-                              color: conversation.unreadCount > 0 ? AppColors.textPrimary : AppColors.textSecondary,
-                              fontWeight: conversation.unreadCount > 0 ? FontWeight.w600 : FontWeight.normal,
+                              color: conversation.unreadCount > 0
+                                  ? AppColors.textPrimary
+                                  : AppColors.textSecondary,
+                              fontWeight: conversation.unreadCount > 0
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
                             ),
                           ),
                         ),
                         if (conversation.unreadCount > 0)
                           _buildUnreadBadge()
                         else if (conversation.isLastMessageRead)
-                          const Icon(Icons.done_all, size: 16, color: Colors.blue),
+                          const Icon(
+                            Icons.done_all,
+                            size: 16,
+                            color: Colors.blue,
+                          ),
                       ],
                     ),
                   ],
@@ -141,7 +157,11 @@ class ConversationTile extends StatelessWidget {
       ),
       child: Text(
         "${conversation.unreadCount}",
-        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

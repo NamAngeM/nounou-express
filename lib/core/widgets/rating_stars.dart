@@ -30,14 +30,17 @@ class RatingStars extends StatelessWidget {
         } else {
           icon = Icons.star_outline_rounded;
         }
-        final color = icon == Icons.star_outline_rounded ? AppColors.border : AppColors.warning;
+        final color = icon == Icons.star_outline_rounded
+            ? AppColors.border
+            : AppColors.warning;
 
         Widget star = Icon(icon, size: size, color: color);
 
         if (isInteractive) {
           return GestureDetector(
             onTap: () => onRatingChanged?.call(starValue.toDouble()),
-            child: star.animate(key: ValueKey('star_$index\_$rating'))
+            child: star
+                .animate(key: ValueKey('star_$index\_$rating'))
                 .scale(duration: 200.ms, curve: Curves.easeOutBack),
           );
         }

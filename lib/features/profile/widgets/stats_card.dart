@@ -47,7 +47,9 @@ class StatsCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondary,
+            ),
             textAlign: TextAlign.center,
           ),
         ],

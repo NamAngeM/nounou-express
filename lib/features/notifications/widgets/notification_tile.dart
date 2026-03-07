@@ -9,18 +9,16 @@ class NotificationTile extends StatelessWidget {
   final NotificationModel notification;
   final VoidCallback? onTap;
 
-  const NotificationTile({
-    super.key,
-    required this.notification,
-    this.onTap,
-  });
+  const NotificationTile({super.key, required this.notification, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       child: Container(
-        color: notification.isRead ? Colors.white : AppColors.primary.withValues(alpha: 0.05),
+        color: notification.isRead
+            ? Colors.white
+            : AppColors.primary.withValues(alpha: 0.05),
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,18 +42,24 @@ class NotificationTile extends StatelessWidget {
                   Text(
                     notification.title,
                     style: AppTypography.bodyLarge.copyWith(
-                      fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.bold,
+                      fontWeight: notification.isRead
+                          ? FontWeight.w500
+                          : FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     notification.body,
-                    style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     _formatTime(notification.createdAt),
-                    style: AppTypography.small.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.small.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),

@@ -42,31 +42,31 @@ class AppBadge extends StatelessWidget {
   }
 
   _BadgeConfig get _config => switch (type) {
-        AppBadgeType.verified => _BadgeConfig(
-            icon: Icons.verified_rounded,
-            label: 'Vérifiée',
-            background: AppColors.accent.withValues(alpha: 0.15),
-            foreground: AppColors.accent,
-          ),
-        AppBadgeType.superNanny => _BadgeConfig(
-            icon: Icons.star_rounded,
-            label: 'Super Nounou',
-            background: AppColors.warning.withValues(alpha: 0.15),
-            foreground: const Color(0xFFB8860B),
-          ),
-        AppBadgeType.available => _BadgeConfig(
-            icon: Icons.circle,
-            label: 'Disponible',
-            background: AppColors.success.withValues(alpha: 0.15),
-            foreground: AppColors.success,
-          ),
-        AppBadgeType.gold => _BadgeConfig(
-            icon: Icons.emoji_events_rounded,
-            label: 'Gold',
-            background: AppColors.warning.withValues(alpha: 0.2),
-            foreground: const Color(0xFFB8860B),
-          ),
-      };
+    AppBadgeType.verified => _BadgeConfig(
+      icon: Icons.verified_rounded,
+      label: 'Vérifiée',
+      background: AppColors.accent.withValues(alpha: 0.15),
+      foreground: AppColors.accent,
+    ),
+    AppBadgeType.superNanny => _BadgeConfig(
+      icon: Icons.star_rounded,
+      label: 'Super Nounou',
+      background: AppColors.warning.withValues(alpha: 0.15),
+      foreground: const Color(0xFFB8860B),
+    ),
+    AppBadgeType.available => _BadgeConfig(
+      icon: Icons.circle,
+      label: 'Disponible',
+      background: AppColors.success.withValues(alpha: 0.15),
+      foreground: AppColors.success,
+    ),
+    AppBadgeType.gold => _BadgeConfig(
+      icon: Icons.emoji_events_rounded,
+      label: 'Gold',
+      background: AppColors.warning.withValues(alpha: 0.2),
+      foreground: const Color(0xFFB8860B),
+    ),
+  };
 }
 
 class _BadgeConfig {

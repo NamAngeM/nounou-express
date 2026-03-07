@@ -18,20 +18,19 @@ class ScaleTap extends StatefulWidget {
   State<ScaleTap> createState() => _ScaleTapState();
 }
 
-class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin {
+class _ScaleTapState extends State<ScaleTap>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
-    _animation = Tween<double>(begin: 1.0, end: widget.scale).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: widget.scale,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -47,10 +46,7 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
       onTapUp: (_) => widget.onTap != null ? _controller.reverse() : null,
       onTapCancel: () => widget.onTap != null ? _controller.reverse() : null,
       onTap: widget.onTap,
-      child: ScaleTransition(
-        scale: _animation,
-        child: widget.child,
-      ),
+      child: ScaleTransition(scale: _animation, child: widget.child),
     );
   }
 }

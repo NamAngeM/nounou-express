@@ -27,7 +27,10 @@ class BookingsListScreen extends StatelessWidget {
               title: 'Mes Réservations',
               subtitle: '$total réservation${total != 1 ? 's' : ''} au total',
               icon: Icons.calendar_month_rounded,
-              gradientColors: const [AppColors.secondary, AppColors.secondaryLight],
+              gradientColors: const [
+                AppColors.secondary,
+                AppColors.secondaryLight,
+              ],
             ),
 
             // ── Custom tab bar ─────────────────────────────────────────────
@@ -36,10 +39,12 @@ class BookingsListScreen extends StatelessWidget {
               child: TabBar(
                 isScrollable: true,
                 tabAlignment: TabAlignment.start,
-                labelStyle: AppTypography.caption
-                    .copyWith(fontWeight: FontWeight.w700),
-                unselectedLabelStyle:
-                    AppTypography.caption.copyWith(fontWeight: FontWeight.w400),
+                labelStyle: AppTypography.caption.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+                unselectedLabelStyle: AppTypography.caption.copyWith(
+                  fontWeight: FontWeight.w400,
+                ),
                 labelColor: AppColors.primary,
                 unselectedLabelColor: AppColors.textSecondary,
                 indicatorColor: AppColors.primary,
@@ -79,8 +84,9 @@ class _BookingsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bookings =
-        MockData.bookings.where((b) => b.status == status).toList();
+    final bookings = MockData.bookings
+        .where((b) => b.status == status)
+        .toList();
 
     if (bookings.isEmpty) {
       return Center(
@@ -96,9 +102,11 @@ class _BookingsList extends StatelessWidget {
                   color: AppColors.surfaceVariant,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.calendar_today_outlined,
-                    size: 40,
-                    color: AppColors.textSecondary.withValues(alpha: 0.4)),
+                child: Icon(
+                  Icons.calendar_today_outlined,
+                  size: 40,
+                  color: AppColors.textSecondary.withValues(alpha: 0.4),
+                ),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
@@ -109,8 +117,9 @@ class _BookingsList extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'dans la catégorie "$status"',
-                style: AppTypography.bodyMedium
-                    .copyWith(color: AppColors.textSecondary),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -121,7 +130,11 @@ class _BookingsList extends StatelessWidget {
 
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 100),
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        100,
+      ),
       itemCount: bookings.length,
       itemBuilder: (context, index) => _BookingCard(booking: bookings[index])
           .animate()
@@ -159,8 +172,9 @@ class _BookingCard extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: statusInfo.$1,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
               ),
             ),
             Padding(
@@ -175,43 +189,53 @@ class _BookingCard extends StatelessWidget {
                         radius: 22,
                         backgroundColor: AppColors.surfaceVariant,
                         backgroundImage: NetworkImage(
-                            'https://i.pravatar.cc/150?u=${nanny.id}'),
+                          'https://i.pravatar.cc/150?u=${nanny.id}',
+                        ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(nanny.name,
-                                style: AppTypography.bodyLarge
-                                    .copyWith(fontWeight: FontWeight.w700)),
-                            Text(booking.address,
-                                style: AppTypography.caption.copyWith(
-                                    color: AppColors.textSecondary)),
+                            Text(
+                              nanny.name,
+                              style: AppTypography.bodyLarge.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              booking.address,
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                       // Status badge
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm, vertical: 4),
+                          horizontal: AppSpacing.sm,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: statusInfo.$1.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                              color: statusInfo.$1.withValues(alpha: 0.30)),
+                            color: statusInfo.$1.withValues(alpha: 0.30),
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(statusInfo.$3,
-                                size: 12, color: statusInfo.$1),
+                            Icon(statusInfo.$3, size: 12, color: statusInfo.$1),
                             const SizedBox(width: 4),
                             Text(
                               booking.status,
                               style: AppTypography.small.copyWith(
-                                  color: statusInfo.$1,
-                                  fontWeight: FontWeight.w700),
+                                color: statusInfo.$1,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ],
                         ),
@@ -220,8 +244,9 @@ class _BookingCard extends StatelessWidget {
                   ),
 
                   Divider(
-                      height: AppSpacing.xl,
-                      color: AppColors.border.withValues(alpha: 0.6)),
+                    height: AppSpacing.xl,
+                    color: AppColors.border.withValues(alpha: 0.6),
+                  ),
 
                   // Date/time + price
                   Row(
@@ -232,29 +257,33 @@ class _BookingCard extends StatelessWidget {
                           children: [
                             _InfoRow(
                               icon: Icons.calendar_today_rounded,
-                              text: DateFormat('dd MMMM yyyy', 'fr_FR')
-                                  .format(booking.date),
+                              text: DateFormat(
+                                'dd MMMM yyyy',
+                                'fr_FR',
+                              ).format(booking.date),
                             ),
                             const SizedBox(height: 4),
                             _InfoRow(
                               icon: Icons.access_time_rounded,
-                              text:
-                                  '${booking.startTime} – ${booking.endTime}',
+                              text: '${booking.startTime} – ${booking.endTime}',
                             ),
                           ],
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.sm,
+                        ),
                         decoration: BoxDecoration(
                           gradient: AppColors.primaryGradientH,
                           borderRadius: AppSpacing.chipBorderRadius,
                         ),
                         child: Text(
                           '${booking.totalPrice.toInt()} F',
-                          style: AppTypography.labelMd
-                              .copyWith(color: Colors.white),
+                          style: AppTypography.labelMd.copyWith(
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
@@ -291,9 +320,10 @@ class _InfoRow extends StatelessWidget {
       children: [
         Icon(icon, size: 13, color: AppColors.primary),
         const SizedBox(width: 5),
-        Text(text,
-            style:
-                AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+        Text(
+          text,
+          style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+        ),
       ],
     );
   }

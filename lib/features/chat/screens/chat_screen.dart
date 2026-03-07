@@ -33,7 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
       orElse: () => MockData.conversations.first,
     );
     _messages = List.from(MockData.messages);
-    
+
     _messageController.addListener(() {
       setState(() {
         _isTyping = _messageController.text.trim().isNotEmpty;
@@ -50,7 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _sendMessage() {
     if (!_isTyping) return;
-    
+
     final newMessage = MessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       senderId: "p1", // Assuming current user is parent
@@ -98,7 +98,9 @@ class _ChatScreenState extends State<ChatScreen> {
             backgroundImage: _conversation.otherUserAvatar != null
                 ? NetworkImage(_conversation.otherUserAvatar!)
                 : null,
-            child: _conversation.otherUserAvatar == null ? const Icon(Icons.person) : null,
+            child: _conversation.otherUserAvatar == null
+                ? const Icon(Icons.person)
+                : null,
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -107,16 +109,20 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Text(
                   _conversation.otherUserName,
-                  style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
-                  _conversation.isOnline 
-                      ? "En ligne" 
-                      : (_conversation.lastSeen != null 
-                          ? "Vu il y a ${DateTime.now().difference(_conversation.lastSeen!).inMinutes} min" 
-                          : "Hors ligne"),
+                  _conversation.isOnline
+                      ? "En ligne"
+                      : (_conversation.lastSeen != null
+                            ? "Vu il y a ${DateTime.now().difference(_conversation.lastSeen!).inMinutes} min"
+                            : "Hors ligne"),
                   style: AppTypography.caption.copyWith(
-                    color: _conversation.isOnline ? Colors.green : AppColors.textSecondary,
+                    color: _conversation.isOnline
+                        ? Colors.green
+                        : AppColors.textSecondary,
                     fontSize: 11,
                   ),
                 ),
@@ -126,14 +132,8 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.phone_outlined),
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () {},
-        ),
+        IconButton(icon: const Icon(Icons.phone_outlined), onPressed: () {}),
+        IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
       ],
     );
   }
@@ -146,14 +146,14 @@ class _ChatScreenState extends State<ChatScreen> {
       itemBuilder: (context, index) {
         final message = _messages[index];
         final bool isMe = message.senderId == "p1";
-        
+
         // Show date separator if the date changed
         bool showDateSeparator = false;
         if (index == 0) {
           showDateSeparator = true;
         } else {
           final prevDate = _messages[index - 1].timestamp;
-          if (prevDate.day != message.timestamp.day || 
+          if (prevDate.day != message.timestamp.day ||
               prevDate.month != message.timestamp.month ||
               prevDate.year != message.timestamp.year) {
             showDateSeparator = true;
@@ -173,7 +173,9 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildDateSeparator(DateTime date) {
     String dateStr;
     final now = DateTime.now();
-    if (date.day == now.day && date.month == now.month && date.year == now.year) {
+    if (date.day == now.day &&
+        date.month == now.month &&
+        date.year == now.year) {
       dateStr = "Aujourd'hui";
     } else if (date.day == now.subtract(const Duration(days: 1)).day) {
       dateStr = "Hier";
@@ -185,14 +187,20 @@ class _ChatScreenState extends State<ChatScreen> {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
       child: Center(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: 4,
+          ),
           decoration: BoxDecoration(
             color: AppColors.border.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             dateStr,
-            style: AppTypography.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600),
+            style: AppTypography.caption.copyWith(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),
@@ -214,7 +222,10 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: AppColors.textSecondary),
+            icon: const Icon(
+              Icons.add_circle_outline,
+              color: AppColors.textSecondary,
+            ),
             onPressed: () {},
           ),
           Expanded(

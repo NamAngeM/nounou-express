@@ -37,7 +37,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       childrenAges: [3, 6],
       totalPrice: 22425,
       commission: 2925,
-      status: "En attente", // "En attente", "Confirmée", "En cours", "Terminée", "Annulée"
+      status:
+          "En attente", // "En attente", "Confirmée", "En cours", "Terminée", "Annulée"
       address: "Quartier Glass, BAT G2",
       notes: "Allergies aux arachides.",
     );
@@ -46,12 +47,18 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
   Color _getStatusColor() {
     switch (_booking.status) {
-      case "En attente": return Colors.orange;
-      case "Confirmée": return const Color(0xFF4ECDC4);
-      case "En cours": return Colors.blue;
-      case "Terminée": return Colors.green;
-      case "Annulée": return Colors.red;
-      default: return AppColors.textSecondary;
+      case "En attente":
+        return Colors.orange;
+      case "Confirmée":
+        return const Color(0xFF4ECDC4);
+      case "En cours":
+        return Colors.blue;
+      case "Terminée":
+        return Colors.green;
+      case "Annulée":
+        return Colors.red;
+      default:
+        return AppColors.textSecondary;
     }
   }
 
@@ -78,7 +85,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
           children: [
             // Status Banner
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
               decoration: BoxDecoration(
                 color: statusColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.md),
@@ -90,7 +100,11 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                   if (isEnCours)
                     const Icon(Icons.circle, color: Colors.blue, size: 12)
                         .animate(onPlay: (controller) => controller.repeat())
-                        .scale(duration: 1.seconds, begin: const Offset(0.8, 0.8), end: const Offset(1.2, 1.2))
+                        .scale(
+                          duration: 1.seconds,
+                          begin: const Offset(0.8, 0.8),
+                          end: const Offset(1.2, 1.2),
+                        )
                         .fadeOut(duration: 1.seconds),
                   if (isEnCours) const SizedBox(width: AppSpacing.sm),
                   Text(
@@ -112,13 +126,29 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
             // Details
             _buildSectionTitle("Informations de la mission"),
             const SizedBox(height: AppSpacing.md),
-            _buildDetailItem(Icons.calendar_today_outlined, "Date", DateFormat('EEEE d MMMM y', 'fr_FR').format(_booking.date)),
-            _buildDetailItem(Icons.access_time, "Horaires", "${_booking.startTime} → ${_booking.endTime}"),
-            _buildDetailItem(Icons.location_on_outlined, "Adresse", _booking.address),
-            _buildDetailItem(Icons.child_care_outlined, "Enfants", "${_booking.numberOfChildren} enfant(s) (${_booking.childrenAges.join(', ')} ans)"),
+            _buildDetailItem(
+              Icons.calendar_today_outlined,
+              "Date",
+              DateFormat('EEEE d MMMM y', 'fr_FR').format(_booking.date),
+            ),
+            _buildDetailItem(
+              Icons.access_time,
+              "Horaires",
+              "${_booking.startTime} → ${_booking.endTime}",
+            ),
+            _buildDetailItem(
+              Icons.location_on_outlined,
+              "Adresse",
+              _booking.address,
+            ),
+            _buildDetailItem(
+              Icons.child_care_outlined,
+              "Enfants",
+              "${_booking.numberOfChildren} enfant(s) (${_booking.childrenAges.join(', ')} ans)",
+            ),
             if (_booking.notes != null)
               _buildDetailItem(Icons.notes, "Notes", _booking.notes!),
-            
+
             const SizedBox(height: AppSpacing.xl),
             _buildSectionTitle("Timeline de la mission"),
             const SizedBox(height: AppSpacing.lg),
@@ -151,20 +181,33 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         children: [
           CircleAvatar(
             radius: 30,
-            backgroundImage: NetworkImage(_nanny.avatar ?? "https://i.pravatar.cc/150?u=${_nanny.id}"),
+            backgroundImage: NetworkImage(
+              _nanny.avatar ?? "https://i.pravatar.cc/150?u=${_nanny.id}",
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_nanny.name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
-                Text("${_nanny.experience} ans d'expérience", style: AppTypography.caption),
+                Text(
+                  _nanny.name,
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  "${_nanny.experience} ans d'expérience",
+                  style: AppTypography.caption,
+                ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.chat_bubble_outline, color: AppColors.primary),
+            icon: const Icon(
+              Icons.chat_bubble_outline,
+              color: AppColors.primary,
+            ),
             onPressed: () => context.push('/chat/${_nanny.id}'),
           ),
         ],
@@ -238,7 +281,9 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     event['title']!,
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: isDone ? FontWeight.bold : FontWeight.normal,
-                      color: isDone ? AppColors.textPrimary : AppColors.textSecondary,
+                      color: isDone
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary,
                     ),
                   ),
                   if (isDone)
@@ -257,7 +302,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     if (_booking.status == "En attente" || _booking.status == "Confirmée") {
       return OutlinedButton(
         onPressed: () {},
-        style: OutlinedButton.styleFrom(foregroundColor: AppColors.danger, side: const BorderSide(color: AppColors.danger)),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.danger,
+          side: const BorderSide(color: AppColors.danger),
+        ),
         child: const Text("Annuler la réservation"),
       );
     } else if (_booking.status == "Terminée") {

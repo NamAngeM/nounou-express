@@ -1,8 +1,8 @@
 class Validators {
   static const _validGabonPrefixes = [
     '060', '062', '065', '066', // Moov Africa
-    '074', '076', '077',         // Airtel Gabon
-    '011',                        // Téléphonie Fixe (Libreville)
+    '074', '076', '077', // Airtel Gabon
+    '011', // Téléphonie Fixe (Libreville)
   ];
 
   static String? validateEmail(String? value) {

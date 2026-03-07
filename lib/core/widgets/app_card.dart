@@ -41,10 +41,7 @@ class AppCard extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return ScaleTap(
-        onTap: onTap,
-        child: card,
-      );
+      return ScaleTap(onTap: onTap, child: card);
     }
 
     return card;

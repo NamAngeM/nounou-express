@@ -7,5 +7,13 @@ class UserModel {
   final String? avatar;
   final DateTime createdAt;
 
-  UserModel({required this.id, required this.name, required this.email, required this.phone, required this.role, this.avatar, required this.createdAt});
+  UserModel({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.role,
+    this.avatar,
+    required this.createdAt,
+  });
 }

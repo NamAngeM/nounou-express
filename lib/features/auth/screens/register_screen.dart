@@ -12,14 +12,14 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   // Base Controllers
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   String _selectedNeighborhood = 'Akanda';
   int _childrenCount = 1;
   bool _acceptedTerms = false;
-  
+
   // Nanny specific
   DateTime? _birthDate;
   final _cniController = TextEditingController();
@@ -27,16 +27,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _rateController = TextEditingController();
   final _bioController = TextEditingController();
   final List<String> _selectedSkills = [];
-  
+
   String role = 'parent';
 
   final List<String> _neighborhoods = [
-    'Akanda', 'Angondjé', 'Nzeng-Ayong', 'Owendo', 'Glass', 'Nombakélé', 'Alibandeng', 'Autre'
+    'Akanda',
+    'Angondjé',
+    'Nzeng-Ayong',
+    'Owendo',
+    'Glass',
+    'Nombakélé',
+    'Alibandeng',
+    'Autre',
   ];
 
   final List<String> _availableSkills = [
-    'Premiers secours', 'Cuisine', 'Aide aux devoirs', 
-    'Éveil musical', 'Jeux créatifs', 'Hygiène bébé', 'Langues étrangères'
+    'Premiers secours',
+    'Cuisine',
+    'Aide aux devoirs',
+    'Éveil musical',
+    'Jeux créatifs',
+    'Hygiène bébé',
+    'Langues étrangères',
   ];
 
   @override
@@ -60,7 +72,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate() && _acceptedTerms) {
       if (role == 'nanny' && _birthDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Veuillez sélectionner une date de naissance.')),
+          const SnackBar(
+            content: Text('Veuillez sélectionner une date de naissance.'),
+          ),
         );
         return;
       }
@@ -70,7 +84,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (mounted) context.go('/home');
     } else if (!_acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez accepter les conditions d\'utilisation.')),
+        const SnackBar(
+          content: Text('Veuillez accepter les conditions d\'utilisation.'),
+        ),
       );
     }
   }
@@ -78,9 +94,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)), // 18 years ago minimum
+      initialDate: DateTime.now().subtract(
+        const Duration(days: 365 * 18),
+      ), // 18 years ago minimum
       firstDate: DateTime(1950),
-      lastDate: DateTime.now().subtract(const Duration(days: 365 * 16)), // Minimum 16 yo
+      lastDate: DateTime.now().subtract(
+        const Duration(days: 365 * 16),
+      ), // Minimum 16 yo
     );
     if (picked != null && picked != _birthDate) {
       setState(() => _birthDate = picked);
@@ -127,7 +147,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       CircleAvatar(
                         radius: 50,
                         backgroundColor: Colors.grey.shade200,
-                        child: Icon(Icons.person, size: 50, color: Colors.grey.shade400),
+                        child: Icon(
+                          Icons.person,
+                          size: 50,
+                          color: Colors.grey.shade400,
+                        ),
                       ),
                       Positioned(
                         bottom: 0,
@@ -136,7 +160,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           radius: 18,
                           backgroundColor: const Color(0xFFFF6B35),
                           child: IconButton(
-                            icon: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                            icon: const Icon(
+                              Icons.camera_alt,
+                              size: 16,
+                              color: Colors.white,
+                            ),
                             onPressed: () {},
                             padding: EdgeInsets.zero,
                           ),
@@ -151,7 +179,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _buildInputLabel('Nom complet'),
                 TextFormField(
                   controller: _nameController,
-                  decoration: _inputDecoration(icon: Icons.person_outline, hint: 'Ex: Marie Ndong'),
+                  decoration: _inputDecoration(
+                    icon: Icons.person_outline,
+                    hint: 'Ex: Marie Ndong',
+                  ),
                   validator: (v) => Validators.validateRequired(v, 'Le nom'),
                 ),
                 const SizedBox(height: 20),
@@ -160,7 +191,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: _inputDecoration(icon: Icons.email_outlined, hint: 'Ex: marie@email.com'),
+                  decoration: _inputDecoration(
+                    icon: Icons.email_outlined,
+                    hint: 'Ex: marie@email.com',
+                  ),
                   validator: Validators.validateEmail,
                 ),
                 const SizedBox(height: 20),
@@ -168,28 +202,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _buildInputLabel('Quartier de résidence'),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedNeighborhood,
-                  decoration: _inputDecoration(icon: Icons.location_on_outlined),
+                  decoration: _inputDecoration(
+                    icon: Icons.location_on_outlined,
+                  ),
                   items: _neighborhoods.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
                     );
                   }).toList(),
-                  onChanged: (newValue) => setState(() => _selectedNeighborhood = newValue!),
+                  onChanged: (newValue) =>
+                      setState(() => _selectedNeighborhood = newValue!),
                 ),
                 const SizedBox(height: 20),
 
-                _buildInputLabel(isNanny ? 'Nombre d\'enfants à charge (optionnel)' : 'Nombre d\'enfants'),
+                _buildInputLabel(
+                  isNanny
+                      ? 'Nombre d\'enfants à charge (optionnel)'
+                      : 'Nombre d\'enfants',
+                ),
                 Row(
                   children: [
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline),
                       color: const Color(0xFFFF6B35),
                       onPressed: () {
-                        if (_childrenCount > 0) setState(() => _childrenCount--);
+                        if (_childrenCount > 0)
+                          setState(() => _childrenCount--);
                       },
                     ),
-                    Text('$_childrenCount', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(
+                      '$_childrenCount',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     IconButton(
                       icon: const Icon(Icons.add_circle_outline),
                       color: const Color(0xFFFF6B35),
@@ -205,7 +253,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 24),
                   Text(
                     'Informations Professionnelles',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 20),
 
@@ -213,7 +263,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   GestureDetector(
                     onTap: () => _selectDate(context),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(12),
@@ -221,14 +274,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.calendar_today, color: Colors.grey.shade600),
+                          Icon(
+                            Icons.calendar_today,
+                            color: Colors.grey.shade600,
+                          ),
                           const SizedBox(width: 12),
                           Text(
                             _birthDate == null
                                 ? 'Sélectionner une date'
                                 : '${_birthDate!.day}/${_birthDate!.month}/${_birthDate!.year}',
                             style: TextStyle(
-                              color: _birthDate == null ? Colors.grey.shade600 : Colors.black87,
+                              color: _birthDate == null
+                                  ? Colors.grey.shade600
+                                  : Colors.black87,
                               fontSize: 16,
                             ),
                           ),
@@ -241,7 +299,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   _buildInputLabel('Numéro CNI / Passeport'),
                   TextFormField(
                     controller: _cniController,
-                    decoration: _inputDecoration(icon: Icons.credit_card, hint: 'Ex: 123456789'),
+                    decoration: _inputDecoration(
+                      icon: Icons.credit_card,
+                      hint: 'Ex: 123456789',
+                    ),
                     validator: Validators.validateCNI,
                   ),
                   const SizedBox(height: 20),
@@ -250,7 +311,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   DropdownButtonFormField<int>(
                     initialValue: _experienceYears,
                     decoration: _inputDecoration(icon: Icons.work_outline),
-                    items: List.generate(21, (i) => DropdownMenuItem(value: i, child: Text('$i an(s)'))),
+                    items: List.generate(
+                      21,
+                      (i) =>
+                          DropdownMenuItem(value: i, child: Text('$i an(s)')),
+                    ),
                     onChanged: (val) => setState(() => _experienceYears = val!),
                   ),
                   const SizedBox(height: 20),
@@ -259,11 +324,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _rateController,
                     keyboardType: TextInputType.number,
-                    decoration: _inputDecoration(icon: Icons.payments_outlined, hint: 'Ex: 3000').copyWith(
-                      suffixText: 'FCFA/h',
-                      suffixStyle: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    validator: (v) => Validators.validateRequired(v, 'Le tarif horaire'),
+                    decoration:
+                        _inputDecoration(
+                          icon: Icons.payments_outlined,
+                          hint: 'Ex: 3000',
+                        ).copyWith(
+                          suffixText: 'FCFA/h',
+                          suffixStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                    validator: (v) =>
+                        Validators.validateRequired(v, 'Le tarif horaire'),
                   ),
                   const SizedBox(height: 20),
 
@@ -272,7 +344,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _bioController,
                     maxLength: 300,
                     maxLines: 4,
-                    decoration: _inputDecoration(hint: 'Présentez-vous en quelques mots...'),
+                    decoration: _inputDecoration(
+                      hint: 'Présentez-vous en quelques mots...',
+                    ),
                     validator: (v) => Validators.validateRequired(v, 'La bio'),
                   ),
                   const SizedBox(height: 20),
@@ -295,7 +369,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             }
                           });
                         },
-                        selectedColor: const Color(0xFFFF6B35).withValues(alpha: 0.2),
+                        selectedColor: const Color(
+                          0xFFFF6B35,
+                        ).withValues(alpha: 0.2),
                         checkmarkColor: const Color(0xFFFF6B35),
                       );
                     }).toList(),
@@ -309,7 +385,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Checkbox(
                       value: _acceptedTerms,
                       activeColor: const Color(0xFFFF6B35),
-                      onChanged: (val) => setState(() => _acceptedTerms = val ?? false),
+                      onChanged: (val) =>
+                          setState(() => _acceptedTerms = val ?? false),
                     ),
                     const Expanded(
                       child: Text(

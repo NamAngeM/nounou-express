@@ -32,7 +32,8 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  String _quartierOf(NannyModel n) => n.quartier.isNotEmpty ? n.quartier : 'Libreville';
+  String _quartierOf(NannyModel n) =>
+      n.quartier.isNotEmpty ? n.quartier : 'Libreville';
 
   double _distanceOf(NannyModel n) {
     final i = MockData.nannies.indexOf(n).clamp(0, _mockDistances.length - 1);
@@ -53,7 +54,9 @@ class _SearchScreenState extends State<SearchScreen> {
       }
 
       // Quartier filter
-      if (_filters.quartiers.isNotEmpty && !_filters.quartiers.contains(quartier)) return false;
+      if (_filters.quartiers.isNotEmpty &&
+          !_filters.quartiers.contains(quartier))
+        return false;
 
       // Price range
       if (n.hourlyRate < _filters.priceRange.start ||
@@ -66,12 +69,16 @@ class _SearchScreenState extends State<SearchScreen> {
 
       // Experience
       final exp = n.experience;
-      if (_filters.experienceFilter == '1-2 ans' && (exp < 1 || exp > 2)) return false;
-      if (_filters.experienceFilter == '3-5 ans' && (exp < 3 || exp > 5)) return false;
+      if (_filters.experienceFilter == '1-2 ans' && (exp < 1 || exp > 2))
+        return false;
+      if (_filters.experienceFilter == '3-5 ans' && (exp < 3 || exp > 5))
+        return false;
       if (_filters.experienceFilter == '5+ ans' && exp < 5) return false;
 
       // Availability
-      if (_filters.onlyAvailable && !n.isVerified && !n.badges.contains('Disponible')) {
+      if (_filters.onlyAvailable &&
+          !n.isVerified &&
+          !n.badges.contains('Disponible')) {
         return false;
       }
 
@@ -121,7 +128,9 @@ class _SearchScreenState extends State<SearchScreen> {
               color: AppColors.primary,
               child: results.isEmpty
                   ? SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
                       child: EmptyState(
                         icon: Icons.search_off_rounded,
                         title: 'Aucune nounou trouvée',
@@ -136,7 +145,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     )
                   : ListView.separated(
-                      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
                       padding: const EdgeInsets.fromLTRB(
                         AppSpacing.xl,
                         AppSpacing.md,
@@ -144,18 +155,22 @@ class _SearchScreenState extends State<SearchScreen> {
                         100,
                       ),
                       itemCount: results.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+                      separatorBuilder: (_, _) =>
+                          const SizedBox(height: AppSpacing.md),
                       itemBuilder: (context, index) {
                         final n = results[index];
                         return NannyCard(
-                          nannyId: n.id,
-                          name: n.name,
-                          quartier: _quartierOf(n),
-                          rating: n.rating,
-                          hourlyRate: n.hourlyRate,
-                          distanceKm: _distanceOf(n),
-                          isVerified: n.isVerified,
-                        ).animate().fadeIn(delay: (index * 50).ms, duration: 400.ms).slideX(begin: 0.1, end: 0);
+                              nannyId: n.id,
+                              name: n.name,
+                              quartier: _quartierOf(n),
+                              rating: n.rating,
+                              hourlyRate: n.hourlyRate,
+                              distanceKm: _distanceOf(n),
+                              isVerified: n.isVerified,
+                            )
+                            .animate()
+                            .fadeIn(delay: (index * 50).ms, duration: 400.ms)
+                            .slideX(begin: 0.1, end: 0);
                       },
                     ),
             ),
@@ -205,14 +220,18 @@ class _SearchScreenState extends State<SearchScreen> {
           decoration: InputDecoration(
             hintText: 'Nom, quartier...',
             hintStyle: AppTypography.bodyLarge.copyWith(
-                color: Colors.white.withValues(alpha: 0.55)),
+              color: Colors.white.withValues(alpha: 0.55),
+            ),
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
             filled: false,
-            prefixIcon: const Icon(Icons.search_rounded,
-                color: Colors.white70, size: 18),
+            prefixIcon: const Icon(
+              Icons.search_rounded,
+              color: Colors.white70,
+              size: 18,
+            ),
           ),
           onChanged: (v) => setState(() => _query = v),
         ),
@@ -272,7 +291,9 @@ class _SearchScreenState extends State<SearchScreen> {
             child: DropdownButton<SortOption>(
               value: _sortBy,
               isDense: true,
-              style: AppTypography.caption.copyWith(color: AppColors.textPrimary),
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textPrimary,
+              ),
               icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
               onChanged: (v) {
                 if (v != null) setState(() => _sortBy = v);
