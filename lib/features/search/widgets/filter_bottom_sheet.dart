@@ -139,7 +139,9 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
       if (_f.experienceFilter == '5+ ans' && exp < 5) {
         return false;
       }
-      if (_f.onlyAvailable && !n.isVerified && !n.badges.contains('Disponible')) {
+      if (_f.onlyAvailable &&
+          !n.isVerified &&
+          !n.badges.contains('Disponible')) {
         return false;
       }
       for (final badge in _f.badges) {
