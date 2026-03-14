@@ -301,9 +301,7 @@ class _DelayScreenState extends State<DelayScreen> {
         ? _selectedMinutes == -1
         : _selectedMinutes == minutes;
     final label = isUnknown ? 'Je ne sais pas' : _minutesLabel(minutes);
-    final extraCost = (!isUnknown && minutes != null)
-        ? _extraCostFcfa(minutes)
-        : null;
+    final extraCost = minutes != null ? _extraCostFcfa(minutes) : null;
 
     return GestureDetector(
       onTap: () => setState(() {

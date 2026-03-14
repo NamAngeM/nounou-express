@@ -60,7 +60,7 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            ..._docs.entries.map((e) => _buildDocTile(e.key, e.value)).toList(),
+            ..._docs.entries.map((e) => _buildDocTile(e.key, e.value)),
             const SizedBox(height: AppSpacing.xxxl),
             _buildUploadSection(),
             const SizedBox(height: 100),

@@ -260,7 +260,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _phone.dispose();
     _email.dispose();
     _address.dispose();
-    for (final c in _children) c.dispose();
+    for (final c in _children) {
+      c.dispose();
+    }
     _emerg1Name.dispose();
     _emerg1Phone.dispose();
     _emerg2Name.dispose();
