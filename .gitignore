@@ -48,3 +48,4 @@ app.*.map.json
 *.txt
 *.py
 emulators_output.txt
+lib/features/auth/screens/*.bak
