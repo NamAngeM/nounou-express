@@ -22,7 +22,7 @@ class AuthLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
@@ -45,12 +45,20 @@ class AuthLayout extends StatelessWidget {
           Positioned(
             top: 60,
             right: 40,
-            child: Icon(Icons.star_rounded, color: Colors.white.withValues(alpha: 0.2), size: 24),
+            child: Icon(
+              Icons.star_rounded,
+              color: Colors.white.withValues(alpha: 0.2),
+              size: 24,
+            ),
           ),
           Positioned(
             top: 100,
             left: 30,
-            child: Icon(Icons.star_rounded, color: Colors.white.withValues(alpha: 0.1), size: 16),
+            child: Icon(
+              Icons.star_rounded,
+              color: Colors.white.withValues(alpha: 0.1),
+              size: 16,
+            ),
           ),
 
           // ── Back Button ──────────────────────────────────────────────────
@@ -59,7 +67,11 @@ class AuthLayout extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   onPressed: onBack ?? () => Navigator.maybePop(context),
                 ),
               ),
@@ -87,10 +99,7 @@ class AuthLayout extends StatelessWidget {
 
                     // Character illustration
                     if (character != null)
-                      Positioned(
-                        bottom: size.height * 0.09,
-                        child: character!,
-                      ),
+                      Positioned(bottom: size.height * 0.09, child: character!),
 
                     // Screen title
                     if (title != null)
@@ -119,12 +128,18 @@ class AuthLayout extends StatelessWidget {
                       topRight: Radius.circular(50),
                     ),
                     boxShadow: [
-                      BoxShadow(color: AppColors.primary.withValues(alpha: 0.1), blurRadius: 40, offset: const Offset(0, -10)),
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        blurRadius: 40,
+                        offset: const Offset(0, -10),
+                      ),
                     ],
                   ),
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xxl,
+                    ),
                     child: child,
                   ),
                 ),
@@ -145,15 +160,22 @@ class _AuthBackgroundPainter extends CustomPainter {
 
     // Subtle decorative circle behind everything
     final bubblePaint = Paint()..color = Colors.white.withValues(alpha: 0.05);
-    canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.2), 120, bubblePaint);
+    canvas.drawCircle(
+      Offset(size.width * 0.8, size.height * 0.2),
+      120,
+      bubblePaint,
+    );
 
     // Light Layer (Secondary wave)
-    final secondaryPaint = Paint()..color = AppColors.primary.withValues(alpha: 0.15);
+    final secondaryPaint = Paint()
+      ..color = AppColors.primary.withValues(alpha: 0.15);
     final secondaryPath = Path();
     secondaryPath.lineTo(0, size.height * 0.9);
     secondaryPath.quadraticBezierTo(
-      size.width * 0.5, size.height * 0.7,
-      size.width, size.height * 0.85,
+      size.width * 0.5,
+      size.height * 0.7,
+      size.width,
+      size.height * 0.85,
     );
     secondaryPath.lineTo(size.width, 0);
     secondaryPath.close();
@@ -164,9 +186,12 @@ class _AuthBackgroundPainter extends CustomPainter {
     final primaryPath = Path();
     primaryPath.lineTo(0, size.height * 0.75);
     primaryPath.cubicTo(
-      size.width * 0.3, size.height * 0.9,
-      size.width * 0.7, size.height * 0.5,
-      size.width, size.height * 0.7,
+      size.width * 0.3,
+      size.height * 0.9,
+      size.width * 0.7,
+      size.height * 0.5,
+      size.width,
+      size.height * 0.7,
     );
     primaryPath.lineTo(size.width, 0);
     primaryPath.close();

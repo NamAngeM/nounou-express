@@ -203,12 +203,13 @@ class _OtpScreenState extends State<OtpScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: List.generate(
                         4,
-                        (i) => _OtpBox(
-                          controller: _controllers[i],
-                          focusNode: _focusNodes[i],
-                          hasError: _hasError,
-                          onChanged: (v) => _onDigitChanged(i, v),
-                        ).animate().fadeIn(
+                        (i) =>
+                            _OtpBox(
+                              controller: _controllers[i],
+                              focusNode: _focusNodes[i],
+                              hasError: _hasError,
+                              onChanged: (v) => _onDigitChanged(i, v),
+                            ).animate().fadeIn(
                               delay: Duration(milliseconds: 200 + i * 60),
                             ),
                       ),
@@ -222,34 +223,34 @@ class _OtpScreenState extends State<OtpScreen>
                     duration: const Duration(milliseconds: 300),
                     child: _isComplete && !_hasError
                         ? Center(
-                            key: const ValueKey('complete'),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.check_circle_rounded,
-                                  size: 16,
-                                  color: AppColors.accent,
+                                key: const ValueKey('complete'),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.check_circle_rounded,
+                                      size: 16,
+                                      color: AppColors.accent,
+                                    ),
+                                    const SizedBox(width: AppSpacing.xs),
+                                    Text(
+                                      'Code complet',
+                                      style: AppTypography.bodySmall.copyWith(
+                                        color: AppColors.accentDark,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: AppSpacing.xs),
-                                Text(
-                                  'Code complet',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.accentDark,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                            .animate()
-                            .fadeIn(duration: 250.ms)
-                            .scale(
-                              begin: const Offset(0.85, 0.85),
-                              end: const Offset(1.0, 1.0),
-                              duration: 250.ms,
-                              curve: Curves.easeOutBack,
-                            )
+                              )
+                              .animate()
+                              .fadeIn(duration: 250.ms)
+                              .scale(
+                                begin: const Offset(0.85, 0.85),
+                                end: const Offset(1.0, 1.0),
+                                duration: 250.ms,
+                                curve: Curves.easeOutBack,
+                              )
                         : const SizedBox(key: ValueKey('empty'), height: 20),
                   ),
 
@@ -534,8 +535,9 @@ class _OtpBoxState extends State<_OtpBox> {
       borderColor = AppColors.border;
     }
 
-    final double borderWidth =
-        (widget.hasError || _isFocused || _hasFilled) ? 2.0 : 1.0;
+    final double borderWidth = (widget.hasError || _isFocused || _hasFilled)
+        ? 2.0
+        : 1.0;
 
     // Gradient border decoration when focused (non-error)
     final bool showGradientBorder = _isFocused && !widget.hasError;
@@ -559,10 +561,7 @@ class _OtpBoxState extends State<_OtpBox> {
           fillColor: fillColor,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(
-              color: borderColor,
-              width: borderWidth,
-            ),
+            borderSide: BorderSide(color: borderColor, width: borderWidth),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
@@ -598,9 +597,7 @@ class _OtpBoxState extends State<_OtpBox> {
             keyboardType: TextInputType.number,
             maxLength: 1,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            style: AppTypography.h2.copyWith(
-              color: AppColors.textPrimary,
-            ),
+            style: AppTypography.h2.copyWith(color: AppColors.textPrimary),
             decoration: const InputDecoration(
               counterText: '',
               filled: false,

@@ -10,7 +10,8 @@ class NannyVerificationScreen extends StatefulWidget {
   const NannyVerificationScreen({super.key});
 
   @override
-  State<NannyVerificationScreen> createState() => _NannyVerificationScreenState();
+  State<NannyVerificationScreen> createState() =>
+      _NannyVerificationScreenState();
 }
 
 class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
@@ -26,11 +27,17 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text("Vérification du Profil", style: AppTypography.h4.copyWith(fontWeight: FontWeight.w900)),
+        title: Text(
+          "Vérification du Profil",
+          style: AppTypography.h4.copyWith(fontWeight: FontWeight.w900),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: AppColors.textPrimary,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
@@ -41,11 +48,16 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
           children: [
             _buildStatusHeader(),
             const SizedBox(height: AppSpacing.xxxl),
-            Text("Documents requis", style: AppTypography.h3.copyWith(fontWeight: FontWeight.w900)),
+            Text(
+              "Documents requis",
+              style: AppTypography.h3.copyWith(fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 8),
             Text(
               "Téléchargez les documents suivants pour obtenir le badge 'Vérifié' et accéder à plus de missions.",
-              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: AppSpacing.xl),
             ..._docs.entries.map((e) => _buildDocTile(e.key, e.value)).toList(),
@@ -71,19 +83,35 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(color: AppColors.warning, shape: BoxShape.circle),
-            child: const Icon(Icons.hourglass_empty_rounded, color: Colors.white, size: 24),
+            decoration: const BoxDecoration(
+              color: AppColors.warning,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.hourglass_empty_rounded,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Vérification en cours", style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w900, color: AppColors.warning)),
+                Text(
+                  "Vérification en cours",
+                  style: AppTypography.bodySmall.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.warning,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Text(
                   "Complétez votre dossier pour débloquer votre compte.",
-                  style: AppTypography.caption.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -126,10 +154,18 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.description_rounded, color: AppColors.primary.withValues(alpha: 0.5)),
+          Icon(
+            Icons.description_rounded,
+            color: AppColors.primary.withValues(alpha: 0.5),
+          ),
           const SizedBox(width: 16),
           Expanded(
-            child: Text(name, style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold)),
+            child: Text(
+              name,
+              style: AppTypography.bodySmall.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -142,7 +178,14 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
               children: [
                 Icon(icon, size: 14, color: color),
                 const SizedBox(width: 6),
-                Text(label, style: AppTypography.small.copyWith(color: color, fontWeight: FontWeight.w900, fontSize: 10)),
+                Text(
+                  label,
+                  style: AppTypography.small.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 10,
+                  ),
+                ),
               ],
             ),
           ),
@@ -158,25 +201,38 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1), style: BorderStyle.solid),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          style: BorderStyle.solid,
+        ),
       ),
       child: Column(
         children: [
-          Icon(Icons.cloud_upload_rounded, size: 48, color: AppColors.primary.withValues(alpha: 0.4)),
+          Icon(
+            Icons.cloud_upload_rounded,
+            size: 48,
+            color: AppColors.primary.withValues(alpha: 0.4),
+          ),
           const SizedBox(height: 16),
           Text(
             "Prendre une photo ou parcourir",
-            style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w900),
+            style: AppTypography.bodySmall.copyWith(
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             "PDF, JPG ou PNG (Max 5Mo)",
-            style: AppTypography.caption.copyWith(color: AppColors.textTertiary),
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textTertiary,
+            ),
           ),
           const SizedBox(height: 24),
           AppButton(
-              label: "Sélectionner un fichier", type: AppButtonType.secondary,
-              onPressed: () {}),
+            label: "Sélectionner un fichier",
+            type: AppButtonType.secondary,
+            onPressed: () {},
+          ),
         ],
       ),
     );
@@ -188,7 +244,11 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -10)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, -10),
+          ),
         ],
       ),
       child: AppButton(
@@ -196,10 +256,14 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text("Vos documents ont été envoyés avec succès !"),
+              content: const Text(
+                "Vos documents ont été envoyés avec succès !",
+              ),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
             ),
           );
           context.pop();

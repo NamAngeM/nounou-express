@@ -29,8 +29,9 @@ class _AvailableMissionsScreenState extends State<AvailableMissionsScreen> {
   ];
 
   List<MissionModel> get _filteredMissions {
-    final pending =
-        mockMissions.where((m) => m.status == MissionStatus.pending).toList();
+    final pending = mockMissions
+        .where((m) => m.status == MissionStatus.pending)
+        .toList();
     switch (_filter) {
       case 'Urgentes 🔴':
         return pending.where((m) => m.isUrgent).toList();
@@ -81,9 +82,8 @@ class _AvailableMissionsScreenState extends State<AvailableMissionsScreen> {
                     itemCount: missions.length,
                     separatorBuilder: (_, _) =>
                         const SizedBox(height: AppSpacing.md),
-                    itemBuilder: (context, i) => _MissionCard(
-                      mission: missions[i],
-                    ),
+                    itemBuilder: (context, i) =>
+                        _MissionCard(mission: missions[i]),
                   ),
           ),
         ],
@@ -103,7 +103,9 @@ class _AvailableMissionsScreenState extends State<AvailableMissionsScreen> {
           Text('Annonces disponibles', style: AppTypography.h3),
           Text(
             'Libreville · Angondjé',
-            style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -134,9 +136,7 @@ class _FilterBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: AppColors.surface,
-      padding: const EdgeInsets.symmetric(
-        vertical: AppSpacing.sm,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -229,10 +229,7 @@ class _MissionCard extends StatelessWidget {
             _InfoRow(
               icon: Icons.location_on_rounded,
               iconColor: AppColors.primary,
-              child: Text(
-                mission.address,
-                style: AppTypography.bodyMedium,
-              ),
+              child: Text(mission.address, style: AppTypography.bodyMedium),
             ),
             const SizedBox(height: AppSpacing.xs),
             // DATE/TIME
@@ -309,15 +306,9 @@ class _TopRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                mission.parentName,
-                style: AppTypography.h4,
-              ),
+              Text(mission.parentName, style: AppTypography.h4),
               const SizedBox(height: 2),
-              Text(
-                _timeAgo(mission.publishedAt),
-                style: AppTypography.caption,
-              ),
+              Text(_timeAgo(mission.publishedAt), style: AppTypography.caption),
             ],
           ),
         ),
@@ -335,7 +326,9 @@ class _UrgencyBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = isUrgent ? AppColors.danger : AppColors.success;
-    final surface = isUrgent ? AppColors.dangerSurface : AppColors.successSurface;
+    final surface = isUrgent
+        ? AppColors.dangerSurface
+        : AppColors.successSurface;
     final icon = isUrgent ? Icons.flash_on_rounded : Icons.schedule_rounded;
     final label = isUrgent ? 'URGENT' : 'Planifiée';
 
@@ -356,10 +349,7 @@ class _UrgencyBadge extends StatelessWidget {
           const SizedBox(width: 3),
           Text(
             label,
-            style: AppTypography.overline.copyWith(
-              color: color,
-              fontSize: 10,
-            ),
+            style: AppTypography.overline.copyWith(color: color, fontSize: 10),
           ),
         ],
       ),
@@ -440,9 +430,7 @@ class _PetChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.warningSurface,
         borderRadius: AppSpacing.chipBorderRadius,
-        border: Border.all(
-          color: AppColors.warning.withValues(alpha: 0.30),
-        ),
+        border: Border.all(color: AppColors.warning.withValues(alpha: 0.30)),
       ),
       child: Text(
         '🐾 Animaux',
@@ -582,7 +570,11 @@ class _ApplySheetState extends State<_ApplySheet> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
             const SizedBox(width: AppSpacing.sm),
             Text(
               'Candidature envoyée !',
@@ -632,10 +624,7 @@ class _ApplySheetState extends State<_ApplySheet> {
           const SizedBox(height: AppSpacing.lg),
           Text('Postuler à cette mission', style: AppTypography.h3),
           const SizedBox(height: AppSpacing.xs),
-          Text(
-            widget.mission.parentName,
-            style: AppTypography.caption,
-          ),
+          Text(widget.mission.parentName, style: AppTypography.caption),
           const SizedBox(height: AppSpacing.lg),
           // Rate display
           Container(
@@ -652,10 +641,7 @@ class _ApplySheetState extends State<_ApplySheet> {
                   size: 18,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text(
-                  'Votre tarif: ',
-                  style: AppTypography.bodyMedium,
-                ),
+                Text('Votre tarif: ', style: AppTypography.bodyMedium),
                 Text(
                   '2 500 FCFA/h',
                   style: AppTypography.bodyMedium.copyWith(
@@ -690,7 +676,10 @@ class _ApplySheetState extends State<_ApplySheet> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: AppSpacing.inputBorderRadius,
-                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                borderSide: const BorderSide(
+                  color: AppColors.primary,
+                  width: 1.5,
+                ),
               ),
             ),
           ),
@@ -762,15 +751,7 @@ class _EmptyState extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 String _formatDate(DateTime date) {
-  const weekdays = [
-    'Lun.',
-    'Mar.',
-    'Mer.',
-    'Jeu.',
-    'Ven.',
-    'Sam.',
-    'Dim.',
-  ];
+  const weekdays = ['Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.', 'Dim.'];
   const months = [
     'janv.',
     'févr.',

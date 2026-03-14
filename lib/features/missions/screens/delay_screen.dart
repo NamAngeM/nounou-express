@@ -42,8 +42,7 @@ class _DelayScreenState extends State<DelayScreen> {
   // ── Helpers ─────────────────────────────────────────────────────────────────
 
   int _extraCostFcfa(int minutes) {
-    final double hours =
-        minutes <= 30 ? 0.5 : (minutes / 60.0).ceilToDouble();
+    final double hours = minutes <= 30 ? 0.5 : (minutes / 60.0).ceilToDouble();
     return (hours * widget.hourlyRate).toInt();
   }
 
@@ -126,7 +125,10 @@ class _DelayScreenState extends State<DelayScreen> {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+        icon: const Icon(
+          Icons.arrow_back_rounded,
+          color: AppColors.textPrimary,
+        ),
         onPressed: () => Navigator.of(context).pop(),
       ),
       title: Row(
@@ -242,10 +244,7 @@ class _DelayScreenState extends State<DelayScreen> {
                   style: AppTypography.h4.copyWith(color: AppColors.warning),
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                Text(
-                  subtitle,
-                  style: AppTypography.bodySmall,
-                ),
+                Text(subtitle, style: AppTypography.bodySmall),
               ],
             ),
           ),
@@ -302,8 +301,9 @@ class _DelayScreenState extends State<DelayScreen> {
         ? _selectedMinutes == -1
         : _selectedMinutes == minutes;
     final label = isUnknown ? 'Je ne sais pas' : _minutesLabel(minutes);
-    final extraCost =
-        (!isUnknown && minutes != null) ? _extraCostFcfa(minutes) : null;
+    final extraCost = (!isUnknown && minutes != null)
+        ? _extraCostFcfa(minutes)
+        : null;
 
     return GestureDetector(
       onTap: () => setState(() {
@@ -317,9 +317,7 @@ class _DelayScreenState extends State<DelayScreen> {
           vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primarySurface
-              : AppColors.surface,
+          color: isSelected ? AppColors.primarySurface : AppColors.surface,
           borderRadius: AppSpacing.cardBorderRadius,
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.border,
@@ -341,8 +339,11 @@ class _DelayScreenState extends State<DelayScreen> {
                 ),
               ),
               child: isSelected
-                  ? const Icon(Icons.check_rounded,
-                      color: Colors.white, size: 14)
+                  ? const Icon(
+                      Icons.check_rounded,
+                      color: Colors.white,
+                      size: 14,
+                    )
                   : null,
             ),
             const SizedBox(width: AppSpacing.md),
@@ -350,18 +351,14 @@ class _DelayScreenState extends State<DelayScreen> {
               child: Text(
                 label,
                 style: AppTypography.h4.copyWith(
-                  color: isSelected
-                      ? AppColors.primary
-                      : AppColors.textPrimary,
+                  color: isSelected ? AppColors.primary : AppColors.textPrimary,
                 ),
               ),
             ),
             if (extraCost != null)
               Text(
                 '+${_formatFcfa(extraCost)} FCFA',
-                style: AppTypography.labelLg.copyWith(
-                  color: AppColors.success,
-                ),
+                style: AppTypography.labelLg.copyWith(color: AppColors.success),
               ),
           ],
         ),
@@ -442,9 +439,7 @@ class _DelayScreenState extends State<DelayScreen> {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: isSelected
-              ? color.withValues(alpha: 0.06)
-              : AppColors.surface,
+          color: isSelected ? color.withValues(alpha: 0.06) : AppColors.surface,
           borderRadius: AppSpacing.cardBorderRadius,
           border: Border.all(
             color: isSelected ? color : AppColors.border,
@@ -500,8 +495,7 @@ class _DelayScreenState extends State<DelayScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Dans combien de temps arrivez-vous ?",
-              style: AppTypography.h4),
+          Text("Dans combien de temps arrivez-vous ?", style: AppTypography.h4),
           const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: AppSpacing.sm,
@@ -530,9 +524,7 @@ class _DelayScreenState extends State<DelayScreen> {
               ),
               child: Text(
                 'Soit +${_formatFcfa(_extraCostFcfa(_selectedMinutes!))} FCFA supplémentaires',
-                style: AppTypography.labelLg.copyWith(
-                  color: AppColors.warning,
-                ),
+                style: AppTypography.labelLg.copyWith(color: AppColors.warning),
               ),
             ),
           ],
@@ -541,8 +533,7 @@ class _DelayScreenState extends State<DelayScreen> {
             width: double.infinity,
             height: 52,
             child: ElevatedButton.icon(
-              onPressed:
-                  _selectedMinutes != null ? _onParentConfirm : null,
+              onPressed: _selectedMinutes != null ? _onParentConfirm : null,
               icon: const Icon(Icons.send_rounded, color: Colors.white),
               label: Text(
                 'Confirmer et notifier la nounou',
@@ -619,10 +610,7 @@ class _DelayScreenState extends State<DelayScreen> {
     return OutlinedButton.icon(
       onPressed: () {},
       icon: Icon(icon, color: color, size: 20),
-      label: Text(
-        label,
-        style: AppTypography.labelLg.copyWith(color: color),
-      ),
+      label: Text(label, style: AppTypography.labelLg.copyWith(color: color)),
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: color.withValues(alpha: 0.5)),
         minimumSize: const Size(double.infinity, 48),
@@ -640,7 +628,9 @@ class _DelayScreenState extends State<DelayScreen> {
     final hasExtra = _selectedMinutes != null && _selectedMinutes! > 0;
     final extraCost = hasExtra ? _extraCostFcfa(_selectedMinutes!) : 0;
     final totalCost = plannedCost + extraCost;
-    final plannedH = _mission.plannedHours.toStringAsFixed(1).replaceAll('.0', '');
+    final plannedH = _mission.plannedHours
+        .toStringAsFixed(1)
+        .replaceAll('.0', '');
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -695,9 +685,7 @@ class _DelayScreenState extends State<DelayScreen> {
       children: [
         Text(
           label,
-          style: isBold
-              ? AppTypography.labelLg
-              : AppTypography.bodyMedium,
+          style: isBold ? AppTypography.labelLg : AppTypography.bodyMedium,
         ),
         Text(
           value,

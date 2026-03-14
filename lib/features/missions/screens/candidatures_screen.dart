@@ -56,8 +56,9 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        shape:
-            RoundedRectangleBorder(borderRadius: AppSpacing.cardBorderRadius),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.cardBorderRadius,
+        ),
         title: Text('Confirmer la sélection', style: AppTypography.h3),
         content: Text(
           'Voulez-vous accepter la candidature de ${app.nannyName} ?',
@@ -66,20 +67,23 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('Annuler',
-                style: AppTypography.labelMd
-                    .copyWith(color: AppColors.textSecondary)),
+            child: Text(
+              'Annuler',
+              style: AppTypography.labelMd.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.success,
               shape: RoundedRectangleBorder(
-                  borderRadius: AppSpacing.buttonBorderRadius),
+                borderRadius: AppSpacing.buttonBorderRadius,
+              ),
               elevation: 0,
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Accepter',
-                style: AppTypography.buttonLabelSm),
+            child: Text('Accepter', style: AppTypography.buttonLabelSm),
           ),
         ],
       ),
@@ -89,8 +93,9 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
       setState(() {
         final index = _applications.indexWhere((a) => a.id == app.id);
         if (index != -1) {
-          _applications[index] =
-              _applications[index].copyWith(status: ApplicationStatus.accepted);
+          _applications[index] = _applications[index].copyWith(
+            status: ApplicationStatus.accepted,
+          );
         }
       });
       if (mounted) {
@@ -99,17 +104,22 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-                borderRadius: AppSpacing.inputBorderRadius),
+              borderRadius: AppSpacing.inputBorderRadius,
+            ),
             content: Row(
               children: [
-                const Icon(Icons.check_circle_rounded,
-                    color: AppColors.surface, size: 18),
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: AppColors.surface,
+                  size: 18,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     '${app.nannyName} a été acceptée !',
-                    style: AppTypography.bodyMedium
-                        .copyWith(color: AppColors.surface),
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.surface,
+                    ),
                   ),
                 ),
               ],
@@ -129,7 +139,8 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
         backgroundColor: AppColors.dangerSurface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-            borderRadius: AppSpacing.inputBorderRadius),
+          borderRadius: AppSpacing.inputBorderRadius,
+        ),
         content: Text(
           'Candidature de ${app.nannyName} refusée.',
           style: AppTypography.bodyMedium.copyWith(color: AppColors.danger),
@@ -143,7 +154,11 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
     if (_mission == null) return const SizedBox.shrink();
     return Container(
       margin: const EdgeInsets.fromLTRB(
-          AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, 0),
+        AppSpacing.xl,
+        AppSpacing.xl,
+        AppSpacing.xl,
+        0,
+      ),
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -158,7 +173,9 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
                 decoration: BoxDecoration(
                   color: _mission!.isUrgent
                       ? AppColors.dangerSurface
@@ -186,14 +203,18 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
           const SizedBox(height: AppSpacing.sm),
           Row(
             children: [
-              const Icon(Icons.location_on_rounded,
-                  size: 14, color: AppColors.primary),
+              const Icon(
+                Icons.location_on_rounded,
+                size: 14,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(
                   _mission!.address,
-                  style: AppTypography.bodySmall
-                      .copyWith(color: AppColors.textPrimary),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -203,16 +224,22 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
           const SizedBox(height: AppSpacing.xs),
           Row(
             children: [
-              const Icon(Icons.schedule_rounded,
-                  size: 14, color: AppColors.textSecondary),
+              const Icon(
+                Icons.schedule_rounded,
+                size: 14,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: AppSpacing.xs),
               Text(
                 '${_mission!.startTime} – ${_mission!.endTime}',
                 style: AppTypography.bodySmall,
               ),
               const SizedBox(width: AppSpacing.md),
-              const Icon(Icons.calendar_today_rounded,
-                  size: 14, color: AppColors.textSecondary),
+              const Icon(
+                Icons.calendar_today_rounded,
+                size: 14,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: AppSpacing.xs),
               Text(
                 '${_mission!.date.day.toString().padLeft(2, '0')}/'
@@ -235,7 +262,11 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
     ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-          AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.sm),
+        AppSpacing.xl,
+        AppSpacing.lg,
+        AppSpacing.xl,
+        AppSpacing.sm,
+      ),
       child: Row(
         children: [
           Text('Trier par :', style: AppTypography.labelMd),
@@ -247,14 +278,15 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
                 children: options.map((opt) {
                   final isSelected = _sortOption == opt.$1;
                   return Padding(
-                    padding:
-                        const EdgeInsets.only(right: AppSpacing.sm),
+                    padding: const EdgeInsets.only(right: AppSpacing.sm),
                     child: GestureDetector(
                       onTap: () => _setSortOption(opt.$1),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 160),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.xs,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppColors.primary
@@ -309,8 +341,7 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
             const SizedBox(height: AppSpacing.lg),
             Text(
               'Aucune candidature pour l\'instant',
-              style: AppTypography.h4
-                  .copyWith(color: AppColors.textSecondary),
+              style: AppTypography.h4.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -334,8 +365,10 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded,
-              color: AppColors.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
@@ -369,8 +402,11 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
                 Expanded(
                   child: ListView.separated(
                     padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.xl, AppSpacing.sm, AppSpacing.xl,
-                        AppSpacing.xl),
+                      AppSpacing.xl,
+                      AppSpacing.sm,
+                      AppSpacing.xl,
+                      AppSpacing.xl,
+                    ),
                     itemCount: _applications.length,
                     separatorBuilder: (_, _) =>
                         const SizedBox(height: AppSpacing.md),
@@ -407,27 +443,35 @@ class _ApplicationCard extends StatelessWidget {
       children: [
         ...List.generate(5, (i) {
           if (i < fullStars) {
-            return const Icon(Icons.star_rounded,
-                color: AppColors.gold, size: 14);
+            return const Icon(
+              Icons.star_rounded,
+              color: AppColors.gold,
+              size: 14,
+            );
           } else if (i == fullStars && hasHalf) {
-            return const Icon(Icons.star_half_rounded,
-                color: AppColors.gold, size: 14);
+            return const Icon(
+              Icons.star_half_rounded,
+              color: AppColors.gold,
+              size: 14,
+            );
           } else {
-            return const Icon(Icons.star_outline_rounded,
-                color: AppColors.gold, size: 14);
+            return const Icon(
+              Icons.star_outline_rounded,
+              color: AppColors.gold,
+              size: 14,
+            );
           }
         }),
         const SizedBox(width: AppSpacing.xs),
         Text(
           rating.toStringAsFixed(1),
-          style: AppTypography.small
-              .copyWith(color: AppColors.gold, fontWeight: FontWeight.w600),
+          style: AppTypography.small.copyWith(
+            color: AppColors.gold,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(width: AppSpacing.xs),
-        Text(
-          '(${application.nannyReviewCount})',
-          style: AppTypography.small,
-        ),
+        Text('(${application.nannyReviewCount})', style: AppTypography.small),
       ],
     );
   }
@@ -443,30 +487,37 @@ class _ApplicationCard extends StatelessWidget {
         ...visible.map(
           (s) => Container(
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm, vertical: 2),
+              horizontal: AppSpacing.sm,
+              vertical: 2,
+            ),
             decoration: BoxDecoration(
               color: AppColors.accentSurface,
               borderRadius: AppSpacing.chipBorderRadius,
             ),
             child: Text(
               s,
-              style: AppTypography.small
-                  .copyWith(color: AppColors.accent, fontWeight: FontWeight.w500),
+              style: AppTypography.small.copyWith(
+                color: AppColors.accent,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),
         if (extra > 0)
           Container(
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm, vertical: 2),
+              horizontal: AppSpacing.sm,
+              vertical: 2,
+            ),
             decoration: BoxDecoration(
               color: AppColors.surfaceVariant,
               borderRadius: AppSpacing.chipBorderRadius,
             ),
             child: Text(
               '+$extra autres',
-              style: AppTypography.small
-                  .copyWith(color: AppColors.textSecondary),
+              style: AppTypography.small.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
       ],
@@ -475,8 +526,7 @@ class _ApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAccepted =
-        application.status == ApplicationStatus.accepted;
+    final isAccepted = application.status == ApplicationStatus.accepted;
 
     return Container(
       decoration: BoxDecoration(
@@ -495,22 +545,29 @@ class _ApplicationCard extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
+              ),
               decoration: const BoxDecoration(
                 color: AppColors.successSurface,
                 borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(AppSpacing.cardRadius)),
+                  top: Radius.circular(AppSpacing.cardRadius),
+                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.check_circle_rounded,
-                      color: AppColors.success, size: 14),
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    color: AppColors.success,
+                    size: 14,
+                  ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     'Candidature acceptée',
                     style: AppTypography.small.copyWith(
-                        color: AppColors.success,
-                        fontWeight: FontWeight.w600),
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -532,8 +589,9 @@ class _ApplicationCard extends StatelessWidget {
                           application.nannyName.isNotEmpty
                               ? application.nannyName[0].toUpperCase()
                               : '?',
-                          style: AppTypography.h3
-                              .copyWith(color: AppColors.primary),
+                          style: AppTypography.h3.copyWith(
+                            color: AppColors.primary,
+                          ),
                         )
                       : null,
                 ),
@@ -567,12 +625,14 @@ class _ApplicationCard extends StatelessWidget {
                         const SizedBox(height: AppSpacing.sm),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                              vertical: AppSpacing.sm),
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(
-                                AppSpacing.inputRadius - 2),
+                              AppSpacing.inputRadius - 2,
+                            ),
                           ),
                           child: Text(
                             '"${application.message!}"',
@@ -593,14 +653,17 @@ class _ApplicationCard extends StatelessWidget {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.success,
                                   padding: const EdgeInsets.symmetric(
-                                      vertical: AppSpacing.sm),
+                                    vertical: AppSpacing.sm,
+                                  ),
                                   shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          AppSpacing.buttonBorderRadius),
+                                    borderRadius: AppSpacing.buttonBorderRadius,
+                                  ),
                                   elevation: 0,
                                 ),
-                                child: Text('Accepter',
-                                    style: AppTypography.buttonLabelSm),
+                                child: Text(
+                                  'Accepter',
+                                  style: AppTypography.buttonLabelSm,
+                                ),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -610,17 +673,20 @@ class _ApplicationCard extends StatelessWidget {
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: AppColors.danger,
                                   side: const BorderSide(
-                                      color: AppColors.danger),
+                                    color: AppColors.danger,
+                                  ),
                                   padding: const EdgeInsets.symmetric(
-                                      vertical: AppSpacing.sm),
+                                    vertical: AppSpacing.sm,
+                                  ),
                                   shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          AppSpacing.buttonBorderRadius),
+                                    borderRadius: AppSpacing.buttonBorderRadius,
+                                  ),
                                 ),
                                 child: Text(
                                   'Refuser',
-                                  style: AppTypography.buttonLabelSm
-                                      .copyWith(color: AppColors.danger),
+                                  style: AppTypography.buttonLabelSm.copyWith(
+                                    color: AppColors.danger,
+                                  ),
                                 ),
                               ),
                             ),
@@ -635,14 +701,17 @@ class _ApplicationCard extends StatelessWidget {
                               foregroundColor: AppColors.textSecondary,
                               side: const BorderSide(color: AppColors.border),
                               padding: const EdgeInsets.symmetric(
-                                  vertical: AppSpacing.sm),
+                                vertical: AppSpacing.sm,
+                              ),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: AppSpacing.buttonBorderRadius),
+                                borderRadius: AppSpacing.buttonBorderRadius,
+                              ),
                             ),
                             child: Text(
                               'Annuler la sélection',
                               style: AppTypography.buttonLabelSm.copyWith(
-                                  color: AppColors.textSecondary),
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                           ),
                         ),

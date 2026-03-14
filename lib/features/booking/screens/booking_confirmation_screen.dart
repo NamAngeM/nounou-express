@@ -36,19 +36,19 @@ class BookingConfirmationScreen extends StatelessWidget {
 
               // ── Success checkmark hero ──────────────────────────────────
               Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  gradient: AppColors.accentGradient,
-                  shape: BoxShape.circle,
-                  boxShadow: AppColors.primaryShadow,
-                ),
-                child: const Icon(
-                  Icons.check_rounded,
-                  color: Colors.white,
-                  size: 64,
-                ),
-              )
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      gradient: AppColors.accentGradient,
+                      shape: BoxShape.circle,
+                      boxShadow: AppColors.primaryShadow,
+                    ),
+                    child: const Icon(
+                      Icons.check_rounded,
+                      color: Colors.white,
+                      size: 64,
+                    ),
+                  )
                   .animate()
                   .scale(duration: 600.ms, curve: Curves.elasticOut)
                   .fadeIn(duration: 400.ms),
@@ -82,9 +82,9 @@ class BookingConfirmationScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.xl),
 
               // ── Booking ID badge ────────────────────────────────────────
-              _BookingIdBadge(bookingId: bookingId)
-                  .animate()
-                  .fadeIn(delay: 200.ms),
+              _BookingIdBadge(
+                bookingId: bookingId,
+              ).animate().fadeIn(delay: 200.ms),
 
               const SizedBox(height: AppSpacing.xl),
 
@@ -207,19 +207,13 @@ class _BookingIdBadgeState extends State<_BookingIdBadge> {
         decoration: BoxDecoration(
           color: AppColors.primarySurface,
           borderRadius: AppSpacing.chipBorderRadius,
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
           boxShadow: AppColors.cardShadow,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.tag_rounded,
-              size: 16,
-              color: AppColors.primary,
-            ),
+            Icon(Icons.tag_rounded, size: 16, color: AppColors.primary),
             const SizedBox(width: 6),
             Text(
               "#NE-${widget.bookingId}",

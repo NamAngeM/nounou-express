@@ -75,10 +75,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         actions: [
           TextButton(
             onPressed: _saveProfile,
-            child: Text(
-              "Enregistrer",
-              style: AppTypography.buttonLabelSm,
-            ),
+            child: Text("Enregistrer", style: AppTypography.buttonLabelSm),
           ),
         ],
       ),
@@ -92,44 +89,51 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _buildAvatarSection()
                   .animate()
                   .fadeIn(duration: 400.ms)
-                  .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1), duration: 400.ms),
+                  .scale(
+                    begin: const Offset(0.95, 0.95),
+                    end: const Offset(1, 1),
+                    duration: 400.ms,
+                  ),
 
               const SizedBox(height: AppSpacing.xxl),
 
               // ── Informations personnelles ────────────────────────────────
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: _ProfileSection(
-                  icon: Icons.person_outline_rounded,
-                  title: "Informations personnelles",
-                  color: AppColors.primary,
-                  children: [
-                    _buildTextField(
-                      controller: _nameController,
-                      label: "Nom complet",
-                      icon: Icons.badge_outlined,
-                      validator: (val) =>
-                          val == null || val.isEmpty ? "Champ requis" : null,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                    _buildTextField(
-                      controller: _emailController,
-                      label: "Adresse email",
-                      icon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: Validators.validateEmail,
+                    child: _ProfileSection(
+                      icon: Icons.person_outline_rounded,
+                      title: "Informations personnelles",
+                      color: AppColors.primary,
+                      children: [
+                        _buildTextField(
+                          controller: _nameController,
+                          label: "Nom complet",
+                          icon: Icons.badge_outlined,
+                          validator: (val) => val == null || val.isEmpty
+                              ? "Champ requis"
+                              : null,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _buildTextField(
+                          controller: _emailController,
+                          label: "Adresse email",
+                          icon: Icons.email_outlined,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: Validators.validateEmail,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _buildTextField(
+                          controller: _phoneController,
+                          label: "Numéro de téléphone",
+                          icon: Icons.phone_outlined,
+                          keyboardType: TextInputType.phone,
+                          validator: (val) => Validators.validatePhone(val),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                    _buildTextField(
-                      controller: _phoneController,
-                      label: "Numéro de téléphone",
-                      icon: Icons.phone_outlined,
-                      keyboardType: TextInputType.phone,
-                      validator: (val) => Validators.validatePhone(val),
-                    ),
-                  ],
-                ),
-              )
+                  )
                   .animate()
                   .fadeIn(delay: 80.ms, duration: 400.ms)
                   .slideY(begin: 0.12, end: 0, delay: 80.ms, duration: 400.ms),
@@ -138,22 +142,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               // ── Localisation ─────────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: _ProfileSection(
-                  icon: Icons.location_on_outlined,
-                  title: "Localisation",
-                  color: AppColors.gold,
-                  children: [
-                    _buildTextField(
-                      controller: TextEditingController(
-                        text: MockData.nannies.first.quartier,
-                      ),
-                      label: "Quartier / Adresse",
-                      icon: Icons.place_outlined,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
                     ),
-                  ],
-                ),
-              )
+                    child: _ProfileSection(
+                      icon: Icons.location_on_outlined,
+                      title: "Localisation",
+                      color: AppColors.gold,
+                      children: [
+                        _buildTextField(
+                          controller: TextEditingController(
+                            text: MockData.nannies.first.quartier,
+                          ),
+                          label: "Quartier / Adresse",
+                          icon: Icons.place_outlined,
+                        ),
+                      ],
+                    ),
+                  )
                   .animate()
                   .fadeIn(delay: 160.ms, duration: 400.ms)
                   .slideY(begin: 0.12, end: 0, delay: 160.ms, duration: 400.ms),
@@ -162,33 +168,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               if (_isNanny) ...[
                 const SizedBox(height: AppSpacing.lg),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  child: _ProfileSection(
-                    icon: Icons.work_outline_rounded,
-                    title: "Profil professionnel",
-                    color: AppColors.accent,
-                    children: [
-                      _buildTextField(
-                        controller: _rateController,
-                        label: "Tarif horaire (FCFA)",
-                        icon: Icons.payments_outlined,
-                        keyboardType: TextInputType.number,
-                        validator: (val) =>
-                            val == null || val.isEmpty ? "Champ requis" : null,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      _buildTextField(
-                        controller: _bioController,
-                        label: "Ma présentation",
-                        icon: Icons.description_outlined,
-                        maxLines: 4,
+                      child: _ProfileSection(
+                        icon: Icons.work_outline_rounded,
+                        title: "Profil professionnel",
+                        color: AppColors.accent,
+                        children: [
+                          _buildTextField(
+                            controller: _rateController,
+                            label: "Tarif horaire (FCFA)",
+                            icon: Icons.payments_outlined,
+                            keyboardType: TextInputType.number,
+                            validator: (val) => val == null || val.isEmpty
+                                ? "Champ requis"
+                                : null,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          _buildTextField(
+                            controller: _bioController,
+                            label: "Ma présentation",
+                            icon: Icons.description_outlined,
+                            maxLines: 4,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )
+                    )
                     .animate()
                     .fadeIn(delay: 240.ms, duration: 400.ms)
-                    .slideY(begin: 0.12, end: 0, delay: 240.ms, duration: 400.ms),
+                    .slideY(
+                      begin: 0.12,
+                      end: 0,
+                      delay: 240.ms,
+                      duration: 400.ms,
+                    ),
               ],
 
               const SizedBox(height: AppSpacing.xxl),
@@ -200,7 +214,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     gradient: AppColors.primaryGradientH,
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.buttonRadius,
+                    ),
                     boxShadow: AppColors.primaryShadow,
                   ),
                   child: ElevatedButton(
@@ -209,9 +225,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.lg,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.buttonRadius,
+                        ),
                       ),
                     ),
                     child: Text(
@@ -262,7 +282,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 child: const CircleAvatar(
                   radius: 60,
-                  backgroundImage: NetworkImage("https://i.pravatar.cc/150?u=n1"),
+                  backgroundImage: NetworkImage(
+                    "https://i.pravatar.cc/150?u=n1",
+                  ),
                 ),
               ),
               Positioned(
@@ -362,7 +384,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
             ),
             filled: true,
             fillColor: AppColors.surface,
@@ -435,10 +460,7 @@ class _ProfileSection extends StatelessWidget {
                   child: Icon(icon, color: color, size: 18),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text(
-                  title,
-                  style: AppTypography.h4.copyWith(color: color),
-                ),
+                Text(title, style: AppTypography.h4.copyWith(color: color)),
               ],
             ),
           ),

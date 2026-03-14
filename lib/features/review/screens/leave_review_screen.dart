@@ -91,35 +91,45 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                 children: [
                   // Star rating card
                   _StarRatingCard(
-                    rating: _rating,
-                    ratingLabel: ratingInfo.label,
-                    ratingColor: ratingInfo.color,
-                    onRatingChanged: (v) => setState(() => _rating = v),
-                  )
+                        rating: _rating,
+                        ratingLabel: ratingInfo.label,
+                        ratingColor: ratingInfo.color,
+                        onRatingChanged: (v) => setState(() => _rating = v),
+                      )
                       .animate()
                       .fadeIn(duration: 400.ms, delay: 100.ms)
-                      .slideY(begin: 0.12, end: 0, duration: 400.ms, delay: 100.ms),
+                      .slideY(
+                        begin: 0.12,
+                        end: 0,
+                        duration: 400.ms,
+                        delay: 100.ms,
+                      ),
 
                   const SizedBox(height: AppSpacing.xxl),
 
                   // Quality tags section
                   if (_rating > 0) ...[
                     _QualityTagsSection(
-                      qualities: _qualities,
-                      selectedQualities: _selectedQualities,
-                      onToggle: (q) {
-                        setState(() {
-                          if (_selectedQualities.contains(q)) {
-                            _selectedQualities.remove(q);
-                          } else {
-                            _selectedQualities.add(q);
-                          }
-                        });
-                      },
-                    )
+                          qualities: _qualities,
+                          selectedQualities: _selectedQualities,
+                          onToggle: (q) {
+                            setState(() {
+                              if (_selectedQualities.contains(q)) {
+                                _selectedQualities.remove(q);
+                              } else {
+                                _selectedQualities.add(q);
+                              }
+                            });
+                          },
+                        )
                         .animate()
                         .fadeIn(duration: 400.ms, delay: 180.ms)
-                        .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: 180.ms),
+                        .slideY(
+                          begin: 0.1,
+                          end: 0,
+                          duration: 400.ms,
+                          delay: 180.ms,
+                        ),
                     const SizedBox(height: AppSpacing.xxl),
                   ],
 
@@ -127,7 +137,12 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                   _CommentField(controller: _commentController)
                       .animate()
                       .fadeIn(duration: 400.ms, delay: 260.ms)
-                      .slideY(begin: 0.1, end: 0, duration: 400.ms, delay: 260.ms),
+                      .slideY(
+                        begin: 0.1,
+                        end: 0,
+                        duration: 400.ms,
+                        delay: 260.ms,
+                      ),
 
                   const SizedBox(height: AppSpacing.xxxl),
 
@@ -148,8 +163,9 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                     ),
                     label: Text(
                       'Signaler un problème',
-                      style: AppTypography.bodySmall
-                          .copyWith(color: AppColors.textTertiary),
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textTertiary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
@@ -175,10 +191,10 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
           maxLines: 4,
           decoration: InputDecoration(
             hintText: 'Décrivez le problème rencontré...',
-            hintStyle:
-                AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            hintStyle: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiary,
+            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
         actions: [
@@ -186,8 +202,9 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               'Annuler',
-              style: AppTypography.bodySmall
-                  .copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
           TextButton(
@@ -199,7 +216,8 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                   backgroundColor: AppColors.primary,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
               );
             },
@@ -229,8 +247,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
         ),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       ),
     );
     context.go('/home');
@@ -249,44 +266,44 @@ class _HeroHeader extends StatelessWidget {
     final topPad = MediaQuery.of(context).padding.top + kToolbarHeight;
 
     return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.xxl,
-        topPad + AppSpacing.lg,
-        AppSpacing.xxl,
-        AppSpacing.xxxl,
-      ),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-      ),
-      child: Column(
-        children: [
-          const AppAvatar(name: 'Julie M.', size: 90),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            'Comment s\'est passée votre mission avec Julie ?',
-            textAlign: TextAlign.center,
-            style: AppTypography.h3.copyWith(
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-            ),
+          width: double.infinity,
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.xxl,
+            topPad + AppSpacing.lg,
+            AppSpacing.xxl,
+            AppSpacing.xxxl,
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'Votre avis aide la communauté Nounou Express.',
-            textAlign: TextAlign.center,
-            style: AppTypography.bodySmall.copyWith(
-              color: Colors.white.withValues(alpha: 0.75),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryLight],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
           ),
-        ],
-      ),
-    )
+          child: Column(
+            children: [
+              const AppAvatar(name: 'Julie M.', size: 90),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                'Comment s\'est passée votre mission avec Julie ?',
+                textAlign: TextAlign.center,
+                style: AppTypography.h3.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Votre avis aide la communauté Nounou Express.',
+                textAlign: TextAlign.center,
+                style: AppTypography.bodySmall.copyWith(
+                  color: Colors.white.withValues(alpha: 0.75),
+                ),
+              ),
+            ],
+          ),
+        )
         .animate()
         .fadeIn(duration: 500.ms)
         .slideY(begin: -0.08, end: 0, duration: 500.ms, curve: Curves.easeOut);
@@ -317,9 +334,7 @@ class _StarRatingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.warningSurface,
         borderRadius: AppSpacing.cardBorderRadius,
-        border: Border.all(
-          color: AppColors.warning.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.warning.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -340,20 +355,18 @@ class _StarRatingCard extends StatelessWidget {
                 onTap: () => onRatingChanged(starValue.toDouble()),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Icon(
-                    isSelected
-                        ? Icons.star_rounded
-                        : Icons.star_outline_rounded,
-                    color: isSelected
-                        ? AppColors.warning
-                        : AppColors.textTertiary.withValues(alpha: 0.3),
-                    size: 48,
-                  )
-                      .animate(target: isSelected ? 1 : 0)
-                      .scale(
-                        duration: 200.ms,
-                        curve: Curves.easeOutBack,
-                      ),
+                  child:
+                      Icon(
+                            isSelected
+                                ? Icons.star_rounded
+                                : Icons.star_outline_rounded,
+                            color: isSelected
+                                ? AppColors.warning
+                                : AppColors.textTertiary.withValues(alpha: 0.3),
+                            size: 48,
+                          )
+                          .animate(target: isSelected ? 1 : 0)
+                          .scale(duration: 200.ms, curve: Curves.easeOutBack),
                 ),
               );
             }),
@@ -448,7 +461,7 @@ class _QualityTagsSection extends StatelessWidget {
                             color: AppColors.primary.withValues(alpha: 0.2),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
-                          )
+                          ),
                         ]
                       : [],
                 ),
@@ -481,11 +494,7 @@ class _CommentField extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Icon(
-              Icons.edit_outlined,
-              size: 18,
-              color: AppColors.primary,
-            ),
+            const Icon(Icons.edit_outlined, size: 18, color: AppColors.primary),
             const SizedBox(width: AppSpacing.sm),
             Text(
               'Votre commentaire',
@@ -502,19 +511,22 @@ class _CommentField extends StatelessWidget {
           maxLines: 4,
           decoration: InputDecoration(
             hintText: 'Détaillez votre expérience (optionnel)...',
-            hintStyle: AppTypography.bodySmall
-                .copyWith(color: AppColors.textTertiary),
+            hintStyle: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiary,
+            ),
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
               borderSide: BorderSide(
-                  color: AppColors.primary.withValues(alpha: 0.1)),
+                color: AppColors.primary.withValues(alpha: 0.1),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
               borderSide: BorderSide(
-                  color: AppColors.primary.withValues(alpha: 0.1)),
+                color: AppColors.primary.withValues(alpha: 0.1),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),

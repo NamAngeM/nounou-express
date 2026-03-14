@@ -81,7 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
               // ── CTA Besoin d'une nounou ────────────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: AppSpacing.screenPadding.copyWith(top: AppSpacing.lg),
+                  padding: AppSpacing.screenPadding.copyWith(
+                    top: AppSpacing.lg,
+                  ),
                   child: GestureDetector(
                     onTap: () => context.push('/missions/publish'),
                     child: Container(

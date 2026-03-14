@@ -75,7 +75,9 @@ class _SosScreenState extends State<SosScreen>
         child: Stack(
           children: [
             // ── Background pulse circles ───────────────────────────────────
-            Positioned.fill(child: _BackgroundPulse(controller: _pulseController)),
+            Positioned.fill(
+              child: _BackgroundPulse(controller: _pulseController),
+            ),
 
             _buildCloseButton(),
 
@@ -88,9 +90,7 @@ class _SosScreenState extends State<SosScreen>
                   const SizedBox(height: AppSpacing.xl),
                   Text(
                     "URGENCE SOS",
-                    style: AppTypography.h2.copyWith(
-                      color: Colors.white,
-                    ),
+                    style: AppTypography.h2.copyWith(color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -206,20 +206,20 @@ class _SosScreenState extends State<SosScreen>
             child: _isSent
                 ? const Icon(Icons.check, color: AppColors.danger, size: 60)
                 : _progress > 0
-                    ? Center(
-                        child: Text(
-                          "$secondsLeft",
-                          style: AppTypography.h1.copyWith(
-                            color: AppColors.danger,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      )
-                    : const Icon(
-                        Icons.warning_rounded,
+                ? Center(
+                    child: Text(
+                      "$secondsLeft",
+                      style: AppTypography.h1.copyWith(
                         color: AppColors.danger,
-                        size: 60,
+                        fontWeight: FontWeight.w800,
                       ),
+                    ),
+                  )
+                : const Icon(
+                    Icons.warning_rounded,
+                    color: AppColors.danger,
+                    size: 60,
+                  ),
           ),
           if (_isSent) const Positioned.fill(child: OndeAnimation()),
         ],
@@ -276,7 +276,11 @@ class _SosScreenState extends State<SosScreen>
               color: Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.phone_rounded, color: Colors.white, size: 22),
+            child: const Icon(
+              Icons.phone_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -300,7 +304,11 @@ class _SosScreenState extends State<SosScreen>
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 24),
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
         ],
       ),
     ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.15, end: 0);
@@ -317,8 +325,11 @@ class _SosScreenState extends State<SosScreen>
         ),
         child: Row(
           children: [
-            const Icon(Icons.warning_amber_rounded,
-                color: Colors.white, size: 18),
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
@@ -403,9 +414,7 @@ class _BackgroundPulse extends StatelessWidget {
       animation: controller,
       builder: (context, _) {
         final t = controller.value;
-        return CustomPaint(
-          painter: _PulsePainter(progress: t),
-        );
+        return CustomPaint(painter: _PulsePainter(progress: t));
       },
     );
   }

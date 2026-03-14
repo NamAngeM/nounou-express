@@ -25,7 +25,10 @@ class FavoritesScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: AppColors.textPrimary,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
@@ -36,9 +39,20 @@ class FavoritesScreen extends StatelessWidget {
               itemCount: favorites.length,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                  child: NannyCard(nannyId: favorites[index].id, name: favorites[index].name, quartier: favorites[index].quartier, rating: favorites[index].rating, hourlyRate: favorites[index].hourlyRate, isVerified: favorites[index].isVerified, avatarUrl: favorites[index].avatar,),
-                ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.1, end: 0);
+                      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                      child: NannyCard(
+                        nannyId: favorites[index].id,
+                        name: favorites[index].name,
+                        quartier: favorites[index].quartier,
+                        rating: favorites[index].rating,
+                        hourlyRate: favorites[index].hourlyRate,
+                        isVerified: favorites[index].isVerified,
+                        avatarUrl: favorites[index].avatar,
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(delay: (index * 100).ms)
+                    .slideX(begin: 0.1, end: 0);
               },
             ),
     );
@@ -72,7 +86,9 @@ class FavoritesScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               "Ajoutez des nounous à vos coups de cœur pour les retrouver facilement ici.",
-              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

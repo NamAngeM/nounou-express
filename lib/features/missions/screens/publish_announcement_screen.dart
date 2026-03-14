@@ -122,7 +122,9 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: AppSpacing.cardBorderRadius),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.cardBorderRadius,
+        ),
         title: Text('Ajouter un enfant', style: AppTypography.h3),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -144,15 +146,19 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Annuler',
-                style: AppTypography.labelMd
-                    .copyWith(color: AppColors.textSecondary)),
+            child: Text(
+              'Annuler',
+              style: AppTypography.labelMd.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                  borderRadius: AppSpacing.buttonBorderRadius),
+                borderRadius: AppSpacing.buttonBorderRadius,
+              ),
             ),
             onPressed: () {
               final name = nameCtrl.text.trim();
@@ -160,17 +166,17 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
               if (name.isNotEmpty && age > 0) {
                 setState(() {
                   final child = _MockChild(
-                      id: 'extra_${DateTime.now().millisecondsSinceEpoch}',
-                      name: name,
-                      age: age);
+                    id: 'extra_${DateTime.now().millisecondsSinceEpoch}',
+                    name: name,
+                    age: age,
+                  );
                   _extraChildren.add(child);
                   _selectedChildIds.add(child.id);
                 });
               }
               Navigator.of(ctx).pop();
             },
-            child: Text('Ajouter',
-                style: AppTypography.buttonLabelSm),
+            child: Text('Ajouter', style: AppTypography.buttonLabelSm),
           ),
         ],
       ),
@@ -182,7 +188,9 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: AppSpacing.cardBorderRadius),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.cardBorderRadius,
+        ),
         title: Text('Confirmer la publication ?', style: AppTypography.h3),
         content: Text(
           'Votre annonce sera visible par les nounous disponibles dans votre zone.',
@@ -191,15 +199,19 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Annuler',
-                style: AppTypography.labelMd
-                    .copyWith(color: AppColors.textSecondary)),
+            child: Text(
+              'Annuler',
+              style: AppTypography.labelMd.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                  borderRadius: AppSpacing.buttonBorderRadius),
+                borderRadius: AppSpacing.buttonBorderRadius,
+              ),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -218,7 +230,8 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-            borderRadius: AppSpacing.inputBorderRadius),
+          borderRadius: AppSpacing.inputBorderRadius,
+        ),
         content: Row(
           children: [
             const Icon(Icons.check_circle_rounded, color: AppColors.surface),
@@ -226,8 +239,9 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
             Expanded(
               child: Text(
                 'Annonce publiée avec succès !',
-                style:
-                    AppTypography.bodyMedium.copyWith(color: AppColors.surface),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.surface,
+                ),
               ),
             ),
           ],
@@ -257,8 +271,9 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
           style: AppTypography.bodyMedium,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTypography.bodyMedium
-                .copyWith(color: AppColors.textTertiary),
+            hintStyle: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textTertiary,
+            ),
             filled: true,
             fillColor: AppColors.surfaceVariant,
             contentPadding: const EdgeInsets.symmetric(
@@ -271,8 +286,10 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: AppSpacing.inputBorderRadius,
-              borderSide:
-                  const BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
             ),
           ),
         ),
@@ -301,10 +318,14 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 padding: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.sm, horizontal: AppSpacing.xs),
+                  vertical: AppSpacing.sm,
+                  horizontal: AppSpacing.xs,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(AppSpacing.inputRadius - 2),
+                  borderRadius: BorderRadius.circular(
+                    AppSpacing.inputRadius - 2,
+                  ),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -344,7 +365,9 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
         decoration: BoxDecoration(
           color: AppColors.surfaceVariant,
           borderRadius: AppSpacing.inputBorderRadius,
@@ -360,14 +383,19 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
                 children: [
                   Text(label, style: AppTypography.labelMd),
                   const SizedBox(height: 2),
-                  Text(value,
-                      style: AppTypography.bodyMedium
-                          .copyWith(color: AppColors.textPrimary)),
+                  Text(
+                    value,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded,
-                color: AppColors.textTertiary),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textTertiary,
+            ),
           ],
         ),
       ),
@@ -387,9 +415,13 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
         padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primarySurface : AppColors.surfaceVariant,
+          color: isSelected
+              ? AppColors.primarySurface
+              : AppColors.surfaceVariant,
           borderRadius: AppSpacing.chipBorderRadius,
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.border,
@@ -413,9 +445,13 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
         padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primarySurface : AppColors.surfaceVariant,
+          color: isSelected
+              ? AppColors.primarySurface
+              : AppColors.surfaceVariant,
           borderRadius: AppSpacing.chipBorderRadius,
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.border,
@@ -465,11 +501,13 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
                 backgroundColor: AppColors.accentSurface,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
-                    borderRadius: AppSpacing.inputBorderRadius),
+                  borderRadius: AppSpacing.inputBorderRadius,
+                ),
                 content: Text(
                   'Localisation en cours...',
-                  style: AppTypography.bodyMedium
-                      .copyWith(color: AppColors.accent),
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.accent,
+                  ),
                 ),
               ),
             );
@@ -480,9 +518,12 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
             foregroundColor: AppColors.primary,
             side: const BorderSide(color: AppColors.primary),
             shape: RoundedRectangleBorder(
-                borderRadius: AppSpacing.buttonBorderRadius),
+              borderRadius: AppSpacing.buttonBorderRadius,
+            ),
             padding: const EdgeInsets.symmetric(
-                vertical: AppSpacing.md, horizontal: AppSpacing.lg),
+              vertical: AppSpacing.md,
+              horizontal: AppSpacing.lg,
+            ),
           ),
         ),
       ],
@@ -502,8 +543,8 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
           value: _selectedDate == null
               ? 'Sélectionner une date'
               : '${_selectedDate!.day.toString().padLeft(2, '0')}/'
-                  '${_selectedDate!.month.toString().padLeft(2, '0')}/'
-                  '${_selectedDate!.year}',
+                    '${_selectedDate!.month.toString().padLeft(2, '0')}/'
+                    '${_selectedDate!.year}',
           icon: Icons.calendar_month_rounded,
           onTap: () async {
             final picked = await showDatePicker(
@@ -571,23 +612,32 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
         if (hours > 0)
           Container(
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
             decoration: BoxDecoration(
               color: AppColors.primarySurface,
               borderRadius: AppSpacing.inputBorderRadius,
-              border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.4)),
+              border: Border.all(
+                color: AppColors.primaryLight.withValues(alpha: 0.4),
+              ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.timer_rounded,
-                    color: AppColors.primary, size: 20),
+                const Icon(
+                  Icons.timer_rounded,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   'Durée : ${_formatHours(hours)}  →  '
                   '~${(estimatedMin / 1000).toStringAsFixed(0)} 000 – '
                   '${(estimatedMax / 1000).toStringAsFixed(0)} 000 FCFA',
-                  style: AppTypography.labelMd
-                      .copyWith(color: AppColors.primary, fontSize: 12),
+                  style: AppTypography.labelMd.copyWith(
+                    color: AppColors.primary,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -638,9 +688,12 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
               activeColor: AppColors.primary,
               checkColor: AppColors.surface,
               shape: RoundedRectangleBorder(
-                  borderRadius: AppSpacing.cardBorderRadius),
+                borderRadius: AppSpacing.cardBorderRadius,
+              ),
               contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
+              ),
             ),
           );
         }),
@@ -653,9 +706,12 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
             foregroundColor: AppColors.primary,
             side: const BorderSide(color: AppColors.primary),
             shape: RoundedRectangleBorder(
-                borderRadius: AppSpacing.buttonBorderRadius),
+              borderRadius: AppSpacing.buttonBorderRadius,
+            ),
             padding: const EdgeInsets.symmetric(
-                vertical: AppSpacing.md, horizontal: AppSpacing.lg),
+              vertical: AppSpacing.md,
+              horizontal: AppSpacing.lg,
+            ),
           ),
         ),
       ],
@@ -684,7 +740,9 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
         const SizedBox(height: AppSpacing.lg),
         Container(
           padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.sm,
+          ),
           decoration: BoxDecoration(
             color: AppColors.surfaceVariant,
             borderRadius: AppSpacing.inputBorderRadius,
@@ -692,11 +750,17 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.pets_rounded,
-                  color: AppColors.textSecondary, size: 20),
+              const Icon(
+                Icons.pets_rounded,
+                color: AppColors.textSecondary,
+                size: 20,
+              ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: Text('Animaux à la maison', style: AppTypography.bodyMedium),
+                child: Text(
+                  'Animaux à la maison',
+                  style: AppTypography.bodyMedium,
+                ),
               ),
               Switch(
                 value: _hasPets,
@@ -799,8 +863,8 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
                 _selectedDate == null
                     ? 'Non renseignée'
                     : '${_selectedDate!.day.toString().padLeft(2, '0')}/'
-                        '${_selectedDate!.month.toString().padLeft(2, '0')}/'
-                        '${_selectedDate!.year}',
+                          '${_selectedDate!.month.toString().padLeft(2, '0')}/'
+                          '${_selectedDate!.year}',
               ),
               const SizedBox(height: AppSpacing.sm),
               _buildSummaryRow(
@@ -808,7 +872,7 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
                 'Horaire',
                 (_startTime != null && _endTime != null)
                     ? '${_timeOfDayLabel(_startTime!)} – ${_timeOfDayLabel(_endTime!)} '
-                        '(${_formatHours(hours)})'
+                          '(${_formatHours(hours)})'
                     : 'Non renseigné',
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -818,8 +882,8 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
                 selectedChildren.isEmpty
                     ? 'Aucun sélectionné'
                     : selectedChildren
-                        .map((c) => '${c.name} ${c.age} ans')
-                        .join(', '),
+                          .map((c) => '${c.name} ${c.age} ans')
+                          .join(', '),
               ),
               const SizedBox(height: AppSpacing.sm),
               _buildSummaryRow(
@@ -839,7 +903,8 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
               backgroundColor: AppColors.primary,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
               shape: RoundedRectangleBorder(
-                  borderRadius: AppSpacing.buttonBorderRadius),
+                borderRadius: AppSpacing.buttonBorderRadius,
+              ),
               elevation: 0,
             ),
             child: Text('Publier l\'annonce', style: AppTypography.buttonLabel),
@@ -861,13 +926,15 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
               children: [
                 TextSpan(
                   text: '$label : ',
-                  style: AppTypography.labelMd
-                      .copyWith(color: AppColors.textSecondary),
+                  style: AppTypography.labelMd.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 TextSpan(
                   text: value,
-                  style: AppTypography.bodySmall
-                      .copyWith(color: AppColors.textPrimary),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ],
             ),
@@ -902,16 +969,16 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Publier une annonce',
-              style: AppTypography.h4,
-            ),
+            Text('Publier une annonce', style: AppTypography.h4),
             Text(
               'Étape ${_currentStep + 1}/$_totalSteps — ${_stepTitles[_currentStep]}',
               style: AppTypography.caption,
@@ -923,8 +990,7 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
           child: LinearProgressIndicator(
             value: (_currentStep + 1) / _totalSteps,
             backgroundColor: AppColors.border,
-            valueColor:
-                const AlwaysStoppedAnimation<Color>(AppColors.primary),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
             minHeight: 4,
           ),
         ),
@@ -968,13 +1034,16 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
                   foregroundColor: AppColors.textSecondary,
                   side: const BorderSide(color: AppColors.border),
                   shape: RoundedRectangleBorder(
-                      borderRadius: AppSpacing.buttonBorderRadius),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                    borderRadius: AppSpacing.buttonBorderRadius,
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 ),
-                child: Text('Précédent',
-                    style: AppTypography.labelMd
-                        .copyWith(color: AppColors.textPrimary)),
+                child: Text(
+                  'Précédent',
+                  style: AppTypography.labelMd.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                ),
               ),
             ),
           if (!isFirst) const SizedBox(width: AppSpacing.md),
@@ -984,14 +1053,13 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
                 onPressed: _goNext,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                   shape: RoundedRectangleBorder(
-                      borderRadius: AppSpacing.buttonBorderRadius),
+                    borderRadius: AppSpacing.buttonBorderRadius,
+                  ),
                   elevation: 0,
                 ),
-                child: Text('Suivant',
-                    style: AppTypography.buttonLabelSm),
+                child: Text('Suivant', style: AppTypography.buttonLabelSm),
               ),
             ),
           if (isFirst && isLast)
@@ -1000,14 +1068,13 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
                 onPressed: _goNext,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                   shape: RoundedRectangleBorder(
-                      borderRadius: AppSpacing.buttonBorderRadius),
+                    borderRadius: AppSpacing.buttonBorderRadius,
+                  ),
                   elevation: 0,
                 ),
-                child: Text('Suivant',
-                    style: AppTypography.buttonLabelSm),
+                child: Text('Suivant', style: AppTypography.buttonLabelSm),
               ),
             ),
         ],

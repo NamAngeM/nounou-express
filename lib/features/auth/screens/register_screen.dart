@@ -107,8 +107,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // Section 5 Nanny — Disponibilités & Tarifs
   double _hourlyRate = 2500;
   final Map<String, Set<String>> _availability = {
-    'Lundi': {}, 'Mardi': {}, 'Mercredi': {}, 'Jeudi': {},
-    'Vendredi': {}, 'Samedi': {}, 'Dimanche': {},
+    'Lundi': {},
+    'Mardi': {},
+    'Mercredi': {},
+    'Jeudi': {},
+    'Vendredi': {},
+    'Samedi': {},
+    'Dimanche': {},
   };
   bool _urgentAvailable = false;
   String _nannyCarMode = 'Les deux';
@@ -131,39 +136,113 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // ── Constants ─────────────────────────────────────────────────────────────
   static const _neighborhoods = [
-    'Akanda', 'Angondjé', 'Nzeng-Ayong', 'Owendo', 'Glass',
-    'Nombakélé', 'Alibandeng', 'Libreville Centre', 'Autre',
+    'Akanda',
+    'Angondjé',
+    'Nzeng-Ayong',
+    'Owendo',
+    'Glass',
+    'Nombakélé',
+    'Alibandeng',
+    'Libreville Centre',
+    'Autre',
   ];
-  static const _radiusOptions = ['1 km', '3 km', '5 km', '10 km', 'Toute Libreville'];
-  static const _careTypeOptions = ['À domicile (chez moi)', 'Chez la nounou', 'Les deux'];
-  static const _timeSlotOptions = ['Matin', 'Après-midi', 'Soir', 'Nuit', 'Week-end'];
+  static const _radiusOptions = [
+    '1 km',
+    '3 km',
+    '5 km',
+    '10 km',
+    'Toute Libreville',
+  ];
+  static const _careTypeOptions = [
+    'À domicile (chez moi)',
+    'Chez la nounou',
+    'Les deux',
+  ];
+  static const _timeSlotOptions = [
+    'Matin',
+    'Après-midi',
+    'Soir',
+    'Nuit',
+    'Week-end',
+  ];
   static const _langOptions = ['Français', 'Fang', 'Myènè', 'Anglais', 'Autre'];
   static const _parentCriteria = [
-    'Premiers secours', 'Aide aux devoirs', 'Expérience nourrissons', 'Cuisine', 'Permis de conduire',
+    'Premiers secours',
+    'Aide aux devoirs',
+    'Expérience nourrissons',
+    'Cuisine',
+    'Permis de conduire',
   ];
-  static const _bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Inconnu'];
-  static const _experienceOptions = ['Débutant (< 1 an)', '1–3 ans', '3–5 ans', '+5 ans'];
+  static const _bloodGroups = [
+    'A+',
+    'A-',
+    'B+',
+    'B-',
+    'AB+',
+    'AB-',
+    'O+',
+    'O-',
+    'Inconnu',
+  ];
+  static const _experienceOptions = [
+    'Débutant (< 1 an)',
+    '1–3 ans',
+    '3–5 ans',
+    '+5 ans',
+  ];
   static const _ageGroupOptions = [
-    'Nourrissons (0–1 an)', '1–3 ans', '3–6 ans', '6–12 ans', 'Ados',
+    'Nourrissons (0–1 an)',
+    '1–3 ans',
+    '3–6 ans',
+    '6–12 ans',
+    'Ados',
   ];
   static const _nannySkillOptions = [
-    'Premiers secours', 'Aide aux devoirs', 'Cuisine', 'Ménage',
-    'Activités créatives', 'Langues étrangères', 'Enfants handicapés', 'Conduite',
+    'Premiers secours',
+    'Aide aux devoirs',
+    'Cuisine',
+    'Ménage',
+    'Activités créatives',
+    'Langues étrangères',
+    'Enfants handicapés',
+    'Conduite',
   ];
   static const _diplomaOptions = [
-    'Aucun', 'CAP Petite Enfance', 'Infirmier(e)', 'Éducateur(trice)', 'Autre',
+    'Aucun',
+    'CAP Petite Enfance',
+    'Infirmier(e)',
+    'Éducateur(trice)',
+    'Autre',
   ];
-  static const _nannyCarModeOptions = ['À domicile parent', 'Chez moi', 'Les deux'];
+  static const _nannyCarModeOptions = [
+    'À domicile parent',
+    'Chez moi',
+    'Les deux',
+  ];
   static const _maxChildrenOptions = ['1', '2', '3', '4+'];
   static const _paymentOptions = ['Espèces', 'Airtel Money', 'Moov Money'];
 
-  static const _parentStepTitles = ['Identité', 'Enfant(s)', 'Préférences', 'Urgence', 'Vérification'];
+  static const _parentStepTitles = [
+    'Identité',
+    'Enfant(s)',
+    'Préférences',
+    'Urgence',
+    'Vérification',
+  ];
   static const _nannyStepTitles = [
-    'Identité', 'KYC', 'Compétences', 'Bio', 'Disponibilités', 'Paiement', 'Références', 'Engagement',
+    'Identité',
+    'KYC',
+    'Compétences',
+    'Bio',
+    'Disponibilités',
+    'Paiement',
+    'Références',
+    'Engagement',
   ];
 
   int get _totalSteps => role == 'nanny' ? 8 : 5;
-  List<String> get _stepTitles => role == 'nanny' ? _nannyStepTitles : _parentStepTitles;
+  List<String> get _stepTitles =>
+      role == 'nanny' ? _nannyStepTitles : _parentStepTitles;
 
   @override
   void didChangeDependencies() {
@@ -175,15 +254,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    _firstName.dispose(); _lastName.dispose(); _nationality.dispose();
-    _phone.dispose(); _email.dispose(); _address.dispose();
+    _firstName.dispose();
+    _lastName.dispose();
+    _nationality.dispose();
+    _phone.dispose();
+    _email.dispose();
+    _address.dispose();
     for (final c in _children) c.dispose();
-    _emerg1Name.dispose(); _emerg1Phone.dispose();
-    _emerg2Name.dispose(); _emerg2Phone.dispose();
-    _doctorName.dispose(); _doctorPhone.dispose();
-    _cniNumber.dispose(); _shortBio.dispose(); _longBio.dispose();
-    _airtelNumber.dispose(); _moovNumber.dispose();
-    _ref1.dispose(); _ref2.dispose();
+    _emerg1Name.dispose();
+    _emerg1Phone.dispose();
+    _emerg2Name.dispose();
+    _emerg2Phone.dispose();
+    _doctorName.dispose();
+    _doctorPhone.dispose();
+    _cniNumber.dispose();
+    _shortBio.dispose();
+    _longBio.dispose();
+    _airtelNumber.dispose();
+    _moovNumber.dispose();
+    _ref1.dispose();
+    _ref2.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -191,7 +281,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _nextStep() {
     if (_currentStep < _totalSteps - 1) {
       setState(() => _currentStep++);
-      _scrollController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     } else {
       _onSubmit();
     }
@@ -200,9 +294,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _prevStep() {
     if (_currentStep > 0) {
       setState(() => _currentStep--);
-      _scrollController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     } else {
-      GoRouter.of(context).canPop() ? context.pop() : context.go('/auth/login?role=$role');
+      GoRouter.of(context).canPop()
+          ? context.pop()
+          : context.go('/auth/login?role=$role');
     }
   }
 
@@ -212,11 +312,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (mounted) context.go('/home');
   }
 
-  void _pickDate({required DateTime? current, required void Function(DateTime) onPicked, int minAge = 0}) async {
+  void _pickDate({
+    required DateTime? current,
+    required void Function(DateTime) onPicked,
+    int minAge = 0,
+  }) async {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate: current ?? now.subtract(Duration(days: 365 * (minAge > 0 ? minAge : 5))),
+      initialDate:
+          current ??
+          now.subtract(Duration(days: 365 * (minAge > 0 ? minAge : 5))),
       firstDate: DateTime(1950),
       lastDate: minAge > 0 ? now.subtract(Duration(days: 365 * minAge)) : now,
     );
@@ -236,16 +342,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
           color: AppColors.textPrimary,
           onPressed: _prevStep,
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(role == 'nanny' ? 'Devenir Nounou' : 'Compte Parent', style: AppTypography.h4),
-            Text(
-              'Étape ${_currentStep + 1}/$_totalSteps · ${_stepTitles[_currentStep]}',
-              style: AppTypography.caption,
-            ),
-          ],
-        ).animate().fadeIn(duration: 400.ms, delay: 0.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
+        title:
+            Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      role == 'nanny' ? 'Devenir Nounou' : 'Compte Parent',
+                      style: AppTypography.h4,
+                    ),
+                    Text(
+                      'Étape ${_currentStep + 1}/$_totalSteps · ${_stepTitles[_currentStep]}',
+                      style: AppTypography.caption,
+                    ),
+                  ],
+                )
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 0.ms)
+                .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
           child: LinearProgressIndicator(
@@ -314,23 +427,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
           title: 'Identité',
           color: AppColors.primary,
           children: [
-            Row(children: [
-              Expanded(
-                child: _LabeledField(
-                  label: 'Prénom *',
-                  child: _TF(controller: _firstName, hint: 'Marie',
-                      icon: Icons.badge_outlined),
+            Row(
+              children: [
+                Expanded(
+                  child: _LabeledField(
+                    label: 'Prénom *',
+                    child: _TF(
+                      controller: _firstName,
+                      hint: 'Marie',
+                      icon: Icons.badge_outlined,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _LabeledField(
-                  label: 'Nom *',
-                  child: _TF(controller: _lastName, hint: 'Ndong',
-                      icon: Icons.badge_outlined),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: _LabeledField(
+                    label: 'Nom *',
+                    child: _TF(
+                      controller: _lastName,
+                      hint: 'Ndong',
+                      icon: Icons.badge_outlined,
+                    ),
+                  ),
                 ),
-              ),
-            ]),
+              ],
+            ),
             _LabeledField(
               label: 'Date de naissance *${isNanny ? ' (18 ans min.)' : ''}',
               child: _DateTile(
@@ -351,8 +472,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             _LabeledField(
               label: 'Nationalité *',
-              child: _TF(controller: _nationality, hint: 'Gabonaise',
-                  icon: Icons.flag_outlined),
+              child: _TF(
+                controller: _nationality,
+                hint: 'Gabonaise',
+                icon: Icons.flag_outlined,
+              ),
             ),
           ],
         ).animate(delay: 80.ms).fadeIn().slideY(begin: 0.06, end: 0),
@@ -367,15 +491,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: [
             _LabeledField(
               label: 'Téléphone (+241) *',
-              child: _TF(controller: _phone, hint: '06 00 00 00',
-                  type: TextInputType.phone, prefix: '+241 ',
-                  icon: Icons.phone_outlined),
+              child: _TF(
+                controller: _phone,
+                hint: '06 00 00 00',
+                type: TextInputType.phone,
+                prefix: '+241 ',
+                icon: Icons.phone_outlined,
+              ),
             ),
             _LabeledField(
               label: 'Email (optionnel)',
-              child: _TF(controller: _email, hint: 'marie@email.com',
-                  type: TextInputType.emailAddress,
-                  icon: Icons.email_outlined),
+              child: _TF(
+                controller: _email,
+                hint: 'marie@email.com',
+                type: TextInputType.emailAddress,
+                icon: Icons.email_outlined,
+              ),
             ),
           ],
         ).animate(delay: 160.ms).fadeIn().slideY(begin: 0.06, end: 0),
@@ -399,9 +530,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             if (!isNanny)
               _LabeledField(
                 label: 'Adresse complète *',
-                child: _TF(controller: _address,
-                    hint: 'Rue, immeuble, précisions...', maxLines: 2,
-                    icon: Icons.home_outlined),
+                child: _TF(
+                  controller: _address,
+                  hint: 'Rue, immeuble, précisions...',
+                  maxLines: 2,
+                  icon: Icons.home_outlined,
+                ),
               ),
             if (isNanny)
               _LabeledField(
@@ -426,32 +560,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
       title: 'Informations des enfants',
       subtitle: 'Ajoutez un profil pour chaque enfant.',
       children: [
-        for (int i = 0; i < _children.length; i++) ...[ // ignore: curly_braces_in_flow_control_structures
+        for (int i = 0; i < _children.length; i++) ...[
+          // ignore: curly_braces_in_flow_control_structures
           _ChildCard(
-            index: i,
-            info: _children[i],
-            canRemove: _children.length > 1,
-            onRemove: () => setState(() => _children.removeAt(i)),
-            onPickDate: () => _pickDate(
-              current: _children[i].birthDate,
-              onPicked: (d) => setState(() => _children[i].birthDate = d),
-            ),
-            onGender: (v) => setState(() => _children[i].gender = v),
-            onNeeds: (v) => setState(() => _children[i].specialNeeds = v),
-          ).animate(delay: Duration(milliseconds: 160 + i * 60)).fadeIn(duration: 400.ms).slideY(begin: 0.08, end: 0, duration: 400.ms),
+                index: i,
+                info: _children[i],
+                canRemove: _children.length > 1,
+                onRemove: () => setState(() => _children.removeAt(i)),
+                onPickDate: () => _pickDate(
+                  current: _children[i].birthDate,
+                  onPicked: (d) => setState(() => _children[i].birthDate = d),
+                ),
+                onGender: (v) => setState(() => _children[i].gender = v),
+                onNeeds: (v) => setState(() => _children[i].specialNeeds = v),
+              )
+              .animate(delay: Duration(milliseconds: 160 + i * 60))
+              .fadeIn(duration: 400.ms)
+              .slideY(begin: 0.08, end: 0, duration: 400.ms),
           const SizedBox(height: AppSpacing.lg),
         ],
         OutlinedButton.icon(
-          onPressed: () => setState(() => _children.add(_ChildInfo())),
-          icon: const Icon(Icons.add_rounded),
-          label: const Text('Ajouter un enfant'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.primary,
-            side: const BorderSide(color: AppColors.primary),
-            minimumSize: const Size(double.infinity, 48),
-            shape: RoundedRectangleBorder(borderRadius: AppSpacing.buttonBorderRadius),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 280.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
+              onPressed: () => setState(() => _children.add(_ChildInfo())),
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Ajouter un enfant'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppSpacing.buttonBorderRadius,
+                ),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 280.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
       ],
     );
   }
@@ -462,46 +605,75 @@ class _RegisterScreenState extends State<RegisterScreen> {
       title: 'Préférences de garde',
       children: [
         _LabeledField(
-          label: 'Type de garde souhaité',
-          child: _Chips(
-            options: _careTypeOptions,
-            selected: {_careType},
-            single: true,
-            onTap: (v) => setState(() => _careType = v),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+              label: 'Type de garde souhaité',
+              child: _Chips(
+                options: _careTypeOptions,
+                selected: {_careType},
+                single: true,
+                onTap: (v) => setState(() => _careType = v),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         _LabeledField(
-          label: 'Créneaux habituels',
-          child: _Chips(
-            options: _timeSlotOptions,
-            selected: _timeSlots,
-            onTap: (v) => setState(() => _timeSlots.contains(v) ? _timeSlots.remove(v) : _timeSlots.add(v)),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 160.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
+              label: 'Créneaux habituels',
+              child: _Chips(
+                options: _timeSlotOptions,
+                selected: _timeSlots,
+                onTap: (v) => setState(
+                  () => _timeSlots.contains(v)
+                      ? _timeSlots.remove(v)
+                      : _timeSlots.add(v),
+                ),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 160.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
         _LabeledField(
-          label: 'Budget horaire maximum',
-          child: _Slider(
-            value: _maxBudget,
-            min: 1000, max: 10000, divisions: 18,
-            onChanged: (v) => setState(() => _maxBudget = v),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 220.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
+              label: 'Budget horaire maximum',
+              child: _Slider(
+                value: _maxBudget,
+                min: 1000,
+                max: 10000,
+                divisions: 18,
+                onChanged: (v) => setState(() => _maxBudget = v),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 220.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
         _LabeledField(
-          label: 'Langues parlées à la maison',
-          child: _Chips(
-            options: _langOptions,
-            selected: _homeLangs,
-            onTap: (v) => setState(() => _homeLangs.contains(v) ? _homeLangs.remove(v) : _homeLangs.add(v)),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 280.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
+              label: 'Langues parlées à la maison',
+              child: _Chips(
+                options: _langOptions,
+                selected: _homeLangs,
+                onTap: (v) => setState(
+                  () => _homeLangs.contains(v)
+                      ? _homeLangs.remove(v)
+                      : _homeLangs.add(v),
+                ),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 280.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
         _LabeledField(
-          label: 'Critères importants',
-          child: _Chips(
-            options: _parentCriteria,
-            selected: _careCriteria,
-            onTap: (v) => setState(() => _careCriteria.contains(v) ? _careCriteria.remove(v) : _careCriteria.add(v)),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 340.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 340.ms),
+              label: 'Critères importants',
+              child: _Chips(
+                options: _parentCriteria,
+                selected: _careCriteria,
+                onTap: (v) => setState(
+                  () => _careCriteria.contains(v)
+                      ? _careCriteria.remove(v)
+                      : _careCriteria.add(v),
+                ),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 340.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 340.ms),
       ],
     );
   }
@@ -512,33 +684,85 @@ class _RegisterScreenState extends State<RegisterScreen> {
       title: 'Urgence & Sécurité',
       children: [
         _SectionLabel('Contact d\'urgence 1 *')
-            .animate().fadeIn(duration: 400.ms, delay: 0.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
-        Row(children: [
-          Expanded(child: _TF(controller: _emerg1Name, hint: 'Nom complet')),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(child: _TF(controller: _emerg1Phone, hint: '+241 XX XX XX', type: TextInputType.phone)),
-        ]).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 0.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
+        Row(
+              children: [
+                Expanded(
+                  child: _TF(controller: _emerg1Name, hint: 'Nom complet'),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: _TF(
+                    controller: _emerg1Phone,
+                    hint: '+241 XX XX XX',
+                    type: TextInputType.phone,
+                  ),
+                ),
+              ],
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         const SizedBox(height: AppSpacing.lg),
         _SectionLabel('Contact d\'urgence 2 (optionnel)')
-            .animate().fadeIn(duration: 400.ms, delay: 160.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
-        Row(children: [
-          Expanded(child: _TF(controller: _emerg2Name, hint: 'Nom complet')),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(child: _TF(controller: _emerg2Phone, hint: '+241 XX XX XX', type: TextInputType.phone)),
-        ]).animate().fadeIn(duration: 400.ms, delay: 220.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 160.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
+        Row(
+              children: [
+                Expanded(
+                  child: _TF(controller: _emerg2Name, hint: 'Nom complet'),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: _TF(
+                    controller: _emerg2Phone,
+                    hint: '+241 XX XX XX',
+                    type: TextInputType.phone,
+                  ),
+                ),
+              ],
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 220.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
         const SizedBox(height: AppSpacing.lg),
         _SectionLabel('Médecin de famille (optionnel)')
-            .animate().fadeIn(duration: 400.ms, delay: 280.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
-        Row(children: [
-          Expanded(child: _TF(controller: _doctorName, hint: 'Dr. Nom')),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(child: _TF(controller: _doctorPhone, hint: '+241 XX XX XX', type: TextInputType.phone)),
-        ]).animate().fadeIn(duration: 400.ms, delay: 340.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 340.ms),
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 280.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
+        Row(
+              children: [
+                Expanded(
+                  child: _TF(controller: _doctorName, hint: 'Dr. Nom'),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: _TF(
+                    controller: _doctorPhone,
+                    hint: '+241 XX XX XX',
+                    type: TextInputType.phone,
+                  ),
+                ),
+              ],
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 340.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 340.ms),
         const SizedBox(height: AppSpacing.lg),
         _LabeledField(
-          label: 'Groupe sanguin (optionnel)',
-          child: _DD(value: _bloodGroup, items: _bloodGroups, onChanged: (v) => setState(() => _bloodGroup = v!)),
-        ).animate().fadeIn(duration: 400.ms, delay: 400.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 400.ms),
+              label: 'Groupe sanguin (optionnel)',
+              child: _DD(
+                value: _bloodGroup,
+                items: _bloodGroups,
+                onChanged: (v) => setState(() => _bloodGroup = v!),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 400.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 400.ms),
         _SwitchTile(
           label: 'Autorisation de transport',
           subtitle: 'La nounou peut transporter l\'enfant',
@@ -562,20 +786,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
       subtitle: 'Veuillez lire et accepter les conditions avant de finaliser.',
       children: [
         _CheckTile(
-          label: 'J\'accepte les Conditions Générales d\'Utilisation *',
-          value: _acceptCGU,
-          onChanged: (v) => setState(() => _acceptCGU = v),
-        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+              label: 'J\'accepte les Conditions Générales d\'Utilisation *',
+              value: _acceptCGU,
+              onChanged: (v) => setState(() => _acceptCGU = v),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         _CheckTile(
-          label: 'J\'accepte la Politique de Confidentialité *',
-          value: _acceptPrivacy,
-          onChanged: (v) => setState(() => _acceptPrivacy = v),
-        ).animate().fadeIn(duration: 400.ms, delay: 160.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
+              label: 'J\'accepte la Politique de Confidentialité *',
+              value: _acceptPrivacy,
+              onChanged: (v) => setState(() => _acceptPrivacy = v),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 160.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
         _CheckTile(
-          label: 'Je certifie que toutes les informations fournies sont exactes *',
-          value: _certifyAccurate,
-          onChanged: (v) => setState(() => _certifyAccurate = v),
-        ).animate().fadeIn(duration: 400.ms, delay: 220.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
+              label:
+                  'Je certifie que toutes les informations fournies sont exactes *',
+              value: _certifyAccurate,
+              onChanged: (v) => setState(() => _certifyAccurate = v),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 220.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
       ],
     );
   }
@@ -586,27 +820,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
       title: 'Documents & Vérification KYC',
       subtitle: 'Ces documents garantissent la sécurité des familles.',
       children: [
-        _LabeledField(label: 'Numéro CNI *', child: _TF(controller: _cniNumber, hint: 'Ex: 123456789'))
-            .animate().fadeIn(duration: 400.ms, delay: 0.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
+        _LabeledField(
+              label: 'Numéro CNI *',
+              child: _TF(controller: _cniNumber, hint: 'Ex: 123456789'),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 0.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
         _DocUpload(
-          label: 'Photo CNI recto *', icon: Icons.credit_card_rounded,
-          uploaded: _hasCNIRecto, onTap: () => setState(() => _hasCNIRecto = true),
-        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+              label: 'Photo CNI recto *',
+              icon: Icons.credit_card_rounded,
+              uploaded: _hasCNIRecto,
+              onTap: () => setState(() => _hasCNIRecto = true),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         _DocUpload(
-          label: 'Photo CNI verso *', icon: Icons.credit_card_rounded,
-          uploaded: _hasCNIVerso, onTap: () => setState(() => _hasCNIVerso = true),
-        ).animate().fadeIn(duration: 400.ms, delay: 160.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
+              label: 'Photo CNI verso *',
+              icon: Icons.credit_card_rounded,
+              uploaded: _hasCNIVerso,
+              onTap: () => setState(() => _hasCNIVerso = true),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 160.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
         _DocUpload(
-          label: 'Selfie de vérification *', icon: Icons.face_rounded,
-          uploaded: _hasSelfie, onTap: () => setState(() => _hasSelfie = true),
-          subtitle: 'Visage visible, bonne luminosité',
-        ).animate().fadeIn(duration: 400.ms, delay: 220.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
+              label: 'Selfie de vérification *',
+              icon: Icons.face_rounded,
+              uploaded: _hasSelfie,
+              onTap: () => setState(() => _hasSelfie = true),
+              subtitle: 'Visage visible, bonne luminosité',
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 220.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
         _DocUpload(
-          label: 'Casier judiciaire vierge', icon: Icons.description_rounded,
-          uploaded: _hasCriminalRecord, onTap: () => setState(() => _hasCriminalRecord = true),
-          subtitle: 'Optionnel à l\'inscription — requis sous 7 jours',
-          required: false,
-        ).animate().fadeIn(duration: 400.ms, delay: 280.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
+              label: 'Casier judiciaire vierge',
+              icon: Icons.description_rounded,
+              uploaded: _hasCriminalRecord,
+              onTap: () => setState(() => _hasCriminalRecord = true),
+              subtitle: 'Optionnel à l\'inscription — requis sous 7 jours',
+              required: false,
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 280.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
       ],
     );
   }
@@ -617,37 +876,72 @@ class _RegisterScreenState extends State<RegisterScreen> {
       title: 'Expérience & Compétences',
       children: [
         _LabeledField(
-          label: 'Années d\'expérience',
-          child: _DD(value: _experience, items: _experienceOptions, onChanged: (v) => setState(() => _experience = v!)),
-        ).animate().fadeIn(duration: 400.ms, delay: 0.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
+              label: 'Années d\'expérience',
+              child: _DD(
+                value: _experience,
+                items: _experienceOptions,
+                onChanged: (v) => setState(() => _experience = v!),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 0.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
         _LabeledField(
-          label: 'Tranches d\'âge maîtrisées',
-          child: _Chips(
-            options: _ageGroupOptions,
-            selected: _ageGroups,
-            onTap: (v) => setState(() => _ageGroups.contains(v) ? _ageGroups.remove(v) : _ageGroups.add(v)),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+              label: 'Tranches d\'âge maîtrisées',
+              child: _Chips(
+                options: _ageGroupOptions,
+                selected: _ageGroups,
+                onTap: (v) => setState(
+                  () => _ageGroups.contains(v)
+                      ? _ageGroups.remove(v)
+                      : _ageGroups.add(v),
+                ),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         _LabeledField(
-          label: 'Compétences',
-          child: _Chips(
-            options: _nannySkillOptions,
-            selected: _nannySkills,
-            onTap: (v) => setState(() => _nannySkills.contains(v) ? _nannySkills.remove(v) : _nannySkills.add(v)),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 160.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
+              label: 'Compétences',
+              child: _Chips(
+                options: _nannySkillOptions,
+                selected: _nannySkills,
+                onTap: (v) => setState(
+                  () => _nannySkills.contains(v)
+                      ? _nannySkills.remove(v)
+                      : _nannySkills.add(v),
+                ),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 160.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
         _LabeledField(
-          label: 'Diplôme / Formation (optionnel)',
-          child: _DD(value: _diploma, items: _diplomaOptions, onChanged: (v) => setState(() => _diploma = v!)),
-        ).animate().fadeIn(duration: 400.ms, delay: 220.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
+              label: 'Diplôme / Formation (optionnel)',
+              child: _DD(
+                value: _diploma,
+                items: _diplomaOptions,
+                onChanged: (v) => setState(() => _diploma = v!),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 220.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
         _LabeledField(
-          label: 'Langues parlées',
-          child: _Chips(
-            options: _langOptions,
-            selected: _nannyLangs,
-            onTap: (v) => setState(() => _nannyLangs.contains(v) ? _nannyLangs.remove(v) : _nannyLangs.add(v)),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 280.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
+              label: 'Langues parlées',
+              child: _Chips(
+                options: _langOptions,
+                selected: _nannyLangs,
+                onTap: (v) => setState(
+                  () => _nannyLangs.contains(v)
+                      ? _nannyLangs.remove(v)
+                      : _nannyLangs.add(v),
+                ),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 280.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
       ],
     );
   }
@@ -659,21 +953,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
       subtitle: 'Une bonne bio augmente vos chances de décrocher des missions.',
       children: [
         _LabeledField(
-          label: 'Bio courte * (150 caractères — affichée sur votre profil)',
-          child: _TF(
-            controller: _shortBio,
-            hint: 'Ex : "Passionnée de la petite enfance, 3 ans d\'expérience..."',
-            maxLines: 3, maxLength: 150,
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+              label:
+                  'Bio courte * (150 caractères — affichée sur votre profil)',
+              child: _TF(
+                controller: _shortBio,
+                hint:
+                    'Ex : "Passionnée de la petite enfance, 3 ans d\'expérience..."',
+                maxLines: 3,
+                maxLength: 150,
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         _LabeledField(
-          label: 'Description longue (500 caractères — visible en "Voir plus")',
-          child: _TF(
-            controller: _longBio,
-            hint: 'Parlez de votre parcours, vos valeurs, vos méthodes...',
-            maxLines: 6, maxLength: 500,
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 160.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
+              label:
+                  'Description longue (500 caractères — visible en "Voir plus")',
+              child: _TF(
+                controller: _longBio,
+                hint: 'Parlez de votre parcours, vos valeurs, vos méthodes...',
+                maxLines: 6,
+                maxLength: 500,
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 160.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
       ],
     );
   }
@@ -684,48 +989,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
       title: 'Disponibilités & Tarifs',
       children: [
         _LabeledField(
-          label: 'Tarif horaire *',
-          child: _Slider(
-            value: _hourlyRate, min: 1000, max: 10000, divisions: 18,
-            showEstimate: true,
-            onChanged: (v) => setState(() => _hourlyRate = v),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 0.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
+              label: 'Tarif horaire *',
+              child: _Slider(
+                value: _hourlyRate,
+                min: 1000,
+                max: 10000,
+                divisions: 18,
+                showEstimate: true,
+                onChanged: (v) => setState(() => _hourlyRate = v),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 0.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
         _LabeledField(
-          label: 'Disponibilités habituelles',
-          child: _AvailabilityGrid(
-            availability: _availability,
-            onChanged: (day, slot) => setState(() {
-              _availability[day]!.contains(slot)
-                  ? _availability[day]!.remove(slot)
-                  : _availability[day]!.add(slot);
-            }),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+              label: 'Disponibilités habituelles',
+              child: _AvailabilityGrid(
+                availability: _availability,
+                onChanged: (day, slot) => setState(() {
+                  _availability[day]!.contains(slot)
+                      ? _availability[day]!.remove(slot)
+                      : _availability[day]!.add(slot);
+                }),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         _SwitchTile(
-          label: 'Disponible pour missions urgentes',
-          subtitle: 'Moins de 2h de préavis',
-          value: _urgentAvailable,
-          onChanged: (v) => setState(() => _urgentAvailable = v),
-        ).animate().fadeIn(duration: 400.ms, delay: 160.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
+              label: 'Disponible pour missions urgentes',
+              subtitle: 'Moins de 2h de préavis',
+              value: _urgentAvailable,
+              onChanged: (v) => setState(() => _urgentAvailable = v),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 160.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
         _LabeledField(
-          label: 'Mode de garde accepté',
-          child: _Chips(
-            options: _nannyCarModeOptions,
-            selected: {_nannyCarMode},
-            single: true,
-            onTap: (v) => setState(() => _nannyCarMode = v),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 220.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
+              label: 'Mode de garde accepté',
+              child: _Chips(
+                options: _nannyCarModeOptions,
+                selected: {_nannyCarMode},
+                single: true,
+                onTap: (v) => setState(() => _nannyCarMode = v),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 220.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
         _LabeledField(
-          label: 'Nombre maximum d\'enfants simultanés',
-          child: _Chips(
-            options: _maxChildrenOptions,
-            selected: {_maxChildren},
-            single: true,
-            onTap: (v) => setState(() => _maxChildren = v),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 280.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
+              label: 'Nombre maximum d\'enfants simultanés',
+              child: _Chips(
+                options: _maxChildrenOptions,
+                selected: {_maxChildren},
+                single: true,
+                onTap: (v) => setState(() => _maxChildren = v),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 280.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
       ],
     );
   }
@@ -736,23 +1059,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
       title: 'Informations de paiement',
       children: [
         _LabeledField(
-          label: 'Méthode(s) acceptée(s)',
-          child: _Chips(
-            options: _paymentOptions,
-            selected: _paymentMethods,
-            onTap: (v) => setState(() => _paymentMethods.contains(v) ? _paymentMethods.remove(v) : _paymentMethods.add(v)),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 0.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
+              label: 'Méthode(s) acceptée(s)',
+              child: _Chips(
+                options: _paymentOptions,
+                selected: _paymentMethods,
+                onTap: (v) => setState(
+                  () => _paymentMethods.contains(v)
+                      ? _paymentMethods.remove(v)
+                      : _paymentMethods.add(v),
+                ),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 0.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
         if (_paymentMethods.contains('Airtel Money'))
           _LabeledField(
-            label: 'Numéro Airtel Money',
-            child: _TF(controller: _airtelNumber, hint: '07 XX XX XX', type: TextInputType.phone),
-          ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+                label: 'Numéro Airtel Money',
+                child: _TF(
+                  controller: _airtelNumber,
+                  hint: '07 XX XX XX',
+                  type: TextInputType.phone,
+                ),
+              )
+              .animate()
+              .fadeIn(duration: 400.ms, delay: 100.ms)
+              .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         if (_paymentMethods.contains('Moov Money'))
           _LabeledField(
-            label: 'Numéro Moov Money',
-            child: _TF(controller: _moovNumber, hint: '06 XX XX XX', type: TextInputType.phone),
-          ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+                label: 'Numéro Moov Money',
+                child: _TF(
+                  controller: _moovNumber,
+                  hint: '06 XX XX XX',
+                  type: TextInputType.phone,
+                ),
+              )
+              .animate()
+              .fadeIn(duration: 400.ms, delay: 100.ms)
+              .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
       ],
     );
   }
@@ -764,26 +1108,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
       subtitle: 'Les références augmentent la confiance des familles.',
       children: [
         _SectionLabel('Référence 1 (recommandé)')
-            .animate().fadeIn(duration: 400.ms, delay: 0.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 0.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
         _TF(controller: _ref1.name, hint: 'Nom complet')
-            .animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         const SizedBox(height: AppSpacing.sm),
-        _TF(controller: _ref1.phone, hint: '+241 XX XX XX', type: TextInputType.phone)
-            .animate().fadeIn(duration: 400.ms, delay: 160.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
+        _TF(
+              controller: _ref1.phone,
+              hint: '+241 XX XX XX',
+              type: TextInputType.phone,
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 160.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
         const SizedBox(height: AppSpacing.sm),
-        _TF(controller: _ref1.relation, hint: 'Relation (ex : Ancien employeur)')
-            .animate().fadeIn(duration: 400.ms, delay: 220.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
+        _TF(
+              controller: _ref1.relation,
+              hint: 'Relation (ex : Ancien employeur)',
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 220.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
         const SizedBox(height: AppSpacing.xl),
         _SectionLabel('Référence 2 (optionnel)')
-            .animate().fadeIn(duration: 400.ms, delay: 280.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 280.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
         _TF(controller: _ref2.name, hint: 'Nom complet')
-            .animate().fadeIn(duration: 400.ms, delay: 340.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 340.ms),
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 340.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 340.ms),
         const SizedBox(height: AppSpacing.sm),
-        _TF(controller: _ref2.phone, hint: '+241 XX XX XX', type: TextInputType.phone)
-            .animate().fadeIn(duration: 400.ms, delay: 400.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 400.ms),
+        _TF(
+              controller: _ref2.phone,
+              hint: '+241 XX XX XX',
+              type: TextInputType.phone,
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 400.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 400.ms),
         const SizedBox(height: AppSpacing.sm),
         _TF(controller: _ref2.relation, hint: 'Relation')
-            .animate().fadeIn(duration: 400.ms, delay: 400.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 400.ms),
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 400.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 400.ms),
       ],
     );
   }
@@ -792,28 +1163,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildNannyVerification() {
     return _StepContent(
       title: 'Engagement & Vérification',
-      subtitle: 'En rejoignant Nounou Express, vous vous engagez à respecter nos standards.',
+      subtitle:
+          'En rejoignant Nounou Express, vous vous engagez à respecter nos standards.',
       children: [
         _CheckTile(
-          label: 'Je certifie que toutes les informations fournies sont exactes *',
-          value: _certifyNanny,
-          onChanged: (v) => setState(() => _certifyNanny = v),
-        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
+              label:
+                  'Je certifie que toutes les informations fournies sont exactes *',
+              value: _certifyNanny,
+              onChanged: (v) => setState(() => _certifyNanny = v),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 100.ms),
         _CheckTile(
-          label: 'J\'accepte les Conditions Générales d\'Utilisation *',
-          value: _acceptCGUNanny,
-          onChanged: (v) => setState(() => _acceptCGUNanny = v),
-        ).animate().fadeIn(duration: 400.ms, delay: 160.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
+              label: 'J\'accepte les Conditions Générales d\'Utilisation *',
+              value: _acceptCGUNanny,
+              onChanged: (v) => setState(() => _acceptCGUNanny = v),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 160.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
         _CheckTile(
-          label: 'J\'autorise Nounou Express à vérifier mon identité *',
-          value: _acceptVerification,
-          onChanged: (v) => setState(() => _acceptVerification = v),
-        ).animate().fadeIn(duration: 400.ms, delay: 220.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
+              label: 'J\'autorise Nounou Express à vérifier mon identité *',
+              value: _acceptVerification,
+              onChanged: (v) => setState(() => _acceptVerification = v),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 220.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 220.ms),
         _CheckTile(
-          label: 'Je m\'engage à respecter la charte de bonne conduite *',
-          value: _acceptCharter,
-          onChanged: (v) => setState(() => _acceptCharter = v),
-        ).animate().fadeIn(duration: 400.ms, delay: 280.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
+              label: 'Je m\'engage à respecter la charte de bonne conduite *',
+              value: _acceptCharter,
+              onChanged: (v) => setState(() => _acceptCharter = v),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 280.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 280.ms),
       ],
     );
   }
@@ -828,7 +1213,11 @@ class _StepContent extends StatelessWidget {
   final String? subtitle;
   final List<Widget> children;
 
-  const _StepContent({required this.title, this.subtitle, required this.children});
+  const _StepContent({
+    required this.title,
+    this.subtitle,
+    required this.children,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -836,11 +1225,15 @@ class _StepContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: AppTypography.h2)
-            .animate().fadeIn(duration: 400.ms, delay: 0.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 0.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 0.ms),
         if (subtitle != null) ...[
           const SizedBox(height: 4),
-          Text(subtitle!, style: AppTypography.bodySmall)
-              .animate().fadeIn(duration: 400.ms, delay: 60.ms),
+          Text(
+            subtitle!,
+            style: AppTypography.bodySmall,
+          ).animate().fadeIn(duration: 400.ms, delay: 60.ms),
         ],
         const SizedBox(height: AppSpacing.xl),
         ...children,
@@ -863,9 +1256,13 @@ class _LabeledField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textPrimary, fontWeight: FontWeight.w600,
-          )),
+          Text(
+            label,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 6),
           child,
         ],
@@ -924,9 +1321,18 @@ class _TF extends StatelessWidget {
           horizontal: icon != null ? AppSpacing.sm : AppSpacing.lg,
           vertical: AppSpacing.md,
         ),
-        border: OutlineInputBorder(borderRadius: AppSpacing.inputBorderRadius, borderSide: const BorderSide(color: AppColors.border)),
-        enabledBorder: OutlineInputBorder(borderRadius: AppSpacing.inputBorderRadius, borderSide: const BorderSide(color: AppColors.border)),
-        focusedBorder: OutlineInputBorder(borderRadius: AppSpacing.inputBorderRadius, borderSide: const BorderSide(color: AppColors.primary, width: 2)),
+        border: OutlineInputBorder(
+          borderRadius: AppSpacing.inputBorderRadius,
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppSpacing.inputBorderRadius,
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppSpacing.inputBorderRadius,
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        ),
       ),
     );
   }
@@ -938,7 +1344,11 @@ class _DD extends StatelessWidget {
   final List<String> items;
   final void Function(String?) onChanged;
 
-  const _DD({required this.value, required this.items, required this.onChanged});
+  const _DD({
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -947,12 +1357,31 @@ class _DD extends StatelessWidget {
       decoration: InputDecoration(
         filled: true,
         fillColor: AppColors.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-        border: OutlineInputBorder(borderRadius: AppSpacing.inputBorderRadius, borderSide: const BorderSide(color: AppColors.border)),
-        enabledBorder: OutlineInputBorder(borderRadius: AppSpacing.inputBorderRadius, borderSide: const BorderSide(color: AppColors.border)),
-        focusedBorder: OutlineInputBorder(borderRadius: AppSpacing.inputBorderRadius, borderSide: const BorderSide(color: AppColors.primary, width: 2)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: AppSpacing.inputBorderRadius,
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppSpacing.inputBorderRadius,
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppSpacing.inputBorderRadius,
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        ),
       ),
-      items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: AppTypography.bodyMedium))).toList(),
+      items: items
+          .map(
+            (e) => DropdownMenuItem(
+              value: e,
+              child: Text(e, style: AppTypography.bodyMedium),
+            ),
+          )
+          .toList(),
       onChanged: onChanged,
     );
   }
@@ -970,7 +1399,10 @@ class _DateTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: AppSpacing.inputBorderRadius,
@@ -978,14 +1410,20 @@ class _DateTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.textSecondary),
+            const Icon(
+              Icons.calendar_today_rounded,
+              size: 18,
+              color: AppColors.textSecondary,
+            ),
             const SizedBox(width: AppSpacing.md),
             Text(
               date == null
                   ? 'Sélectionner une date'
                   : '${date!.day.toString().padLeft(2, '0')}/${date!.month.toString().padLeft(2, '0')}/${date!.year}',
               style: AppTypography.bodyMedium.copyWith(
-                color: date == null ? AppColors.textSecondary : AppColors.textPrimary,
+                color: date == null
+                    ? AppColors.textSecondary
+                    : AppColors.textPrimary,
               ),
             ),
           ],
@@ -1002,7 +1440,12 @@ class _Chips extends StatelessWidget {
   final void Function(String) onTap;
   final bool single;
 
-  const _Chips({required this.options, required this.selected, required this.onTap, this.single = false});
+  const _Chips({
+    required this.options,
+    required this.selected,
+    required this.onTap,
+    this.single = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1015,11 +1458,16 @@ class _Chips extends StatelessWidget {
           onTap: () => onTap(opt),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.sm,
+            ),
             decoration: BoxDecoration(
               color: isSelected ? AppColors.primary : AppColors.surface,
               borderRadius: AppSpacing.chipBorderRadius,
-              border: Border.all(color: isSelected ? AppColors.primary : AppColors.border),
+              border: Border.all(
+                color: isSelected ? AppColors.primary : AppColors.border,
+              ),
             ),
             child: Text(
               opt,
@@ -1044,8 +1492,12 @@ class _Slider extends StatelessWidget {
   final void Function(double) onChanged;
 
   const _Slider({
-    required this.value, required this.min, required this.max,
-    required this.divisions, this.showEstimate = false, required this.onChanged,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.divisions,
+    this.showEstimate = false,
+    required this.onChanged,
   });
 
   @override
@@ -1056,14 +1508,24 @@ class _Slider extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('${value.round()} FCFA/h', style: AppTypography.h3.copyWith(color: AppColors.primary)),
+            Text(
+              '${value.round()} FCFA/h',
+              style: AppTypography.h3.copyWith(color: AppColors.primary),
+            ),
             if (showEstimate)
-              Text('4h = ${(value * 4).round()} FCFA', style: AppTypography.caption),
+              Text(
+                '4h = ${(value * 4).round()} FCFA',
+                style: AppTypography.caption,
+              ),
           ],
         ),
         Slider(
-          value: value, min: min, max: max, divisions: divisions,
-          activeColor: AppColors.primary, inactiveColor: AppColors.border,
+          value: value,
+          min: min,
+          max: max,
+          divisions: divisions,
+          activeColor: AppColors.primary,
+          inactiveColor: AppColors.border,
           onChanged: onChanged,
         ),
         Row(
@@ -1085,13 +1547,21 @@ class _SwitchTile extends StatelessWidget {
   final bool value;
   final void Function(bool) onChanged;
 
-  const _SwitchTile({required this.label, this.subtitle, required this.value, required this.onChanged});
+  const _SwitchTile({
+    required this.label,
+    this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: AppSpacing.cardBorderRadius,
@@ -1103,12 +1573,22 @@ class _SwitchTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                if (subtitle != null) Text(subtitle!, style: AppTypography.caption),
+                Text(
+                  label,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (subtitle != null)
+                  Text(subtitle!, style: AppTypography.caption),
               ],
             ),
           ),
-          Switch(value: value, onChanged: onChanged, activeThumbColor: AppColors.primary),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: AppColors.primary,
+          ),
         ],
       ),
     );
@@ -1121,7 +1601,11 @@ class _CheckTile extends StatelessWidget {
   final bool value;
   final void Function(bool) onChanged;
 
-  const _CheckTile({required this.label, required this.value, required this.onChanged});
+  const _CheckTile({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1131,24 +1615,45 @@ class _CheckTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: value ? AppColors.primary.withValues(alpha: 0.06) : AppColors.surface,
+          color: value
+              ? AppColors.primary.withValues(alpha: 0.06)
+              : AppColors.surface,
           borderRadius: AppSpacing.cardBorderRadius,
-          border: Border.all(color: value ? AppColors.primary : AppColors.border),
+          border: Border.all(
+            color: value ? AppColors.primary : AppColors.border,
+          ),
         ),
         child: Row(
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 180),
-              width: 22, height: 22,
+              width: 22,
+              height: 22,
               decoration: BoxDecoration(
                 color: value ? AppColors.primary : Colors.transparent,
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: value ? AppColors.primary : AppColors.border, width: 2),
+                border: Border.all(
+                  color: value ? AppColors.primary : AppColors.border,
+                  width: 2,
+                ),
               ),
-              child: value ? const Icon(Icons.check_rounded, size: 14, color: Colors.white) : null,
+              child: value
+                  ? const Icon(
+                      Icons.check_rounded,
+                      size: 14,
+                      color: Colors.white,
+                    )
+                  : null,
             ),
             const SizedBox(width: AppSpacing.md),
-            Expanded(child: Text(label, style: AppTypography.bodySmall.copyWith(color: AppColors.textPrimary))),
+            Expanded(
+              child: Text(
+                label,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -1234,7 +1739,10 @@ class _IdentityPhotoPicker extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 3),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 3,
+            ),
             decoration: BoxDecoration(
               color: AppColors.accentSurface,
               borderRadius: AppSpacing.chipBorderRadius,
@@ -1315,7 +1823,10 @@ class _IdentityCard extends StatelessWidget {
           // Fields
           Padding(
             padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xs,
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.xs,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1383,7 +1894,9 @@ class _GenderOption extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
-            color: isSelected ? color.withValues(alpha: 0.10) : AppColors.surfaceVariant,
+            color: isSelected
+                ? color.withValues(alpha: 0.10)
+                : AppColors.surfaceVariant,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isSelected ? color : AppColors.border,
@@ -1393,7 +1906,11 @@ class _GenderOption extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 22, color: isSelected ? color : AppColors.textTertiary),
+              Icon(
+                icon,
+                size: 22,
+                color: isSelected ? color : AppColors.textTertiary,
+              ),
               const SizedBox(width: 6),
               Text(
                 label,
@@ -1420,8 +1937,12 @@ class _DocUpload extends StatelessWidget {
   final bool required;
 
   const _DocUpload({
-    required this.label, required this.icon, required this.uploaded,
-    required this.onTap, this.subtitle, this.required = true,
+    required this.label,
+    required this.icon,
+    required this.uploaded,
+    required this.onTap,
+    this.subtitle,
+    this.required = true,
   });
 
   @override
@@ -1432,16 +1953,22 @@ class _DocUpload extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: uploaded ? AppColors.success.withValues(alpha: 0.06) : AppColors.surface,
+          color: uploaded
+              ? AppColors.success.withValues(alpha: 0.06)
+              : AppColors.surface,
           borderRadius: AppSpacing.cardBorderRadius,
-          border: Border.all(color: uploaded ? AppColors.success : AppColors.border),
+          border: Border.all(
+            color: uploaded ? AppColors.success : AppColors.border,
+          ),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: uploaded ? AppColors.success.withValues(alpha: 0.12) : AppColors.primary.withValues(alpha: 0.08),
+                color: uploaded
+                    ? AppColors.success.withValues(alpha: 0.12)
+                    : AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -1455,14 +1982,28 @@ class _DocUpload extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                  if (subtitle != null) Text(subtitle!, style: AppTypography.caption),
-                  if (!required) Text('Optionnel', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                  Text(
+                    label,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (subtitle != null)
+                    Text(subtitle!, style: AppTypography.caption),
+                  if (!required)
+                    Text(
+                      'Optionnel',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                 ],
               ),
             ),
-            Icon(uploaded ? Icons.check_rounded : Icons.upload_rounded,
-                color: uploaded ? AppColors.success : AppColors.textSecondary),
+            Icon(
+              uploaded ? Icons.check_rounded : Icons.upload_rounded,
+              color: uploaded ? AppColors.success : AppColors.textSecondary,
+            ),
           ],
         ),
       ),
@@ -1475,29 +2016,57 @@ class _AvailabilityGrid extends StatelessWidget {
   final Map<String, Set<String>> availability;
   final void Function(String day, String slot) onChanged;
 
-  static const _days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+  static const _days = [
+    'Lundi',
+    'Mardi',
+    'Mercredi',
+    'Jeudi',
+    'Vendredi',
+    'Samedi',
+    'Dimanche',
+  ];
   static const _slots = ['Matin', 'Après-midi', 'Soir', 'Nuit'];
 
-  const _AvailabilityGrid({required this.availability, required this.onChanged});
+  const _AvailabilityGrid({
+    required this.availability,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(children: [
-          const SizedBox(width: 76),
-          ..._slots.map((s) => Expanded(
-            child: Text(s, style: AppTypography.small, textAlign: TextAlign.center, maxLines: 1,
-              overflow: TextOverflow.ellipsis),
-          )),
-        ]),
+        Row(
+          children: [
+            const SizedBox(width: 76),
+            ..._slots.map(
+              (s) => Expanded(
+                child: Text(
+                  s,
+                  style: AppTypography.small,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: AppSpacing.sm),
         ..._days.map((day) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 3),
             child: Row(
               children: [
-                SizedBox(width: 76, child: Text(day, style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600))),
+                SizedBox(
+                  width: 76,
+                  child: Text(
+                    day,
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
                 ..._slots.map((slot) {
                   final active = availability[day]?.contains(slot) ?? false;
                   return Expanded(
@@ -1508,10 +2077,18 @@ class _AvailabilityGrid extends StatelessWidget {
                         margin: const EdgeInsets.symmetric(horizontal: 2),
                         height: 32,
                         decoration: BoxDecoration(
-                          color: active ? AppColors.primary : AppColors.surfaceVariant,
+                          color: active
+                              ? AppColors.primary
+                              : AppColors.surfaceVariant,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: active ? const Icon(Icons.check_rounded, size: 14, color: Colors.white) : null,
+                        child: active
+                            ? const Icon(
+                                Icons.check_rounded,
+                                size: 14,
+                                color: Colors.white,
+                              )
+                            : null,
                       ),
                     ),
                   );
@@ -1536,9 +2113,13 @@ class _ChildCard extends StatelessWidget {
   final void Function(String) onNeeds;
 
   const _ChildCard({
-    required this.index, required this.info, required this.canRemove,
-    required this.onRemove, required this.onPickDate,
-    required this.onGender, required this.onNeeds,
+    required this.index,
+    required this.info,
+    required this.canRemove,
+    required this.onRemove,
+    required this.onPickDate,
+    required this.onGender,
+    required this.onNeeds,
   });
 
   @override
@@ -1560,30 +2141,54 @@ class _ChildCard extends StatelessWidget {
               if (canRemove)
                 IconButton(
                   icon: const Icon(Icons.close_rounded, size: 18),
-                  color: AppColors.danger, onPressed: onRemove,
-                  padding: EdgeInsets.zero, constraints: const BoxConstraints(),
+                  color: AppColors.danger,
+                  onPressed: onRemove,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                 ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          _LabeledField(label: 'Prénom *', child: _TF(controller: info.firstName, hint: 'Prénom')),
-          _LabeledField(label: 'Date de naissance *', child: _DateTile(date: info.birthDate, onTap: onPickDate)),
+          _LabeledField(
+            label: 'Prénom *',
+            child: _TF(controller: info.firstName, hint: 'Prénom'),
+          ),
+          _LabeledField(
+            label: 'Date de naissance *',
+            child: _DateTile(date: info.birthDate, onTap: onPickDate),
+          ),
           _LabeledField(
             label: 'Sexe',
             child: _Chips(
-              options: const ['Garçon', 'Fille'], selected: {info.gender},
-              single: true, onTap: onGender,
+              options: const ['Garçon', 'Fille'],
+              selected: {info.gender},
+              single: true,
+              onTap: onGender,
             ),
           ),
           _LabeledField(
             label: 'Besoins spéciaux',
             child: _Chips(
               options: const ['Aucun', 'Allergie', 'Handicap', 'Autre'],
-              selected: {info.specialNeeds}, single: true, onTap: onNeeds,
+              selected: {info.specialNeeds},
+              single: true,
+              onTap: onNeeds,
             ),
           ),
-          _LabeledField(label: 'Allergies connues', child: _TF(controller: info.allergies, hint: 'Ex: arachides, lait...')),
-          _LabeledField(label: 'Médicaments réguliers (optionnel)', child: _TF(controller: info.medications, hint: 'Nom, dosage, fréquence...')),
+          _LabeledField(
+            label: 'Allergies connues',
+            child: _TF(
+              controller: info.allergies,
+              hint: 'Ex: arachides, lait...',
+            ),
+          ),
+          _LabeledField(
+            label: 'Médicaments réguliers (optionnel)',
+            child: _TF(
+              controller: info.medications,
+              hint: 'Nom, dosage, fréquence...',
+            ),
+          ),
         ],
       ),
     );
@@ -1596,8 +2201,10 @@ class _BottomNav extends StatelessWidget {
   final VoidCallback onNext, onPrev;
 
   const _BottomNav({
-    required this.currentStep, required this.totalSteps,
-    required this.onNext, required this.onPrev,
+    required this.currentStep,
+    required this.totalSteps,
+    required this.onNext,
+    required this.onPrev,
   });
 
   @override
@@ -1606,7 +2213,12 @@ class _BottomNav extends StatelessWidget {
     final bottomPad = MediaQuery.of(context).padding.bottom;
 
     return Container(
-      padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.lg + bottomPad),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.lg,
+        AppSpacing.xl,
+        AppSpacing.lg + bottomPad,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surface,
         border: const Border(top: BorderSide(color: AppColors.border)),
@@ -1615,35 +2227,57 @@ class _BottomNav extends StatelessWidget {
         children: [
           if (currentStep > 0) ...[
             Expanded(
-              child: OutlinedButton(
-                onPressed: onPrev,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textPrimary,
-                  side: const BorderSide(color: AppColors.border),
-                  minimumSize: const Size(0, 52),
-                  shape: RoundedRectangleBorder(borderRadius: AppSpacing.buttonBorderRadius),
-                ),
-                child: const Text('Précédent'),
-              ).animate().fadeIn(duration: 400.ms, delay: 340.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 340.ms),
+              child:
+                  OutlinedButton(
+                        onPressed: onPrev,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.textPrimary,
+                          side: const BorderSide(color: AppColors.border),
+                          minimumSize: const Size(0, 52),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppSpacing.buttonBorderRadius,
+                          ),
+                        ),
+                        child: const Text('Précédent'),
+                      )
+                      .animate()
+                      .fadeIn(duration: 400.ms, delay: 340.ms)
+                      .slideY(
+                        begin: 0.08,
+                        end: 0,
+                        duration: 400.ms,
+                        delay: 340.ms,
+                      ),
             ),
             const SizedBox(width: AppSpacing.md),
           ],
           Expanded(
             flex: 2,
-            child: ElevatedButton(
-              onPressed: onNext,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(0, 52),
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: AppSpacing.buttonBorderRadius),
-              ),
-              child: Text(
-                isLast ? 'Créer mon compte' : 'Suivant',
-                style: AppTypography.buttonLabel,
-              ),
-            ).animate().fadeIn(duration: 400.ms, delay: 400.ms).slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 400.ms),
+            child:
+                ElevatedButton(
+                      onPressed: onNext,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(0, 52),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: AppSpacing.buttonBorderRadius,
+                        ),
+                      ),
+                      child: Text(
+                        isLast ? 'Créer mon compte' : 'Suivant',
+                        style: AppTypography.buttonLabel,
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(duration: 400.ms, delay: 400.ms)
+                    .slideY(
+                      begin: 0.08,
+                      end: 0,
+                      duration: 400.ms,
+                      delay: 400.ms,
+                    ),
           ),
         ],
       ),

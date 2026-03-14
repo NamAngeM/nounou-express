@@ -149,7 +149,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                         'Je cherche une nounou de confiance pour mes enfants',
                     accentColor: AppColors.primary,
                     badgeText: 'FAMILLE',
-                    features: const ['Trouver une nounou', 'Planifier les missions', 'Suivre en temps réel'],
+                    features: const [
+                      'Trouver une nounou',
+                      'Planifier les missions',
+                      'Suivre en temps réel',
+                    ],
                     isSelected: selectedRole == 'parent',
                     onTap: () => _onRoleTap('parent'),
                   ).animate().fadeIn(delay: 320.ms).slideX(begin: -0.06, end: 0),
@@ -164,7 +168,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                         'Je propose mes services de garde d\'enfants professionnels',
                     accentColor: AppColors.accent,
                     badgeText: 'PROFESSIONNEL',
-                    features: const ['Proposer mes services', 'Gérer mon agenda', 'Recevoir des missions'],
+                    features: const [
+                      'Proposer mes services',
+                      'Gérer mon agenda',
+                      'Recevoir des missions',
+                    ],
                     isSelected: selectedRole == 'nanny',
                     onTap: () => _onRoleTap('nanny'),
                   ).animate().fadeIn(delay: 420.ms).slideX(begin: -0.06, end: 0),
@@ -176,11 +184,17 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.verified_rounded, size: 14, color: AppColors.textTertiary),
+                        Icon(
+                          Icons.verified_rounded,
+                          size: 14,
+                          color: AppColors.textTertiary,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           'Profils vérifiés · Données sécurisées',
-                          style: AppTypography.small.copyWith(color: AppColors.textTertiary),
+                          style: AppTypography.small.copyWith(
+                            color: AppColors.textTertiary,
+                          ),
                         ),
                       ],
                     ),
@@ -245,7 +259,9 @@ class _RoleCard extends StatelessWidget {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
-          color: isSelected ? accentColor.withValues(alpha: 0.04) : AppColors.surface,
+          color: isSelected
+              ? accentColor.withValues(alpha: 0.04)
+              : AppColors.surface,
           borderRadius: AppSpacing.largeBorderRadius,
           border: Border.all(
             color: isSelected ? accentColor : AppColors.border,
@@ -343,16 +359,28 @@ class _RoleCard extends StatelessWidget {
                   ),
                   if (isSelected) ...[
                     const SizedBox(height: AppSpacing.sm),
-                    ...features.map((f) => Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Row(
-                        children: [
-                          Icon(Icons.check_circle_rounded, size: 12, color: accentColor),
-                          const SizedBox(width: 6),
-                          Text(f, style: AppTypography.small.copyWith(color: accentColor, fontWeight: FontWeight.w600)),
-                        ],
+                    ...features.map(
+                      (f) => Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_rounded,
+                              size: 12,
+                              color: accentColor,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              f,
+                              style: AppTypography.small.copyWith(
+                                color: accentColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    )),
+                    ),
                   ],
                 ],
               ),

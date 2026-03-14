@@ -105,8 +105,18 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
 
   String _formatDate(DateTime d) {
     const months = [
-      'jan', 'fév', 'mar', 'avr', 'mai', 'juin',
-      'juil', 'août', 'sep', 'oct', 'nov', 'déc',
+      'jan',
+      'fév',
+      'mar',
+      'avr',
+      'mai',
+      'juin',
+      'juil',
+      'août',
+      'sep',
+      'oct',
+      'nov',
+      'déc',
     ];
     return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
@@ -254,17 +264,17 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+        icon: const Icon(
+          Icons.arrow_back_rounded,
+          color: AppColors.textPrimary,
+        ),
         onPressed: () => Navigator.of(context).pop(),
       ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Suivi de mission', style: AppTypography.h4),
-          Text(
-            _formatDate(_mission.date),
-            style: AppTypography.caption,
-          ),
+          Text(_formatDate(_mission.date), style: AppTypography.caption),
         ],
       ),
       bottom: PreferredSize(
@@ -300,8 +310,7 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
                 ),
               ],
               selected: {_perspective},
-              onSelectionChanged: (s) =>
-                  setState(() => _perspective = s.first),
+              onSelectionChanged: (s) => setState(() => _perspective = s.first),
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.selected)) {
@@ -418,23 +427,21 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.attach_money_rounded,
-              color: AppColors.primary, size: 20),
+          const Icon(
+            Icons.attach_money_rounded,
+            color: AppColors.primary,
+            size: 20,
+          ),
           const SizedBox(width: AppSpacing.sm),
           Text(
             'Coût estimé :',
-            style: AppTypography.bodyMedium
-                .copyWith(color: AppColors.textSecondary),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
           ),
           const Spacer(),
-          Text(
-            '$formattedCost FCFA',
-            style: AppTypography.price,
-          ),
-          Text(
-            '  (${rate.toInt()} FCFA/h)',
-            style: AppTypography.caption,
-          ),
+          Text('$formattedCost FCFA', style: AppTypography.price),
+          Text('  (${rate.toInt()} FCFA/h)', style: AppTypography.caption),
         ],
       ),
     );
@@ -771,10 +778,7 @@ class _TimelineTile extends StatelessWidget {
           // Label + timestamp
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(
-                bottom: AppSpacing.lg,
-                top: 2,
-              ),
+              padding: const EdgeInsets.only(bottom: AppSpacing.lg, top: 2),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -786,12 +790,12 @@ class _TimelineTile extends StatelessWidget {
                           style: isCurrent
                               ? AppTypography.h4.copyWith(color: step.color)
                               : isDone
-                                  ? AppTypography.labelLg.copyWith(
-                                      color: AppColors.textPrimary,
-                                    )
-                                  : AppTypography.bodyMedium.copyWith(
-                                      color: AppColors.textTertiary,
-                                    ),
+                              ? AppTypography.labelLg.copyWith(
+                                  color: AppColors.textPrimary,
+                                )
+                              : AppTypography.bodyMedium.copyWith(
+                                  color: AppColors.textTertiary,
+                                ),
                         ),
                       ),
                       if (isCurrent && step.isLiveTimer)
@@ -823,10 +827,7 @@ class _TimelineTile extends StatelessWidget {
       return Container(
         width: 32,
         height: 32,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         child: const Icon(Icons.check_rounded, color: Colors.white, size: 18),
       );
     }
