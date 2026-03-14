@@ -72,14 +72,32 @@ final GoRouter appRouter = GoRouter(
   },
   routes: [
     // --- Public Routes ---
-    GoRoute(path: '/', builder: (c, s) => const SplashScreen()),
-    GoRoute(path: '/onboarding', builder: (c, s) => const OnboardingScreen()),
+    GoRoute(
+      path: '/',
+      pageBuilder: (c, s) => _fadeTransition(const SplashScreen()),
+    ),
+    GoRoute(
+      path: '/onboarding',
+      pageBuilder: (c, s) => _fadeTransition(const OnboardingScreen()),
+    ),
 
     // --- Auth Routes ---
-    GoRoute(path: '/auth/role', builder: (c, s) => const RoleSelectionScreen()),
-    GoRoute(path: '/auth/login', builder: (c, s) => const LoginScreen()),
-    GoRoute(path: '/auth/otp', builder: (c, s) => const OtpScreen()),
-    GoRoute(path: '/auth/register', builder: (c, s) => const RegisterScreen()),
+    GoRoute(
+      path: '/auth/role',
+      pageBuilder: (c, s) => _slideTransition(const RoleSelectionScreen()),
+    ),
+    GoRoute(
+      path: '/auth/login',
+      pageBuilder: (c, s) => _slideTransition(const LoginScreen()),
+    ),
+    GoRoute(
+      path: '/auth/otp',
+      pageBuilder: (c, s) => _slideTransition(const OtpScreen()),
+    ),
+    GoRoute(
+      path: '/auth/register',
+      pageBuilder: (c, s) => _slideTransition(const RegisterScreen()),
+    ),
 
     // --- Shell View (Bottom Navigation) ---
     StatefulShellRoute.indexedStack(
@@ -206,9 +224,27 @@ final GoRouter appRouter = GoRouter(
 // Helpers for transitions
 CustomTransitionPage _fadeTransition(Widget child) {
   return CustomTransitionPage(
+    transitionDuration: const Duration(milliseconds: 600),
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(opacity: animation, child: child);
+      return FadeTransition(
+        opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+        child: child,
+      );
+    },
+  );
+}
+
+CustomTransitionPage _slideTransition(Widget child) {
+  return CustomTransitionPage(
+    transitionDuration: const Duration(milliseconds: 350),
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final slide = Tween<Offset>(
+        begin: const Offset(1.0, 0.0),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+      return SlideTransition(position: slide, child: child);
     },
   );
 }
