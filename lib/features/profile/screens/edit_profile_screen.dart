@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -62,75 +63,166 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text("Modifier le profil"),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          "Modifier le profil",
+          style: AppTypography.h4.copyWith(color: Colors.white),
+        ),
         actions: [
           TextButton(
             onPressed: _saveProfile,
-            child: const Text(
+            child: Text(
               "Enregistrer",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: AppTypography.buttonLabelSm,
             ),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildAvatarSection(),
-              const SizedBox(height: AppSpacing.xl),
-              _buildTextField(
-                controller: _nameController,
-                label: "Nom complet",
-                icon: Icons.person_outline,
-                validator: (val) =>
-                    val == null || val.isEmpty ? "Champ requis" : null,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              _buildTextField(
-                controller: _emailController,
-                label: "Adresse email",
-                icon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-                validator: Validators.validateEmail,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              _buildTextField(
-                controller: _phoneController,
-                label: "Numéro de téléphone",
-                icon: Icons.phone_outlined,
-                keyboardType: TextInputType.phone,
-                validator: (val) => Validators.validatePhone(val),
-              ),
+              // ── Hero avatar section ──────────────────────────────────────
+              _buildAvatarSection()
+                  .animate()
+                  .fadeIn(duration: 400.ms)
+                  .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1), duration: 400.ms),
+
+              const SizedBox(height: AppSpacing.xxl),
+
+              // ── Informations personnelles ────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: _ProfileSection(
+                  icon: Icons.person_outline_rounded,
+                  title: "Informations personnelles",
+                  color: AppColors.primary,
+                  children: [
+                    _buildTextField(
+                      controller: _nameController,
+                      label: "Nom complet",
+                      icon: Icons.badge_outlined,
+                      validator: (val) =>
+                          val == null || val.isEmpty ? "Champ requis" : null,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    _buildTextField(
+                      controller: _emailController,
+                      label: "Adresse email",
+                      icon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: Validators.validateEmail,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    _buildTextField(
+                      controller: _phoneController,
+                      label: "Numéro de téléphone",
+                      icon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                      validator: (val) => Validators.validatePhone(val),
+                    ),
+                  ],
+                ),
+              )
+                  .animate()
+                  .fadeIn(delay: 80.ms, duration: 400.ms)
+                  .slideY(begin: 0.12, end: 0, delay: 80.ms, duration: 400.ms),
+
+              const SizedBox(height: AppSpacing.lg),
+
+              // ── Localisation ─────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: _ProfileSection(
+                  icon: Icons.location_on_outlined,
+                  title: "Localisation",
+                  color: AppColors.gold,
+                  children: [
+                    _buildTextField(
+                      controller: TextEditingController(
+                        text: MockData.nannies.first.quartier,
+                      ),
+                      label: "Quartier / Adresse",
+                      icon: Icons.place_outlined,
+                    ),
+                  ],
+                ),
+              )
+                  .animate()
+                  .fadeIn(delay: 160.ms, duration: 400.ms)
+                  .slideY(begin: 0.12, end: 0, delay: 160.ms, duration: 400.ms),
+
+              // ── Profil professionnel (nanny only) ────────────────────────
               if (_isNanny) ...[
-                const SizedBox(height: AppSpacing.md),
-                _buildTextField(
-                  controller: _rateController,
-                  label: "Tarif horaire (FCFA)",
-                  icon: Icons.payments_outlined,
-                  keyboardType: TextInputType.number,
-                  validator: (val) =>
-                      val == null || val.isEmpty ? "Champ requis" : null,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                _buildTextField(
-                  controller: _bioController,
-                  label: "Ma présentation",
-                  icon: Icons.description_outlined,
-                  maxLines: 4,
-                ),
+                const SizedBox(height: AppSpacing.lg),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  child: _ProfileSection(
+                    icon: Icons.work_outline_rounded,
+                    title: "Profil professionnel",
+                    color: AppColors.accent,
+                    children: [
+                      _buildTextField(
+                        controller: _rateController,
+                        label: "Tarif horaire (FCFA)",
+                        icon: Icons.payments_outlined,
+                        keyboardType: TextInputType.number,
+                        validator: (val) =>
+                            val == null || val.isEmpty ? "Champ requis" : null,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _buildTextField(
+                        controller: _bioController,
+                        label: "Ma présentation",
+                        icon: Icons.description_outlined,
+                        maxLines: 4,
+                      ),
+                    ],
+                  ),
+                )
+                    .animate()
+                    .fadeIn(delay: 240.ms, duration: 400.ms)
+                    .slideY(begin: 0.12, end: 0, delay: 240.ms, duration: 400.ms),
               ],
-              const SizedBox(height: AppSpacing.xl * 2),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveProfile,
-                  child: const Text("Sauvegarder les modifications"),
+
+              const SizedBox(height: AppSpacing.xxl),
+
+              // ── Save button ──────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradientH,
+                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    boxShadow: AppColors.primaryShadow,
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _saveProfile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                      ),
+                    ),
+                    child: Text(
+                      "Sauvegarder les modifications",
+                      style: AppTypography.buttonLabel,
+                    ),
+                  ),
                 ),
               ),
+
+              const SizedBox(height: AppSpacing.xxxl),
             ],
           ),
         ),
@@ -139,27 +231,97 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildAvatarSection() {
-    return Center(
-      child: Stack(
+    final user = MockData.nannies.first;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 32),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
+      child: Column(
         children: [
-          const CircleAvatar(
-            radius: 60,
-            backgroundImage: NetworkImage("https://i.pravatar.cc/150?u=n1"),
-          ),
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+          // Avatar with camera button
+          Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryDark.withValues(alpha: 0.35),
+                      blurRadius: 20,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.white, width: 3),
+                ),
+                child: const CircleAvatar(
+                  radius: 60,
+                  backgroundImage: NetworkImage("https://i.pravatar.cc/150?u=n1"),
+                ),
               ),
-              child: const Icon(
-                Icons.camera_alt,
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradientH,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.40),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.md),
+
+          // Name
+          Text(
+            user.name,
+            style: AppTypography.h3.copyWith(color: Colors.white),
+          ),
+
+          const SizedBox(height: AppSpacing.xs),
+
+          // Role badge
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.20),
+              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.40),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              _isNanny ? "Nounou" : "Parent",
+              style: AppTypography.labelMd.copyWith(
                 color: Colors.white,
-                size: 20,
+                letterSpacing: 0.5,
               ),
             ),
           ),
@@ -183,7 +345,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           label,
           style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
@@ -191,19 +353,106 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           validator: validator,
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: AppColors.textSecondary, size: 20),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+            ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
               borderSide: const BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
             ),
+            filled: true,
+            fillColor: AppColors.surface,
             hintText: "Saisissez votre ${label.toLowerCase()}",
+            hintStyle: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiary,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.md,
+            ),
           ),
         ),
       ],
+    );
+  }
+}
+
+// ── Section card widget ────────────────────────────────────────────────────────
+
+class _ProfileSection extends StatelessWidget {
+  const _ProfileSection({
+    required this.icon,
+    required this.title,
+    required this.color,
+    required this.children,
+  });
+
+  final IconData icon;
+  final String title;
+  final Color color;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        boxShadow: AppColors.cardShadow,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Colored header
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.10),
+              border: Border(
+                bottom: BorderSide(
+                  color: color.withValues(alpha: 0.20),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(AppSpacing.sm),
+                  ),
+                  child: Icon(icon, color: color, size: 18),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  title,
+                  style: AppTypography.h4.copyWith(color: color),
+                ),
+              ],
+            ),
+          ),
+
+          // White body with fields
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -24,6 +24,11 @@ import '../../features/profile/screens/edit_profile_screen.dart';
 import '../../features/profile/screens/nanny_dashboard_screen.dart';
 import '../../features/search/screens/map_screen.dart';
 import '../../features/sos/screens/sos_screen.dart';
+import '../../features/missions/screens/publish_announcement_screen.dart';
+import '../../features/missions/screens/available_missions_screen.dart';
+import '../../features/missions/screens/candidatures_screen.dart';
+import '../../features/missions/screens/mission_tracking_screen.dart';
+import '../../features/missions/screens/delay_screen.dart';
 import 'app_router_observer.dart';
 
 // Mock Auth State (persisted via SharedPreferences)
@@ -167,6 +172,34 @@ final GoRouter appRouter = GoRouter(
       builder: (c, s) => const NotificationsScreen(),
     ),
     GoRoute(path: '/sos', builder: (c, s) => const SosScreen()),
+
+    // --- Missions routes ---
+    GoRoute(
+      path: '/missions/publish',
+      builder: (c, s) => const PublishAnnouncementScreen(),
+    ),
+    GoRoute(
+      path: '/missions/available',
+      builder: (c, s) => const AvailableMissionsScreen(),
+    ),
+    GoRoute(
+      path: '/missions/:missionId/candidatures',
+      builder: (c, s) =>
+          CandidaturesScreen(missionId: s.pathParameters['missionId']!),
+    ),
+    GoRoute(
+      path: '/missions/:missionId/tracking',
+      builder: (c, s) =>
+          MissionTrackingScreen(missionId: s.pathParameters['missionId']!),
+    ),
+    GoRoute(
+      path: '/missions/:missionId/delay',
+      builder: (c, s) => DelayScreen(
+        missionId: s.pathParameters['missionId']!,
+        hourlyRate:
+            double.tryParse(s.uri.queryParameters['rate'] ?? '2500') ?? 2500,
+      ),
+    ),
   ],
 );
 

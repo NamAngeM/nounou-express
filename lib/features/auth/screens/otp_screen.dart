@@ -30,6 +30,7 @@ class _OtpScreenState extends State<OtpScreen>
   String phone = '';
   String role = '';
   bool _hasError = false;
+  bool _isComplete = false;
   late AnimationController _shakeController;
 
   @override
@@ -40,6 +41,17 @@ class _OtpScreenState extends State<OtpScreen>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
+    // Listen to all controllers to track completion
+    for (final c in _controllers) {
+      c.addListener(_onControllersChanged);
+    }
+  }
+
+  void _onControllersChanged() {
+    final filled = _controllers.every((c) => c.text.isNotEmpty);
+    if (filled != _isComplete) {
+      setState(() => _isComplete = filled);
+    }
   }
 
   @override
@@ -55,6 +67,7 @@ class _OtpScreenState extends State<OtpScreen>
     _timer?.cancel();
     _shakeController.dispose();
     for (final c in _controllers) {
+      c.removeListener(_onControllersChanged);
       c.dispose();
     }
     for (final fn in _focusNodes) {
@@ -160,24 +173,26 @@ class _OtpScreenState extends State<OtpScreen>
 
                   const SizedBox(height: AppSpacing.xxl),
 
+                  // ── Title — delay 0 ms ──────────────────────────────────
                   Text(
                     'Vérification',
                     style: AppTypography.h1,
-                  ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1, end: 0),
+                  ).animate().fadeIn(delay: 0.ms).slideY(begin: 0.1, end: 0),
 
                   const SizedBox(height: AppSpacing.xs),
 
+                  // ── Subtitle — delay 100 ms ─────────────────────────────
                   Text(
                     'Entrez le code à 4 chiffres envoyé au\n$_formattedPhone',
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                       height: 1.5,
                     ),
-                  ).animate().fadeIn(delay: 150.ms),
+                  ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.08, end: 0),
 
                   const SizedBox(height: AppSpacing.xxxl),
 
-                  // ── OTP fields ──────────────────────────────────────────
+                  // ── OTP fields — delay 200 ms ───────────────────────────
                   AnimatedBuilder(
                     animation: _shakeController,
                     builder: (context, child) => Transform.translate(
@@ -188,20 +203,57 @@ class _OtpScreenState extends State<OtpScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: List.generate(
                         4,
-                        (i) =>
-                            _OtpBox(
-                              controller: _controllers[i],
-                              focusNode: _focusNodes[i],
-                              hasError: _hasError,
-                              onChanged: (v) => _onDigitChanged(i, v),
-                            ).animate().fadeIn(
+                        (i) => _OtpBox(
+                          controller: _controllers[i],
+                          focusNode: _focusNodes[i],
+                          hasError: _hasError,
+                          onChanged: (v) => _onDigitChanged(i, v),
+                        ).animate().fadeIn(
                               delay: Duration(milliseconds: 200 + i * 60),
                             ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── Success indicator — appears when all 4 digits filled ─
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _isComplete && !_hasError
+                        ? Center(
+                            key: const ValueKey('complete'),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.check_circle_rounded,
+                                  size: 16,
+                                  color: AppColors.accent,
+                                ),
+                                const SizedBox(width: AppSpacing.xs),
+                                Text(
+                                  'Code complet',
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: AppColors.accentDark,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                            .animate()
+                            .fadeIn(duration: 250.ms)
+                            .scale(
+                              begin: const Offset(0.85, 0.85),
+                              end: const Offset(1.0, 1.0),
+                              duration: 250.ms,
+                              curve: Curves.easeOutBack,
+                            )
+                        : const SizedBox(key: ValueKey('empty'), height: 20),
+                  ),
+
+                  const SizedBox(height: AppSpacing.md),
 
                   // ── Error text ──────────────────────────────────────────
                   if (_hasError)
@@ -214,42 +266,65 @@ class _OtpScreenState extends State<OtpScreen>
                       ),
                     ).animate().fadeIn(duration: 200.ms),
 
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.lg),
 
-                  // ── Timer / Resend ──────────────────────────────────────
+                  // ── Timer / Resend — delay 300 ms ───────────────────────
                   Center(
-                    child: _secondsRemaining > 0
-                        ? RichText(
-                            text: TextSpan(
-                              text: 'Renvoyer le code dans ',
-                              style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text:
-                                      '00:${_secondsRemaining.toString().padLeft(2, '0')}',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w700,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.sm + 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primarySurface,
+                        borderRadius: AppSpacing.chipBorderRadius,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _secondsRemaining > 0
+                                ? Icons.timer_outlined
+                                : Icons.refresh_rounded,
+                            size: 15,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          _secondsRemaining > 0
+                              ? RichText(
+                                  text: TextSpan(
+                                    text: 'Renvoyer dans ',
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text:
+                                            '00:${_secondsRemaining.toString().padLeft(2, '0')}',
+                                        style: AppTypography.bodySmall.copyWith(
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : GestureDetector(
+                                  onTap: _startTimer,
+                                  child: Text(
+                                    'Renvoyer le code',
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w700,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: AppColors.primary,
+                                    ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          )
-                        : GestureDetector(
-                            onTap: _startTimer,
-                            child: Text(
-                              'Renvoyer le code',
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w700,
-                                decoration: TextDecoration.underline,
-                                decorationColor: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                  ).animate().fadeIn(delay: 380.ms),
+                        ],
+                      ),
+                    ),
+                  ).animate().fadeIn(delay: 300.ms),
 
                   const SizedBox(height: AppSpacing.xxxl),
 
@@ -257,11 +332,11 @@ class _OtpScreenState extends State<OtpScreen>
                     label: 'Vérifier',
                     icon: Icons.verified_rounded,
                     onPressed: _onVerify,
-                  ).animate().fadeIn(delay: 440.ms),
+                  ).animate().fadeIn(delay: 380.ms),
 
                   const SizedBox(height: AppSpacing.xl),
 
-                  // Hint for demo
+                  // ── Demo hint — distinct chip with accentSurface ─────────
                   Center(
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -271,11 +346,14 @@ class _OtpScreenState extends State<OtpScreen>
                       decoration: BoxDecoration(
                         color: AppColors.accentSurface,
                         borderRadius: AppSpacing.chipBorderRadius,
+                        border: Border.all(
+                          color: AppColors.accent.withValues(alpha: 0.25),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.info_outline_rounded,
                             size: 14,
                             color: AppColors.accent,
@@ -285,10 +363,43 @@ class _OtpScreenState extends State<OtpScreen>
                             'Mode demo : entrez n\'importe quel code',
                             style: AppTypography.small.copyWith(
                               color: AppColors.accentDark,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
+                    ),
+                  ).animate().fadeIn(delay: 440.ms),
+
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // ── Bottom security card ─────────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.md,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primarySurface,
+                      borderRadius: AppSpacing.cardBorderRadius,
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.lock_outline_rounded,
+                          size: 14,
+                          color: AppColors.textSecondary,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          'Connexion sécurisée · Code valide 5 min',
+                          style: AppTypography.small.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ).animate().fadeIn(delay: 500.ms),
 
@@ -354,7 +465,7 @@ class _HeroSection extends StatelessWidget {
 }
 
 // ── Single OTP box ────────────────────────────────────────────────────────────
-class _OtpBox extends StatelessWidget {
+class _OtpBox extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool hasError;
@@ -368,41 +479,147 @@ class _OtpBox extends StatelessWidget {
   });
 
   @override
+  State<_OtpBox> createState() => _OtpBoxState();
+}
+
+class _OtpBoxState extends State<_OtpBox> {
+  bool _isFocused = false;
+  bool _hasFilled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.focusNode.addListener(_onFocusChanged);
+    widget.controller.addListener(_onControllerChanged);
+  }
+
+  void _onFocusChanged() {
+    setState(() => _isFocused = widget.focusNode.hasFocus);
+  }
+
+  void _onControllerChanged() {
+    final filled = widget.controller.text.isNotEmpty;
+    if (filled != _hasFilled) {
+      setState(() => _hasFilled = filled);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.focusNode.removeListener(_onFocusChanged);
+    widget.controller.removeListener(_onControllerChanged);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    // Determine box visual state
+    final Color fillColor;
+    if (widget.hasError) {
+      fillColor = AppColors.dangerSurface;
+    } else if (_hasFilled) {
+      fillColor = AppColors.surface;
+    } else {
+      fillColor = AppColors.primarySurface;
+    }
+
+    final Color borderColor;
+    if (widget.hasError) {
+      borderColor = AppColors.danger;
+    } else if (_isFocused) {
+      borderColor = AppColors.primary;
+    } else if (_hasFilled) {
+      borderColor = AppColors.primaryLight;
+    } else {
+      borderColor = AppColors.border;
+    }
+
+    final double borderWidth =
+        (widget.hasError || _isFocused || _hasFilled) ? 2.0 : 1.0;
+
+    // Gradient border decoration when focused (non-error)
+    final bool showGradientBorder = _isFocused && !widget.hasError;
+
+    Widget box = SizedBox(
       width: 64,
       height: 64,
       child: TextField(
-        controller: controller,
-        focusNode: focusNode,
+        controller: widget.controller,
+        focusNode: widget.focusNode,
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
         maxLength: 1,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         style: AppTypography.h2.copyWith(
-          color: hasError ? AppColors.danger : AppColors.textPrimary,
+          color: widget.hasError ? AppColors.danger : AppColors.textPrimary,
         ),
         decoration: InputDecoration(
           counterText: '',
           filled: true,
-          fillColor: hasError ? AppColors.dangerSurface : AppColors.surface,
+          fillColor: fillColor,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide(
-              color: hasError ? AppColors.danger : AppColors.border,
-              width: hasError ? 2 : 1,
+              color: borderColor,
+              width: borderWidth,
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide(
-              color: hasError ? AppColors.danger : AppColors.primary,
+              color: widget.hasError ? AppColors.danger : AppColors.primary,
               width: 2,
             ),
           ),
         ),
-        onChanged: onChanged,
+        onChanged: widget.onChanged,
       ),
+    );
+
+    // Wrap with gradient border when focused
+    if (showGradientBorder) {
+      box = Container(
+        width: 64,
+        height: 64,
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          gradient: AppColors.primaryGradientH,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: fillColor,
+            borderRadius: BorderRadius.circular(13),
+          ),
+          child: TextField(
+            controller: widget.controller,
+            focusNode: widget.focusNode,
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
+            maxLength: 1,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            style: AppTypography.h2.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            decoration: const InputDecoration(
+              counterText: '',
+              filled: false,
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+            ),
+            onChanged: widget.onChanged,
+          ),
+        ),
+      );
+    }
+
+    // Scale micro-animation when a digit is filled
+    return AnimatedScale(
+      scale: _hasFilled ? 1.06 : 1.0,
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutBack,
+      child: box,
     );
   }
 }

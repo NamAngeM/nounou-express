@@ -52,7 +52,7 @@ class AppButton extends StatelessWidget {
   Gradient? get _gradient => switch (type) {
     AppButtonType.primary => AppColors.primaryGradientH,
     AppButtonType.danger => const LinearGradient(
-      colors: [Color(0xFFE53935), Color(0xFFEF5350)],
+      colors: [AppColors.danger, Color(0xFFEF5350)],
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
     ),

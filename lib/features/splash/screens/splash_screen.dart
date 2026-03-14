@@ -64,10 +64,11 @@ class _SplashScreenState extends State<SplashScreen> {
                     ],
                   ),
                   child: Image.asset(
-                    'assets/images/logo.png',
+                    'assets/logo.png',
                     width: 100,
                     height: 100,
                     color: Colors.white,
+                    colorBlendMode: BlendMode.srcATop,
                   ),
                 )
                 .animate()

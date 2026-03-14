@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 
@@ -19,6 +21,18 @@ class _SosScreenState extends State<SosScreen>
   double _progress = 0;
   Timer? _timer;
   final int _durationMs = 3000;
+
+  // ── Pulse animation controller (background circles) ────────────────────────
+  late final AnimationController _pulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat();
+  }
 
   void _startTimer() {
     setState(() => _progress = 0);
@@ -49,17 +63,22 @@ class _SosScreenState extends State<SosScreen>
   @override
   void dispose() {
     _timer?.cancel();
+    _pulseController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE63946),
+      backgroundColor: AppColors.danger,
       body: SafeArea(
         child: Stack(
           children: [
+            // ── Background pulse circles ───────────────────────────────────
+            Positioned.fill(child: _BackgroundPulse(controller: _pulseController)),
+
             _buildCloseButton(),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: Column(
@@ -69,9 +88,8 @@ class _SosScreenState extends State<SosScreen>
                   const SizedBox(height: AppSpacing.xl),
                   Text(
                     "URGENCE SOS",
-                    style: AppTypography.h1.copyWith(
+                    style: AppTypography.h2.copyWith(
                       color: Colors.white,
-                      fontSize: 32,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -85,11 +103,21 @@ class _SosScreenState extends State<SosScreen>
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacing.xl * 2),
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // ── Status badge ───────────────────────────────────────
+                  _StatusBadge(progress: _progress, isSent: _isSent),
+
+                  const SizedBox(height: AppSpacing.xl),
                   _buildSosButton(),
+
                   if (_isSent) ...[
                     const SizedBox(height: AppSpacing.xl * 2),
                     _buildEmergencyActions(),
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // ── Emergency contact row ──────────────────────────
+                    _buildEmergencyContactCard(),
                   ],
                   const Spacer(),
                   _buildFooterInfo(),
@@ -126,6 +154,11 @@ class _SosScreenState extends State<SosScreen>
   }
 
   Widget _buildSosButton() {
+    // Countdown: 3 → 2 → 1 → 0
+    final int secondsLeft = _progress == 0
+        ? 3
+        : math.max(0, (3 - (_progress * 3)).ceil());
+
     return GestureDetector(
       onLongPressStart: (_) => !_isSent ? _startTimer() : null,
       onLongPressEnd: (_) => _stopTimer(),
@@ -170,11 +203,23 @@ class _SosScreenState extends State<SosScreen>
                 ),
               ],
             ),
-            child: Icon(
-              _isSent ? Icons.check : Icons.warning_rounded,
-              color: const Color(0xFFE63946),
-              size: 60,
-            ),
+            child: _isSent
+                ? const Icon(Icons.check, color: AppColors.danger, size: 60)
+                : _progress > 0
+                    ? Center(
+                        child: Text(
+                          "$secondsLeft",
+                          style: AppTypography.h1.copyWith(
+                            color: AppColors.danger,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      )
+                    : const Icon(
+                        Icons.warning_rounded,
+                        color: AppColors.danger,
+                        size: 60,
+                      ),
           ),
           if (_isSent) const Positioned.fill(child: OndeAnimation()),
         ],
@@ -200,7 +245,7 @@ class _SosScreenState extends State<SosScreen>
           label: const Text("Appeler les secours (17)"),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
-            foregroundColor: const Color(0xFFE63946),
+            foregroundColor: AppColors.danger,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
             textStyle: AppTypography.bodyLarge.copyWith(
               fontWeight: FontWeight.bold,
@@ -211,19 +256,188 @@ class _SosScreenState extends State<SosScreen>
     ).animate().fadeIn().slideY(begin: 0.2);
   }
 
+  Widget _buildEmergencyContactCard() {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.25),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.phone_rounded, color: Colors.white, size: 22),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "SAMU — 15",
+                  style: AppTypography.h4.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  "Appel d'urgence médical",
+                  style: AppTypography.bodySmall.copyWith(
+                    color: Colors.white.withValues(alpha: 0.8),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 24),
+        ],
+      ),
+    ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.15, end: 0);
+  }
+
   Widget _buildFooterInfo() {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-      child: Text(
-        "Cette fonctionnalité est réservée aux situations d'urgence",
-        style: AppTypography.small.copyWith(
-          color: Colors.white.withValues(alpha: 0.7),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.20),
+          borderRadius: BorderRadius.circular(16),
         ),
-        textAlign: TextAlign.center,
+        child: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded,
+                color: Colors.white, size: 18),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                "Utilisez uniquement en cas de réelle urgence. Toute fausse alerte est signalée.",
+                style: AppTypography.small.copyWith(
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
+// ── Status badge ─────────────────────────────────────────────────────────────
+
+class _StatusBadge extends StatelessWidget {
+  final double progress;
+  final bool isSent;
+
+  const _StatusBadge({required this.progress, required this.isSent});
+
+  @override
+  Widget build(BuildContext context) {
+    final String label;
+    final Color bg;
+    final Color fg;
+
+    if (isSent) {
+      label = "ENVOYÉ";
+      bg = AppColors.accent;
+      fg = Colors.white;
+    } else if (progress > 0) {
+      label = "ENVOI...";
+      bg = AppColors.gold;
+      fg = Colors.white;
+    } else {
+      label = "PRÊT";
+      bg = Colors.white.withValues(alpha: 0.20);
+      fg = Colors.white;
+    }
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(50),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.4),
+          width: 1,
+        ),
+      ),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 250),
+        child: Text(
+          label,
+          key: ValueKey(label),
+          style: AppTypography.overline.copyWith(
+            color: fg,
+            letterSpacing: 2.0,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Background pulse (concentric expanding circles) ──────────────────────────
+
+class _BackgroundPulse extends StatelessWidget {
+  final AnimationController controller;
+
+  const _BackgroundPulse({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        final t = controller.value;
+        return CustomPaint(
+          painter: _PulsePainter(progress: t),
+        );
+      },
+    );
+  }
+}
+
+class _PulsePainter extends CustomPainter {
+  final double progress;
+  _PulsePainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final maxRadius = size.longestSide * 0.7;
+    final paint = Paint()..style = PaintingStyle.stroke;
+
+    // Draw 3 staggered concentric circles
+    for (int i = 0; i < 3; i++) {
+      final phase = (progress + i / 3) % 1.0;
+      final radius = maxRadius * phase;
+      final opacity = (1.0 - phase) * 0.15;
+      paint
+        ..color = Colors.white.withValues(alpha: opacity)
+        ..strokeWidth = 2.0 + (1.0 - phase) * 2;
+      canvas.drawCircle(center, radius, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_PulsePainter old) => old.progress != progress;
+}
+
+// ── Wave / onde animation ─────────────────────────────────────────────────────
 
 class OndeAnimation extends StatelessWidget {
   const OndeAnimation({super.key});

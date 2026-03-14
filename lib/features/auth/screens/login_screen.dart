@@ -220,25 +220,27 @@ class _TopSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Logo area
+          // Logo
           Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.child_care_rounded,
-              size: 36,
               color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Image.asset(
+              'assets/logo.png',
+              height: 56,
+              fit: BoxFit.contain,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            'Nounou Express',
-            style: AppTypography.h2.copyWith(color: Colors.white),
-          ),
-          const SizedBox(height: AppSpacing.xs),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
@@ -279,18 +281,10 @@ class _GoogleButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
+            Image.asset(
+              'assets/icons/google.png',
               width: 24,
               height: 24,
-              decoration: BoxDecoration(
-                color: const Color(0xFF4285F4),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Icon(
-                Icons.g_mobiledata,
-                color: Colors.white,
-                size: 20,
-              ),
             ),
             const SizedBox(width: AppSpacing.md),
             Text(

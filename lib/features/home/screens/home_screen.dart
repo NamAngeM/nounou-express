@@ -78,6 +78,69 @@ class _HomeScreenState extends State<HomeScreen> {
                     .slideY(begin: -0.05, end: 0),
               ),
 
+              // ── CTA Besoin d'une nounou ────────────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: AppSpacing.screenPadding.copyWith(top: AppSpacing.lg),
+                  child: GestureDetector(
+                    onTap: () => context.push('/missions/publish'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                        vertical: AppSpacing.lg,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradientH,
+                        borderRadius: AppSpacing.cardBorderRadius,
+                        boxShadow: AppColors.primaryShadow,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.20),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.add_circle_outline_rounded,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Besoin d\'une nounou ?',
+                                  style: AppTypography.h4.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                Text(
+                                  'Publiez une annonce en 2 minutes',
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.80),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ).animate().fadeIn(delay: 60.ms).slideY(begin: 0.08, end: 0),
+              ),
+
               // ── Search ─────────────────────────────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
@@ -244,10 +307,10 @@ class _NotifButton extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 1.5),
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
                   '3',
-                  style: TextStyle(
+                  style: AppTypography.small.copyWith(
                     color: Colors.white,
                     fontSize: 8,
                     fontWeight: FontWeight.w800,

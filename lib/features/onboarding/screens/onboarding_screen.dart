@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -19,9 +18,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   static const _pages = [
     _OnboardingData(
-      // Mère noire avec enfant — scène chaleureuse
-      imageUrl:
-          'https://images.unsplash.com/photo-1531983372-62e91f840e99?auto=format&fit=crop&w=800&q=80',
+      imageAsset: 'assets/images/onboarding/pexels-philboakye-2995309.jpg',
       gradientColors: [Color(0xFFB83220), Color(0xFFE8552A)],
       tag: 'RECHERCHE',
       title: 'Trouvez la nounou\nidéale',
@@ -29,9 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           'Des nounous vérifiées et qualifiées dans votre quartier à Libreville. Filtrez par disponibilité, tarif et compétences.',
     ),
     _OnboardingData(
-      // Femme africaine avec bébé — moment de tendresse
-      imageUrl:
-          'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
+      imageAsset: 'assets/images/onboarding/pexels-shkrabaanthony-7970114.jpg',
       gradientColors: [Color(0xFF1B2B3A), Color(0xFF2D4A6B)],
       tag: 'RÉSERVATION',
       title: 'Réservez en\nun instant',
@@ -39,9 +34,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           'Choisissez votre créneau, confirmez en quelques secondes. Aussi simple que ça.',
     ),
     _OnboardingData(
-      // Famille noire — confiance et sécurité
-      imageUrl:
-          'https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?auto=format&fit=crop&w=800&q=80',
+      imageAsset: 'assets/images/onboarding/portrait-congolese-kid.jpg',
       gradientColors: [Color(0xFF006D62), Color(0xFF00A896)],
       tag: 'CONFIANCE',
       title: 'En toute\nconfiance',
@@ -81,6 +74,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             itemBuilder: (context, index) =>
                 _OnboardingPage(data: _pages[index]),
           ),
+
+          // ── Logo top-left ──────────────────────────────────────────────────
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Image.asset(
+                'assets/logo.png',
+                height: 36,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ).animate().fadeIn(delay: 300.ms),
 
           // ── Skip button ────────────────────────────────────────────────────
           SafeArea(
@@ -144,34 +149,11 @@ class _OnboardingPage extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         // Photo background
-        CachedNetworkImage(
-          imageUrl: data.imageUrl,
+        Image.asset(
+          data.imageAsset,
           fit: BoxFit.cover,
-          placeholder: (context, url) => Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: data.gradientColors,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-          errorWidget: (context, url, error) => Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: data.gradientColors,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.child_care_rounded,
-                size: 100,
-                color: Colors.white30,
-              ),
-            ),
-          ),
+          width: double.infinity,
+          height: double.infinity,
         ),
 
         // Gradient overlay — dark bottom for text, slight top tint
@@ -314,7 +296,7 @@ class _BottomControls extends StatelessWidget {
                 onTap: onNext,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: isLast ? null : 56,
+                  width: isLast ? 200 : 56,
                   height: 56,
                   padding: isLast
                       ? const EdgeInsets.symmetric(horizontal: AppSpacing.xl)
@@ -361,14 +343,14 @@ class _BottomControls extends StatelessWidget {
 
 // ── Data model ────────────────────────────────────────────────────────────────
 class _OnboardingData {
-  final String imageUrl;
+  final String imageAsset;
   final List<Color> gradientColors;
   final String tag;
   final String title;
   final String description;
 
   const _OnboardingData({
-    required this.imageUrl,
+    required this.imageAsset,
     required this.gradientColors,
     required this.tag,
     required this.title,

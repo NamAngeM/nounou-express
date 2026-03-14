@@ -315,7 +315,7 @@ class _BookingScreenState extends State<BookingScreen> {
               ),
               const SizedBox(height: AppSpacing.md),
               DropdownButtonFormField<String>(
-                value: _selectedNeighborhood,
+                initialValue: _selectedNeighborhood,
                 items: MockData.quartiers
                     .map((q) => DropdownMenuItem(value: q, child: Text(q)))
                     .toList(),
