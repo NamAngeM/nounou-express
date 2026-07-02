@@ -1,44 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/validators.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 
-class EditProfileScreen extends StatefulWidget {
+class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _emailController;
-  late TextEditingController _phoneController;
-  late TextEditingController _bioController;
-  late TextEditingController _rateController;
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _bioController = TextEditingController();
+  final _rateController = TextEditingController();
+  final _quartierController = TextEditingController();
 
   bool _isNanny = false; // This would normally come from an auth provider
+  bool _prefilled = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // Pre-fill with mock data
-    final user =
-        MockData.nannies.first; // Mocking a nanny for testing dynamic fields
+  /// Pré-remplit les champs une seule fois à l'arrivée des données.
+  // TODO Phase 3: profil de l'utilisateur connecté (via auth), pas la
+  // première nounou de la liste (profil de démo).
+  void _prefillFrom(NannyModel user) {
+    if (_prefilled) return;
+    _prefilled = true;
     _isNanny = user.role == "nanny";
-
-    _nameController = TextEditingController(text: user.name);
-    _emailController = TextEditingController(text: user.email);
-    _phoneController = TextEditingController(text: user.phone);
-    _bioController = TextEditingController(text: user.bio);
-    _rateController = TextEditingController(
-      text: user.hourlyRate.toInt().toString(),
-    );
+    _nameController.text = user.name;
+    _emailController.text = user.email;
+    _phoneController.text = user.phone;
+    _bioController.text = user.bio;
+    _rateController.text = user.hourlyRate.toInt().toString();
+    _quartierController.text = user.quartier;
   }
 
   @override
@@ -48,6 +52,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _phoneController.dispose();
     _bioController.dispose();
     _rateController.dispose();
+    _quartierController.dispose();
     super.dispose();
   }
 
@@ -79,179 +84,200 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Hero avatar section ──────────────────────────────────────
-              _buildAvatarSection()
-                  .animate()
-                  .fadeIn(duration: 400.ms)
-                  .scale(
-                    begin: const Offset(0.95, 0.95),
-                    end: const Offset(1, 1),
-                    duration: 400.ms,
+      body: ref
+          .watch(nanniesProvider)
+          .when(
+            data: (nannies) {
+              if (nannies.isEmpty) {
+                return const EmptyState(
+                  icon: Icons.person_off_outlined,
+                  title: "Profil indisponible",
+                  description: "Aucun profil à afficher pour le moment.",
+                );
+              }
+              final user = nannies.first;
+              _prefillFrom(user);
+              return _buildForm(user);
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => const EmptyState(
+              icon: Icons.error_outline_rounded,
+              title: "Erreur de chargement",
+              description: "Impossible de charger le profil. Réessayez.",
+            ),
+          ),
+    );
+  }
+
+  Widget _buildForm(NannyModel user) {
+    return SingleChildScrollView(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Hero avatar section ──────────────────────────────────────
+            _buildAvatarSection(user)
+                .animate()
+                .fadeIn(duration: 400.ms)
+                .scale(
+                  begin: const Offset(0.95, 0.95),
+                  end: const Offset(1, 1),
+                  duration: 400.ms,
+                ),
+
+            const SizedBox(height: AppSpacing.xxl),
+
+            // ── Informations personnelles ────────────────────────────────
+            Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
                   ),
+                  child: _ProfileSection(
+                    icon: Icons.person_outline_rounded,
+                    title: "Informations personnelles",
+                    color: AppColors.primary,
+                    children: [
+                      _buildTextField(
+                        controller: _nameController,
+                        label: "Nom complet",
+                        icon: Icons.badge_outlined,
+                        validator: (val) =>
+                            val == null || val.isEmpty ? "Champ requis" : null,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _buildTextField(
+                        controller: _emailController,
+                        label: "Adresse email",
+                        icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: Validators.validateEmail,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _buildTextField(
+                        controller: _phoneController,
+                        label: "Numéro de téléphone",
+                        icon: Icons.phone_outlined,
+                        keyboardType: TextInputType.phone,
+                        validator: (val) => Validators.validatePhone(val),
+                      ),
+                    ],
+                  ),
+                )
+                .animate()
+                .fadeIn(delay: 80.ms, duration: 400.ms)
+                .slideY(begin: 0.12, end: 0, delay: 80.ms, duration: 400.ms),
 
-              const SizedBox(height: AppSpacing.xxl),
+            const SizedBox(height: AppSpacing.lg),
 
-              // ── Informations personnelles ────────────────────────────────
+            // ── Localisation ─────────────────────────────────────────────
+            Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  child: _ProfileSection(
+                    icon: Icons.location_on_outlined,
+                    title: "Localisation",
+                    color: AppColors.gold,
+                    children: [
+                      _buildTextField(
+                        controller: _quartierController,
+                        label: "Quartier / Adresse",
+                        icon: Icons.place_outlined,
+                      ),
+                    ],
+                  ),
+                )
+                .animate()
+                .fadeIn(delay: 160.ms, duration: 400.ms)
+                .slideY(begin: 0.12, end: 0, delay: 160.ms, duration: 400.ms),
+
+            // ── Profil professionnel (nanny only) ────────────────────────
+            if (_isNanny) ...[
+              const SizedBox(height: AppSpacing.lg),
               Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.lg,
                     ),
                     child: _ProfileSection(
-                      icon: Icons.person_outline_rounded,
-                      title: "Informations personnelles",
-                      color: AppColors.primary,
+                      icon: Icons.work_outline_rounded,
+                      title: "Profil professionnel",
+                      color: AppColors.accent,
                       children: [
                         _buildTextField(
-                          controller: _nameController,
-                          label: "Nom complet",
-                          icon: Icons.badge_outlined,
+                          controller: _rateController,
+                          label: "Tarif horaire (${AppConstants.currency})",
+                          icon: Icons.payments_outlined,
+                          keyboardType: TextInputType.number,
                           validator: (val) => val == null || val.isEmpty
                               ? "Champ requis"
                               : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         _buildTextField(
-                          controller: _emailController,
-                          label: "Adresse email",
-                          icon: Icons.email_outlined,
-                          keyboardType: TextInputType.emailAddress,
-                          validator: Validators.validateEmail,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        _buildTextField(
-                          controller: _phoneController,
-                          label: "Numéro de téléphone",
-                          icon: Icons.phone_outlined,
-                          keyboardType: TextInputType.phone,
-                          validator: (val) => Validators.validatePhone(val),
+                          controller: _bioController,
+                          label: "Ma présentation",
+                          icon: Icons.description_outlined,
+                          maxLines: 4,
                         ),
                       ],
                     ),
                   )
                   .animate()
-                  .fadeIn(delay: 80.ms, duration: 400.ms)
-                  .slideY(begin: 0.12, end: 0, delay: 80.ms, duration: 400.ms),
-
-              const SizedBox(height: AppSpacing.lg),
-
-              // ── Localisation ─────────────────────────────────────────────
-              Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                    ),
-                    child: _ProfileSection(
-                      icon: Icons.location_on_outlined,
-                      title: "Localisation",
-                      color: AppColors.gold,
-                      children: [
-                        _buildTextField(
-                          controller: TextEditingController(
-                            text: MockData.nannies.first.quartier,
-                          ),
-                          label: "Quartier / Adresse",
-                          icon: Icons.place_outlined,
-                        ),
-                      ],
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(delay: 160.ms, duration: 400.ms)
-                  .slideY(begin: 0.12, end: 0, delay: 160.ms, duration: 400.ms),
-
-              // ── Profil professionnel (nanny only) ────────────────────────
-              if (_isNanny) ...[
-                const SizedBox(height: AppSpacing.lg),
-                Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.lg,
-                      ),
-                      child: _ProfileSection(
-                        icon: Icons.work_outline_rounded,
-                        title: "Profil professionnel",
-                        color: AppColors.accent,
-                        children: [
-                          _buildTextField(
-                            controller: _rateController,
-                            label: "Tarif horaire (FCFA)",
-                            icon: Icons.payments_outlined,
-                            keyboardType: TextInputType.number,
-                            validator: (val) => val == null || val.isEmpty
-                                ? "Champ requis"
-                                : null,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          _buildTextField(
-                            controller: _bioController,
-                            label: "Ma présentation",
-                            icon: Icons.description_outlined,
-                            maxLines: 4,
-                          ),
-                        ],
-                      ),
-                    )
-                    .animate()
-                    .fadeIn(delay: 240.ms, duration: 400.ms)
-                    .slideY(
-                      begin: 0.12,
-                      end: 0,
-                      delay: 240.ms,
-                      duration: 400.ms,
-                    ),
-              ],
-
-              const SizedBox(height: AppSpacing.xxl),
-
-              // ── Save button ──────────────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradientH,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.buttonRadius,
-                    ),
-                    boxShadow: AppColors.primaryShadow,
+                  .fadeIn(delay: 240.ms, duration: 400.ms)
+                  .slideY(
+                    begin: 0.12,
+                    end: 0,
+                    delay: 240.ms,
+                    duration: 400.ms,
                   ),
-                  child: ElevatedButton(
-                    onPressed: _saveProfile,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.lg,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.buttonRadius,
-                        ),
+            ],
+
+            const SizedBox(height: AppSpacing.xxl),
+
+            // ── Save button ──────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradientH,
+                  borderRadius: BorderRadius.circular(
+                    AppSpacing.buttonRadius,
+                  ),
+                  boxShadow: AppColors.primaryShadow,
+                ),
+                child: ElevatedButton(
+                  onPressed: _saveProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.lg,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.buttonRadius,
                       ),
                     ),
-                    child: Text(
-                      "Sauvegarder les modifications",
-                      style: AppTypography.buttonLabel,
-                    ),
+                  ),
+                  child: Text(
+                    "Sauvegarder les modifications",
+                    style: AppTypography.buttonLabel,
                   ),
                 ),
               ),
+            ),
 
-              const SizedBox(height: AppSpacing.xxxl),
-            ],
-          ),
+            const SizedBox(height: AppSpacing.xxxl),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildAvatarSection() {
-    final user = MockData.nannies.first;
+  Widget _buildAvatarSection(NannyModel user) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32),

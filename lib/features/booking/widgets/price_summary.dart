@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -36,7 +37,7 @@ class PriceSummary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildPriceRow(
-          "Tarif de base ($hours h × ${baseRate.toInt()} FCFA)",
+          "Tarif de base ($hours h × ${baseRate.toInt()} ${AppConstants.currency})",
           baseTotal,
         ),
         if (isNight) _buildPriceRow("Majoration nuit (+20%)", nightSurcharge),
@@ -90,7 +91,7 @@ class PriceSummary extends StatelessWidget {
                   ),
           ),
           Text(
-            "${amount.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]} ')} FCFA",
+            "${amount.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]} ')} ${AppConstants.currency}",
             style:
                 (isLarge
                         ? AppTypography.h3

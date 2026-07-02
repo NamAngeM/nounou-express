@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -8,19 +9,19 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/avatar_widget.dart';
 import '../../../core/widgets/nanny_card.dart';
 import '../../../core/widgets/rating_stars.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 
 const _mockDistances = [1.2, 0.8, 2.5, 1.9, 3.1, 0.5, 4.2, 2.1, 1.7, 3.8];
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedCategory = 0;
 
   static const _categories = [
@@ -31,8 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ('Moins chères', Icons.savings_rounded),
   ];
 
-  List<NannyModel> get _filteredNannies {
-    final all = MockData.nannies;
+  List<NannyModel> _filteredNannies(List<NannyModel> all) {
     switch (_selectedCategory) {
       case 1:
         return all
@@ -53,16 +53,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  List<NannyModel> get _topRated =>
-      [...MockData.nannies]..sort((a, b) => b.rating.compareTo(a.rating));
+  List<NannyModel> _topRated(List<NannyModel> all) =>
+      [...all]..sort((a, b) => b.rating.compareTo(a.rating));
 
   @override
   Widget build(BuildContext context) {
+    final nanniesAsync = ref.watch(nanniesProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () async => await Future.delayed(1.seconds),
+          onRefresh: () => ref.refresh(nanniesProvider.future),
           color: AppColors.primary,
           displacement: 60,
           child: CustomScrollView(
@@ -162,57 +164,96 @@ class _HomeScreenState extends State<HomeScreen> {
                 ).animate().fadeIn(delay: 140.ms),
               ),
 
-              // ── Section "À proximité" ───────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: AppSpacing.xl),
-                    _SectionHeader(
-                      title: 'À proximité',
-                      onSeeAll: () => context.go('/search'),
-                    ).animate().fadeIn(delay: 200.ms),
-                    const SizedBox(height: AppSpacing.md),
-                    _NearbyScroll(nannies: _filteredNannies)
-                        .animate()
-                        .fadeIn(delay: 250.ms)
-                        .slideX(begin: 0.05, end: 0),
-                    const SizedBox(height: AppSpacing.xxl),
-                  ],
-                ),
-              ),
-
-              // ── Promo banner ────────────────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: AppSpacing.screenPadding,
-                  child: const _PromoBanner(),
-                ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.08, end: 0),
-              ),
-
-              // ── Section "Top nounous" ───────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: AppSpacing.xxl),
-                    _SectionHeader(
-                      title: 'Les mieux notées',
-                      onSeeAll: () => context.go('/search'),
-                    ).animate().fadeIn(delay: 350.ms),
-                    const SizedBox(height: AppSpacing.md),
-                    _TopRatedList(
-                      nannies: _topRated.take(4).toList(),
-                    ).animate().fadeIn(delay: 400.ms),
-                    const SizedBox(height: 100),
-                  ],
-                ),
+              // ── Sections alimentées par le provider ────────────────────────
+              ...nanniesAsync.when(
+                data: (nannies) => _buildNannySlivers(context, nannies),
+                loading: () => const [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ],
+                error: (e, _) => [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Padding(
+                        padding: AppSpacing.screenPadding,
+                        child: Text(
+                          'Impossible de charger les nounous.\n$e',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildNannySlivers(
+    BuildContext context,
+    List<NannyModel> nannies,
+  ) {
+    return [
+      // ── Section "À proximité" ─────────────────────────────────────────────
+      SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: AppSpacing.xl),
+            _SectionHeader(
+              title: 'À proximité',
+              onSeeAll: () => context.go('/search'),
+            ).animate().fadeIn(delay: 200.ms),
+            const SizedBox(height: AppSpacing.md),
+            _NearbyScroll(
+                  nannies: _filteredNannies(nannies),
+                  allNannies: nannies,
+                )
+                .animate()
+                .fadeIn(delay: 250.ms)
+                .slideX(begin: 0.05, end: 0),
+            const SizedBox(height: AppSpacing.xxl),
+          ],
+        ),
+      ),
+
+      // ── Promo banner ──────────────────────────────────────────────────────
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: AppSpacing.screenPadding,
+          child: const _PromoBanner(),
+        ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.08, end: 0),
+      ),
+
+      // ── Section "Top nounous" ─────────────────────────────────────────────
+      SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: AppSpacing.xxl),
+            _SectionHeader(
+              title: 'Les mieux notées',
+              onSeeAll: () => context.go('/search'),
+            ).animate().fadeIn(delay: 350.ms),
+            const SizedBox(height: AppSpacing.md),
+            _TopRatedList(
+              nannies: _topRated(nannies).take(4).toList(),
+              allNannies: nannies,
+            ).animate().fadeIn(delay: 400.ms),
+            const SizedBox(height: 100),
+          ],
+        ),
+      ),
+    ];
   }
 }
 
@@ -517,7 +558,8 @@ class _SectionHeader extends StatelessWidget {
 // ─────────────────────────────────────────────────────── Nearby scroll ──
 class _NearbyScroll extends StatelessWidget {
   final List<NannyModel> nannies;
-  const _NearbyScroll({required this.nannies});
+  final List<NannyModel> allNannies;
+  const _NearbyScroll({required this.nannies, required this.allNannies});
 
   @override
   Widget build(BuildContext context) {
@@ -531,7 +573,7 @@ class _NearbyScroll extends StatelessWidget {
         separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
         itemBuilder: (context, index) {
           final nanny = nannies[index];
-          final originalIndex = MockData.nannies.indexOf(nanny);
+          final originalIndex = allNannies.indexOf(nanny);
           final quartier = nanny.quartier.isNotEmpty
               ? nanny.quartier
               : 'Libreville';
@@ -790,7 +832,8 @@ class _PromoBanner extends StatelessWidget {
 // ─────────────────────────────────────────────────────── Top rated list ──
 class _TopRatedList extends StatelessWidget {
   final List<NannyModel> nannies;
-  const _TopRatedList({required this.nannies});
+  final List<NannyModel> allNannies;
+  const _TopRatedList({required this.nannies, required this.allNannies});
 
   @override
   Widget build(BuildContext context) {
@@ -800,7 +843,7 @@ class _TopRatedList extends StatelessWidget {
         children: nannies.asMap().entries.map((entry) {
           final index = entry.key;
           final nanny = entry.value;
-          final originalIndex = MockData.nannies.indexOf(nanny);
+          final originalIndex = allNannies.indexOf(nanny);
           final quartier = nanny.quartier.isNotEmpty
               ? nanny.quartier
               : 'Libreville';

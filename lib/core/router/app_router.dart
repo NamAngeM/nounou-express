@@ -1,229 +1,214 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../features/splash/screens/splash_screen.dart';
-import '../../features/onboarding/screens/onboarding_screen.dart';
-import '../../features/auth/screens/role_selection_screen.dart';
+import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/otp_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
-import '../../features/home/screens/home_screen.dart';
-import '../../features/home/screens/main_shell.dart';
-import '../../features/search/screens/search_screen.dart';
-import '../../features/chat/screens/conversations_screen.dart';
-import '../../features/notifications/screens/notifications_screen.dart';
-import '../../features/profile/screens/parent_profile_screen.dart';
-import '../../features/nanny_profile/screens/nanny_profile_screen.dart';
+import '../../features/auth/screens/role_selection_screen.dart';
+import '../../features/booking/screens/booking_confirmation_screen.dart';
+import '../../features/booking/screens/booking_detail_screen.dart';
 import '../../features/booking/screens/booking_screen.dart';
 import '../../features/booking/screens/bookings_list_screen.dart';
-import '../../features/booking/screens/booking_detail_screen.dart';
-import '../../features/booking/screens/booking_confirmation_screen.dart';
 import '../../features/chat/screens/chat_screen.dart';
-import '../../features/profile/screens/edit_profile_screen.dart';
-import '../../features/profile/screens/nanny_dashboard_screen.dart';
-import '../../features/search/screens/map_screen.dart';
-import '../../features/sos/screens/sos_screen.dart';
-import '../../features/missions/screens/publish_announcement_screen.dart';
+import '../../features/chat/screens/conversations_screen.dart';
+import '../../features/home/screens/home_screen.dart';
+import '../../features/home/screens/main_shell.dart';
 import '../../features/missions/screens/available_missions_screen.dart';
 import '../../features/missions/screens/candidatures_screen.dart';
-import '../../features/missions/screens/mission_tracking_screen.dart';
 import '../../features/missions/screens/delay_screen.dart';
+import '../../features/missions/screens/mission_tracking_screen.dart';
+import '../../features/missions/screens/publish_announcement_screen.dart';
+import '../../features/nanny_profile/screens/nanny_profile_screen.dart';
+import '../../features/notifications/screens/notifications_screen.dart';
+import '../../features/onboarding/screens/onboarding_screen.dart';
+import '../../features/profile/screens/edit_profile_screen.dart';
+import '../../features/profile/screens/nanny_dashboard_screen.dart';
+import '../../features/profile/screens/parent_profile_screen.dart';
+import '../../features/search/screens/map_screen.dart';
+import '../../features/search/screens/search_screen.dart';
+import '../../features/sos/screens/sos_screen.dart';
+import '../../features/splash/screens/splash_screen.dart';
 import '../constants/app_constants.dart';
 import 'app_router_observer.dart';
 
-// Mock Auth State (persisted via SharedPreferences)
-bool _isAuthenticated = false;
-String _userRole = 'parent'; // 'parent' | 'nanny'
+/// Routeur de l'application, réactif à l'état d'authentification :
+/// tout changement de session (connexion, déconnexion) réévalue le redirect
+/// via [GoRouter.refreshListenable].
+final appRouterProvider = Provider<GoRouter>((ref) {
+  final refreshNotifier = ValueNotifier<int>(0);
+  ref.listen(authProvider, (_, _) => refreshNotifier.value++);
+  ref.onDispose(refreshNotifier.dispose);
 
-/// État d'authentification courant (lecture seule pour les écrans).
-bool get isAuthenticated => _isAuthenticated;
+  return GoRouter(
+    initialLocation: '/',
+    observers: [AppRouterObserver()],
+    refreshListenable: refreshNotifier,
+    redirect: (context, state) {
+      final session = ref.read(authProvider);
+      final bool isAuthPath =
+          state.uri.path.startsWith('/auth') ||
+          state.uri.path == '/' || // splash
+          state.uri.path == '/onboarding';
 
-/// Load auth state from SharedPreferences (call before runApp).
-Future<void> loadAuthState() async {
-  final prefs = await SharedPreferences.getInstance();
-  _isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
-  _userRole = prefs.getString('userRole') ?? 'parent';
-}
-
-/// Call this after a successful login/registration.
-Future<void> setAuthenticated(bool value) async {
-  _isAuthenticated = value;
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('isAuthenticated', value);
-}
-
-/// Call this when the user's role is determined (during registration/login).
-Future<void> setUserRole(String role) async {
-  _userRole = role;
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('userRole', role);
-}
-
-final GoRouter appRouter = GoRouter(
-  initialLocation: '/',
-  observers: [AppRouterObserver()],
-  redirect: (context, state) {
-    final bool isAuthPath =
-        state.uri.path.startsWith('/auth') ||
-        state.uri.path == '/' || // splash
-        state.uri.path == '/onboarding';
-
-    if (!_isAuthenticated && !isAuthPath) {
-      return '/onboarding';
-    }
-    return null;
-  },
-  routes: [
-    // --- Public Routes ---
-    GoRoute(
-      path: '/',
-      pageBuilder: (c, s) => _fadeTransition(const SplashScreen()),
-    ),
-    GoRoute(
-      path: '/onboarding',
-      pageBuilder: (c, s) => _fadeTransition(const OnboardingScreen()),
-    ),
-
-    // --- Auth Routes ---
-    GoRoute(
-      path: '/auth/role',
-      pageBuilder: (c, s) => _slideTransition(const RoleSelectionScreen()),
-    ),
-    GoRoute(
-      path: '/auth/login',
-      pageBuilder: (c, s) => _slideTransition(const LoginScreen()),
-    ),
-    GoRoute(
-      path: '/auth/otp',
-      pageBuilder: (c, s) => _slideTransition(const OtpScreen()),
-    ),
-    GoRoute(
-      path: '/auth/register',
-      pageBuilder: (c, s) => _slideTransition(const RegisterScreen()),
-    ),
-
-    // --- Shell View (Bottom Navigation) ---
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) =>
-          MainShell(navigationShell: navigationShell),
-      branches: [
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/home',
-              pageBuilder: (c, s) => _fadeTransition(const HomeScreen()),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/search',
-              pageBuilder: (c, s) => _fadeTransition(const SearchScreen()),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/bookings',
-              pageBuilder: (c, s) =>
-                  _fadeTransition(const BookingsListScreen()),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/chat',
-              pageBuilder: (c, s) =>
-                  _fadeTransition(const ConversationsScreen()),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/profile',
-              pageBuilder: (c, s) {
-                final bool isNanny = _userRole == 'nanny';
-                return _fadeTransition(
-                  isNanny
-                      ? const NannyDashboardScreen()
-                      : const ParentProfileScreen(),
-                );
-              },
-            ),
-          ],
-        ),
-      ],
-    ),
-
-    // --- Full Screen Routes (Push / Slide) ---
-    GoRoute(path: '/search/map', builder: (c, s) => const MapScreen()),
-    GoRoute(
-      path: '/nanny/:id',
-      builder: (c, s) => NannyProfileScreen(nannyId: s.pathParameters['id']!),
-    ),
-    GoRoute(
-      path: '/booking/new/:nannyId',
-      builder: (c, s) => BookingScreen(nannyId: s.pathParameters['nannyId']!),
-    ),
-    GoRoute(
-      path: '/booking/:id',
-      builder: (c, s) =>
-          BookingDetailScreen(bookingId: s.pathParameters['id']!),
-    ),
-    GoRoute(
-      path: '/booking/confirmation/:id',
-      builder: (c, s) =>
-          BookingConfirmationScreen(bookingId: s.pathParameters['id']!),
-    ),
-    GoRoute(
-      path: '/chat/:nannyId',
-      builder: (c, s) => ChatScreen(nannyId: s.pathParameters['nannyId']),
-    ),
-    GoRoute(
-      path: '/profile/edit',
-      builder: (c, s) => const EditProfileScreen(),
-    ),
-    GoRoute(
-      path: '/notifications',
-      builder: (c, s) => const NotificationsScreen(),
-    ),
-    GoRoute(path: '/sos', builder: (c, s) => const SosScreen()),
-
-    // --- Missions routes ---
-    GoRoute(
-      path: '/missions/publish',
-      builder: (c, s) => const PublishAnnouncementScreen(),
-    ),
-    GoRoute(
-      path: '/missions/available',
-      builder: (c, s) => const AvailableMissionsScreen(),
-    ),
-    GoRoute(
-      path: '/missions/:missionId/candidatures',
-      builder: (c, s) =>
-          CandidaturesScreen(missionId: s.pathParameters['missionId']!),
-    ),
-    GoRoute(
-      path: '/missions/:missionId/tracking',
-      builder: (c, s) =>
-          MissionTrackingScreen(missionId: s.pathParameters['missionId']!),
-    ),
-    GoRoute(
-      path: '/missions/:missionId/delay',
-      builder: (c, s) => DelayScreen(
-        missionId: s.pathParameters['missionId']!,
-        hourlyRate:
-            double.tryParse(s.uri.queryParameters['rate'] ?? '') ??
-            AppConstants.defaultHourlyRate,
+      if (!session.isAuthenticated && !isAuthPath) {
+        return '/onboarding';
+      }
+      return null;
+    },
+    routes: [
+      // --- Public Routes ---
+      GoRoute(
+        path: '/',
+        pageBuilder: (c, s) => _fadeTransition(const SplashScreen()),
       ),
-    ),
-  ],
-);
+      GoRoute(
+        path: '/onboarding',
+        pageBuilder: (c, s) => _fadeTransition(const OnboardingScreen()),
+      ),
+
+      // --- Auth Routes ---
+      GoRoute(
+        path: '/auth/role',
+        pageBuilder: (c, s) => _slideTransition(const RoleSelectionScreen()),
+      ),
+      GoRoute(
+        path: '/auth/login',
+        pageBuilder: (c, s) => _slideTransition(const LoginScreen()),
+      ),
+      GoRoute(
+        path: '/auth/otp',
+        pageBuilder: (c, s) => _slideTransition(const OtpScreen()),
+      ),
+      GoRoute(
+        path: '/auth/register',
+        pageBuilder: (c, s) => _slideTransition(const RegisterScreen()),
+      ),
+
+      // --- Shell View (Bottom Navigation) ---
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                pageBuilder: (c, s) => _fadeTransition(const HomeScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/search',
+                pageBuilder: (c, s) => _fadeTransition(const SearchScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/bookings',
+                pageBuilder: (c, s) =>
+                    _fadeTransition(const BookingsListScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/chat',
+                pageBuilder: (c, s) =>
+                    _fadeTransition(const ConversationsScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                pageBuilder: (c, s) {
+                  final bool isNanny = ref.read(authProvider).isNanny;
+                  return _fadeTransition(
+                    isNanny
+                        ? const NannyDashboardScreen()
+                        : const ParentProfileScreen(),
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+
+      // --- Full Screen Routes (Push / Slide) ---
+      GoRoute(path: '/search/map', builder: (c, s) => const MapScreen()),
+      GoRoute(
+        path: '/nanny/:id',
+        builder: (c, s) => NannyProfileScreen(nannyId: s.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/booking/new/:nannyId',
+        builder: (c, s) =>
+            BookingScreen(nannyId: s.pathParameters['nannyId']!),
+      ),
+      GoRoute(
+        path: '/booking/:id',
+        builder: (c, s) =>
+            BookingDetailScreen(bookingId: s.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/booking/confirmation/:id',
+        builder: (c, s) =>
+            BookingConfirmationScreen(bookingId: s.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/chat/:nannyId',
+        builder: (c, s) => ChatScreen(nannyId: s.pathParameters['nannyId']),
+      ),
+      GoRoute(
+        path: '/profile/edit',
+        builder: (c, s) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (c, s) => const NotificationsScreen(),
+      ),
+      GoRoute(path: '/sos', builder: (c, s) => const SosScreen()),
+
+      // --- Missions routes ---
+      GoRoute(
+        path: '/missions/publish',
+        builder: (c, s) => const PublishAnnouncementScreen(),
+      ),
+      GoRoute(
+        path: '/missions/available',
+        builder: (c, s) => const AvailableMissionsScreen(),
+      ),
+      GoRoute(
+        path: '/missions/:missionId/candidatures',
+        builder: (c, s) =>
+            CandidaturesScreen(missionId: s.pathParameters['missionId']!),
+      ),
+      GoRoute(
+        path: '/missions/:missionId/tracking',
+        builder: (c, s) =>
+            MissionTrackingScreen(missionId: s.pathParameters['missionId']!),
+      ),
+      GoRoute(
+        path: '/missions/:missionId/delay',
+        builder: (c, s) => DelayScreen(
+          missionId: s.pathParameters['missionId']!,
+          hourlyRate:
+              double.tryParse(s.uri.queryParameters['rate'] ?? '') ??
+              AppConstants.defaultHourlyRate,
+        ),
+      ),
+    ],
+  );
+});
 
 // Helpers for transitions
 CustomTransitionPage _fadeTransition(Widget child) {

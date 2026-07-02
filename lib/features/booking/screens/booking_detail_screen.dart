@@ -1,54 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../data/models/booking_model.dart';
-import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 
-class BookingDetailScreen extends StatefulWidget {
+class BookingDetailScreen extends ConsumerWidget {
   final String bookingId;
 
   const BookingDetailScreen({super.key, required this.bookingId});
 
-  @override
-  State<BookingDetailScreen> createState() => _BookingDetailScreenState();
-}
-
-class _BookingDetailScreenState extends State<BookingDetailScreen> {
-  late BookingModel _booking;
-  late NannyModel _nanny;
-
-  @override
-  void initState() {
-    super.initState();
-    // For demonstration, we'll create a mock booking if not found
-    _booking = BookingModel(
-      id: widget.bookingId,
-      parentId: "p1",
-      nannyId: "n1",
-      date: DateTime.now().add(const Duration(days: 1)),
-      startTime: "09:00",
-      endTime: "17:00",
-      numberOfChildren: 2,
-      childrenAges: [3, 6],
-      totalPrice: 22425,
-      commission: 2925,
-      status:
-          "En attente", // "En attente", "Confirmée", "En cours", "Terminée", "Annulée"
-      address: "Quartier Glass, BAT G2",
-      notes: "Allergies aux arachides.",
-    );
-    _nanny = MockData.nannies.firstWhere((n) => n.id == _booking.nannyId);
-  }
-
-  Color _getStatusColor() {
-    switch (_booking.status) {
+  Color _getStatusColor(String status) {
+    switch (status) {
       case "En attente":
         return Colors.orange;
+      case "À venir":
       case "Confirmée":
         return const Color(0xFF4ECDC4);
       case "En cours":
@@ -63,101 +33,112 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final statusColor = _getStatusColor();
-    final isEnCours = _booking.status == "En cours";
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bookingAsync = ref.watch(bookingByIdProvider(bookingId));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Détails de la réservation #${_booking.id}"),
+        title: Text("Détails de la réservation #$bookingId"),
         actions: [
-          if (_booking.status == "En cours")
+          if (bookingAsync.valueOrNull?.status == "En cours")
             IconButton(
               icon: const Icon(Icons.sos, color: AppColors.danger),
               onPressed: () => context.push('/sos'),
             ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Status Banner
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
-              ),
-              decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.md),
-                border: Border.all(color: statusColor),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (isEnCours)
-                    const Icon(Icons.circle, color: Colors.blue, size: 12)
-                        .animate(onPlay: (controller) => controller.repeat())
-                        .scale(
-                          duration: 1.seconds,
-                          begin: const Offset(0.8, 0.8),
-                          end: const Offset(1.2, 1.2),
-                        )
-                        .fadeOut(duration: 1.seconds),
-                  if (isEnCours) const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    _booking.status,
-                    style: AppTypography.caption.copyWith(
-                      color: statusColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+      body: bookingAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Erreur : $e')),
+        data: (booking) => _buildBody(context, ref, booking),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context, WidgetRef ref, BookingModel booking) {
+    final statusColor = _getStatusColor(booking.status);
+    final isEnCours = booking.status == "En cours";
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Status Banner
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.md),
+              border: Border.all(color: statusColor),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isEnCours)
+                  const Icon(Icons.circle, color: Colors.blue, size: 12)
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .scale(
+                        duration: 1.seconds,
+                        begin: const Offset(0.8, 0.8),
+                        end: const Offset(1.2, 1.2),
+                      )
+                      .fadeOut(duration: 1.seconds),
+                if (isEnCours) const SizedBox(width: AppSpacing.sm),
+                Text(
+                  booking.status,
+                  style: AppTypography.caption.copyWith(
+                    color: statusColor,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.lg),
+          ),
+          const SizedBox(height: AppSpacing.lg),
 
-            // Nanny Info Card
-            _buildNannyCard(),
-            const SizedBox(height: AppSpacing.xl),
+          // Nanny Info Card
+          _buildNannyCard(context, ref, booking),
+          const SizedBox(height: AppSpacing.xl),
 
-            // Details
-            _buildSectionTitle("Informations de la mission"),
-            const SizedBox(height: AppSpacing.md),
-            _buildDetailItem(
-              Icons.calendar_today_outlined,
-              "Date",
-              DateFormat('EEEE d MMMM y', 'fr_FR').format(_booking.date),
-            ),
-            _buildDetailItem(
-              Icons.access_time,
-              "Horaires",
-              "${_booking.startTime} → ${_booking.endTime}",
-            ),
-            _buildDetailItem(
-              Icons.location_on_outlined,
-              "Adresse",
-              _booking.address,
-            ),
-            _buildDetailItem(
-              Icons.child_care_outlined,
-              "Enfants",
-              "${_booking.numberOfChildren} enfant(s) (${_booking.childrenAges.join(', ')} ans)",
-            ),
-            if (_booking.notes != null)
-              _buildDetailItem(Icons.notes, "Notes", _booking.notes!),
+          // Details
+          _buildSectionTitle("Informations de la mission"),
+          const SizedBox(height: AppSpacing.md),
+          _buildDetailItem(
+            Icons.calendar_today_outlined,
+            "Date",
+            DateFormat('EEEE d MMMM y', 'fr_FR').format(booking.date),
+          ),
+          _buildDetailItem(
+            Icons.access_time,
+            "Horaires",
+            "${booking.startTime} → ${booking.endTime}",
+          ),
+          _buildDetailItem(
+            Icons.location_on_outlined,
+            "Adresse",
+            booking.address,
+          ),
+          _buildDetailItem(
+            Icons.child_care_outlined,
+            "Enfants",
+            "${booking.numberOfChildren} enfant(s) "
+                "(${booking.childrenAges.join(', ')} ans)",
+          ),
+          if (booking.notes != null)
+            _buildDetailItem(Icons.notes, "Notes", booking.notes!),
 
-            const SizedBox(height: AppSpacing.xl),
-            _buildSectionTitle("Timeline de la mission"),
-            const SizedBox(height: AppSpacing.lg),
-            _buildTimeline(),
+          const SizedBox(height: AppSpacing.xl),
+          _buildSectionTitle("Timeline de la mission"),
+          const SizedBox(height: AppSpacing.lg),
+          _buildTimeline(),
 
-            const SizedBox(height: AppSpacing.xl * 2),
-            _buildActionButtons(),
-          ],
-        ),
+          const SizedBox(height: AppSpacing.xl * 2),
+          _buildActionButtons(booking),
+        ],
       ),
     );
   }
@@ -169,7 +150,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     );
   }
 
-  Widget _buildNannyCard() {
+  Widget _buildNannyCard(
+    BuildContext context,
+    WidgetRef ref,
+    BookingModel booking,
+  ) {
+    final nannyAsync = ref.watch(nannyByIdProvider(booking.nannyId));
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -177,40 +164,49 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         borderRadius: BorderRadius.circular(AppSpacing.lg),
         border: Border.all(color: AppColors.border),
       ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundImage: NetworkImage(
-              _nanny.avatar ?? "https://i.pravatar.cc/150?u=${_nanny.id}",
-            ),
+      child: nannyAsync.when(
+        loading: () => const Center(
+          child: Padding(
+            padding: EdgeInsets.all(AppSpacing.md),
+            child: CircularProgressIndicator(),
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _nanny.name,
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
+        ),
+        error: (e, _) => Text('Erreur : $e'),
+        data: (nanny) => Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(
+                nanny.avatar ?? "https://i.pravatar.cc/150?u=${nanny.id}",
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    nanny.name,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  "${_nanny.experience} ans d'expérience",
-                  style: AppTypography.caption,
-                ),
-              ],
+                  Text(
+                    "${nanny.experience} ans d'expérience",
+                    style: AppTypography.caption,
+                  ),
+                ],
+              ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.chat_bubble_outline,
-              color: AppColors.primary,
+            IconButton(
+              icon: const Icon(
+                Icons.chat_bubble_outline,
+                color: AppColors.primary,
+              ),
+              onPressed: () => context.push('/chat/${nanny.id}'),
             ),
-            onPressed: () => context.push('/chat/${_nanny.id}'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -298,8 +294,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     );
   }
 
-  Widget _buildActionButtons() {
-    if (_booking.status == "En attente" || _booking.status == "Confirmée") {
+  Widget _buildActionButtons(BookingModel booking) {
+    if (booking.status == "En attente" ||
+        booking.status == "Confirmée" ||
+        booking.status == "À venir") {
       return OutlinedButton(
         onPressed: () {},
         style: OutlinedButton.styleFrom(
@@ -308,7 +306,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         ),
         child: const Text("Annuler la réservation"),
       );
-    } else if (_booking.status == "Terminée") {
+    } else if (booking.status == "Terminée") {
       return ElevatedButton(
         onPressed: () {},
         child: const Text("Noter la nounou"),

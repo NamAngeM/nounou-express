@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/nanny_card.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 
-class FavoritesScreen extends StatelessWidget {
+class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // For demo purposes, we'll just take the first 3 nannies as favorites
-    final favorites = MockData.nannies.take(3).toList();
-
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -32,29 +31,39 @@ class FavoritesScreen extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
       ),
-      body: favorites.isEmpty
-          ? _buildEmptyState()
-          : ListView.builder(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              itemCount: favorites.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                      child: NannyCard(
-                        nannyId: favorites[index].id,
-                        name: favorites[index].name,
-                        quartier: favorites[index].quartier,
-                        rating: favorites[index].rating,
-                        hourlyRate: favorites[index].hourlyRate,
-                        isVerified: favorites[index].isVerified,
-                        avatarUrl: favorites[index].avatar,
-                      ),
-                    )
-                    .animate()
-                    .fadeIn(delay: (index * 100).ms)
-                    .slideX(begin: 0.1, end: 0);
-              },
-            ),
+      body: ref
+          .watch(favoriteNanniesProvider)
+          .when(
+            data: (favorites) => favorites.isEmpty
+                ? _buildEmptyState()
+                : _buildList(favorites),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => _buildEmptyState(),
+          ),
+    );
+  }
+
+  Widget _buildList(List<NannyModel> favorites) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      itemCount: favorites.length,
+      itemBuilder: (context, index) {
+        return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+              child: NannyCard(
+                nannyId: favorites[index].id,
+                name: favorites[index].name,
+                quartier: favorites[index].quartier,
+                rating: favorites[index].rating,
+                hourlyRate: favorites[index].hourlyRate,
+                isVerified: favorites[index].isVerified,
+                avatarUrl: favorites[index].avatar,
+              ),
+            )
+            .animate()
+            .fadeIn(delay: (index * 100).ms)
+            .slideX(begin: 0.1, end: 0);
+      },
     );
   }
 

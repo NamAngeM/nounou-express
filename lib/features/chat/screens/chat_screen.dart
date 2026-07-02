@@ -1,39 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../data/mock/mock_data.dart';
-import '../../../data/models/message_model.dart';
 import '../../../data/models/conversation_model.dart';
+import '../../../data/models/message_model.dart';
+import '../../../data/providers/data_providers.dart';
 import '../widgets/message_bubble.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   final String? nannyId;
 
   const ChatScreen({super.key, this.nannyId});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  late ConversationModel _conversation;
-  late List<MessageModel> _messages;
   bool _isTyping = false;
+
+  String get _otherUserId => widget.nannyId ?? 'n1';
 
   @override
   void initState() {
     super.initState();
-    // For demonstration, we'll find the conversation with the nanny
-    _conversation = MockData.conversations.firstWhere(
-      (c) => c.otherUserId == widget.nannyId,
-      orElse: () => MockData.conversations.first,
-    );
-    _messages = List.from(MockData.messages);
-
     _messageController.addListener(() {
       setState(() {
         _isTyping = _messageController.text.trim().isNotEmpty;
@@ -48,25 +42,29 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     if (!_isTyping) return;
 
     final newMessage = MessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
+      // TODO Phase 3: id utilisateur réel
       senderId: "p1", // Assuming current user is parent
-      receiverId: widget.nannyId ?? "n1",
+      receiverId: _otherUserId,
       content: _messageController.text.trim(),
       timestamp: DateTime.now(),
       isRead: false,
     );
 
-    setState(() {
-      _messages.add(newMessage);
-      _messageController.clear();
-    });
+    _messageController.clear();
+
+    await ref.read(chatRepositoryProvider).sendMessage(newMessage);
+    ref.invalidate(messagesProvider(_otherUserId));
+    await ref.read(messagesProvider(_otherUserId).future);
+    if (!mounted) return;
 
     // Scroll to bottom
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 300),
@@ -77,8 +75,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // En-tête : conversation avec l'interlocuteur, sinon repli sur la
+    // première conversation disponible (comportement historique du mock).
+    final conversation =
+        ref.watch(conversationWithProvider(_otherUserId)).valueOrNull ??
+        ref.watch(conversationsProvider).valueOrNull?.firstOrNull;
+
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(conversation),
       body: Column(
         children: [
           Expanded(child: _buildMessagesList()),
@@ -88,17 +92,17 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(ConversationModel? conversation) {
     return AppBar(
       titleSpacing: 0,
       title: Row(
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundImage: _conversation.otherUserAvatar != null
-                ? NetworkImage(_conversation.otherUserAvatar!)
+            backgroundImage: conversation?.otherUserAvatar != null
+                ? NetworkImage(conversation!.otherUserAvatar!)
                 : null,
-            child: _conversation.otherUserAvatar == null
+            child: conversation?.otherUserAvatar == null
                 ? const Icon(Icons.person)
                 : null,
           ),
@@ -108,24 +112,25 @@ class _ChatScreenState extends State<ChatScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _conversation.otherUserName,
+                  conversation?.otherUserName ?? '',
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  _conversation.isOnline
-                      ? "En ligne"
-                      : (_conversation.lastSeen != null
-                            ? "Vu il y a ${DateTime.now().difference(_conversation.lastSeen!).inMinutes} min"
-                            : "Hors ligne"),
-                  style: AppTypography.caption.copyWith(
-                    color: _conversation.isOnline
-                        ? Colors.green
-                        : AppColors.textSecondary,
-                    fontSize: 11,
+                if (conversation != null)
+                  Text(
+                    conversation.isOnline
+                        ? "En ligne"
+                        : (conversation.lastSeen != null
+                              ? "Vu il y a ${DateTime.now().difference(conversation.lastSeen!).inMinutes} min"
+                              : "Hors ligne"),
+                    style: AppTypography.caption.copyWith(
+                      color: conversation.isOnline
+                          ? Colors.green
+                          : AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -139,35 +144,49 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildMessagesList() {
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      itemCount: _messages.length,
-      itemBuilder: (context, index) {
-        final message = _messages[index];
-        final bool isMe = message.senderId == "p1";
+    return ref
+        .watch(messagesProvider(_otherUserId))
+        .when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(
+            child: Text(
+              'Impossible de charger les messages.',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          data: (messages) => ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              final message = messages[index];
+              final bool isMe = message.senderId == "p1";
 
-        // Show date separator if the date changed
-        bool showDateSeparator = false;
-        if (index == 0) {
-          showDateSeparator = true;
-        } else {
-          final prevDate = _messages[index - 1].timestamp;
-          if (prevDate.day != message.timestamp.day ||
-              prevDate.month != message.timestamp.month ||
-              prevDate.year != message.timestamp.year) {
-            showDateSeparator = true;
-          }
-        }
+              // Show date separator if the date changed
+              bool showDateSeparator = false;
+              if (index == 0) {
+                showDateSeparator = true;
+              } else {
+                final prevDate = messages[index - 1].timestamp;
+                if (prevDate.day != message.timestamp.day ||
+                    prevDate.month != message.timestamp.month ||
+                    prevDate.year != message.timestamp.year) {
+                  showDateSeparator = true;
+                }
+              }
 
-        return Column(
-          children: [
-            if (showDateSeparator) _buildDateSeparator(message.timestamp),
-            MessageBubble(message: message, isMe: isMe),
-          ],
+              return Column(
+                children: [
+                  if (showDateSeparator) _buildDateSeparator(message.timestamp),
+                  MessageBubble(message: message, isMe: isMe),
+                ],
+              );
+            },
+          ),
         );
-      },
-    );
   }
 
   Widget _buildDateSeparator(DateTime date) {

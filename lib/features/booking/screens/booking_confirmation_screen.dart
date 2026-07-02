@@ -1,164 +1,191 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../data/models/booking_model.dart';
 import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 
-class BookingConfirmationScreen extends StatelessWidget {
+class BookingConfirmationScreen extends ConsumerWidget {
   final String bookingId;
 
   const BookingConfirmationScreen({super.key, required this.bookingId});
 
   @override
-  Widget build(BuildContext context) {
-    // We expect the booking details to be passed in the extra
-    final Map<String, dynamic> extra =
-        GoRouterState.of(context).extra as Map<String, dynamic>;
-    final NannyModel nanny = extra['nanny'] as NannyModel;
-    final DateTime date = extra['date'] as DateTime;
-    final TimeOfDay startTime = extra['startTime'] as TimeOfDay;
-    final TimeOfDay endTime = extra['endTime'] as TimeOfDay;
-    final String address = extra['address'] as String;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bookingAsync = ref.watch(bookingByIdProvider(bookingId));
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: AppSpacing.xxxl),
-
-              // ── Success checkmark hero ──────────────────────────────────
-              Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.accentGradient,
-                      shape: BoxShape.circle,
-                      boxShadow: AppColors.primaryShadow,
-                    ),
-                    child: const Icon(
-                      Icons.check_rounded,
-                      color: Colors.white,
-                      size: 64,
-                    ),
-                  )
-                  .animate()
-                  .scale(duration: 600.ms, curve: Curves.elasticOut)
-                  .fadeIn(duration: 400.ms),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              Text(
-                "Réservation confirmée ! 🎉",
-                style: AppTypography.h2,
-                textAlign: TextAlign.center,
-              ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
-
-              const SizedBox(height: AppSpacing.sm),
-
-              Text(
-                "${nanny.name} a été notifiée",
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ).animate().fadeIn(delay: 400.ms),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // ── Status timeline ─────────────────────────────────────────
-              _buildStatusTimeline()
-                  .animate()
-                  .fadeIn(delay: 500.ms)
-                  .slideY(begin: 0.15, end: 0),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // ── Booking ID badge ────────────────────────────────────────
-              _BookingIdBadge(
-                bookingId: bookingId,
-              ).animate().fadeIn(delay: 200.ms),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // ── Detail rows ─────────────────────────────────────────────
-              _ConfirmRow(
-                icon: Icons.calendar_today_rounded,
-                label: "Date",
-                value: DateFormat('EEEE d MMMM y', 'fr_FR').format(date),
-                color: AppColors.primary,
-                iconBg: AppColors.primarySurface,
-              ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0),
-
-              const SizedBox(height: AppSpacing.sm),
-
-              _ConfirmRow(
-                icon: Icons.access_time_rounded,
-                label: "Horaire",
-                value:
-                    "${startTime.format(context)} → ${endTime.format(context)}",
-                color: AppColors.gold,
-                iconBg: AppColors.goldSurface,
-              ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.2, end: 0),
-
-              const SizedBox(height: AppSpacing.sm),
-
-              _ConfirmRow(
-                icon: Icons.location_on_rounded,
-                label: "Adresse",
-                value: address,
-                color: AppColors.danger,
-                iconBg: AppColors.dangerSurface,
-              ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.2, end: 0),
-
-              const SizedBox(height: AppSpacing.sm),
-
-              _ConfirmRow(
-                icon: Icons.person_rounded,
-                label: "Nounou",
-                value: nanny.name,
-                color: AppColors.accent,
-                iconBg: AppColors.accentSurface,
-              ).animate().fadeIn(delay: 900.ms).slideY(begin: 0.2, end: 0),
-
-              const SizedBox(height: AppSpacing.xxl),
-
-              // ── Action buttons ──────────────────────────────────────────
-              Column(
-                children: [
-                  OutlinedButton(
-                    onPressed: () => context.push('/chat/${nanny.id}'),
-                    child: const Text("Contacter la nounou"),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  ElevatedButton(
-                    onPressed: () => context.go('/home'),
-                    child: const Text("Retour à l'accueil"),
-                  ),
-                ],
-              ).animate().fadeIn(delay: 1000.ms),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              Text(
-                "Vous recevrez une notification quand la nounou confirmera",
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ).animate().fadeIn(delay: 1100.ms),
-
-              const SizedBox(height: AppSpacing.xl),
-            ],
+        child: bookingAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(child: Text('Erreur : $e')),
+          data: (booking) => _BookingConfirmationBody(
+            bookingId: bookingId,
+            booking: booking,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BookingConfirmationBody extends ConsumerWidget {
+  final String bookingId;
+  final BookingModel booking;
+
+  const _BookingConfirmationBody({
+    required this.bookingId,
+    required this.booking,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nannyAsync = ref.watch(nannyByIdProvider(booking.nannyId));
+
+    return nannyAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Erreur : $e')),
+      data: (nanny) => _buildContent(context, nanny),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, NannyModel nanny) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: AppSpacing.xxxl),
+
+          // ── Success checkmark hero ──────────────────────────────────
+          Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  gradient: AppColors.accentGradient,
+                  shape: BoxShape.circle,
+                  boxShadow: AppColors.primaryShadow,
+                ),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 64,
+                ),
+              )
+              .animate()
+              .scale(duration: 600.ms, curve: Curves.elasticOut)
+              .fadeIn(duration: 400.ms),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          Text(
+            "Réservation confirmée ! 🎉",
+            style: AppTypography.h2,
+            textAlign: TextAlign.center,
+          ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
+
+          const SizedBox(height: AppSpacing.sm),
+
+          Text(
+            "${nanny.name} a été notifiée",
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ).animate().fadeIn(delay: 400.ms),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          // ── Status timeline ─────────────────────────────────────────
+          _buildStatusTimeline()
+              .animate()
+              .fadeIn(delay: 500.ms)
+              .slideY(begin: 0.15, end: 0),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          // ── Booking ID badge ────────────────────────────────────────
+          _BookingIdBadge(
+            bookingId: bookingId,
+          ).animate().fadeIn(delay: 200.ms),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          // ── Detail rows ─────────────────────────────────────────────
+          _ConfirmRow(
+            icon: Icons.calendar_today_rounded,
+            label: "Date",
+            value: DateFormat('EEEE d MMMM y', 'fr_FR').format(booking.date),
+            color: AppColors.primary,
+            iconBg: AppColors.primarySurface,
+          ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0),
+
+          const SizedBox(height: AppSpacing.sm),
+
+          _ConfirmRow(
+            icon: Icons.access_time_rounded,
+            label: "Horaire",
+            value: "${booking.startTime} → ${booking.endTime}",
+            color: AppColors.gold,
+            iconBg: AppColors.goldSurface,
+          ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.2, end: 0),
+
+          const SizedBox(height: AppSpacing.sm),
+
+          _ConfirmRow(
+            icon: Icons.location_on_rounded,
+            label: "Adresse",
+            value: booking.address,
+            color: AppColors.danger,
+            iconBg: AppColors.dangerSurface,
+          ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.2, end: 0),
+
+          const SizedBox(height: AppSpacing.sm),
+
+          _ConfirmRow(
+            icon: Icons.person_rounded,
+            label: "Nounou",
+            value: nanny.name,
+            color: AppColors.accent,
+            iconBg: AppColors.accentSurface,
+          ).animate().fadeIn(delay: 900.ms).slideY(begin: 0.2, end: 0),
+
+          const SizedBox(height: AppSpacing.xxl),
+
+          // ── Action buttons ──────────────────────────────────────────
+          Column(
+            children: [
+              OutlinedButton(
+                onPressed: () => context.push('/chat/${nanny.id}'),
+                child: const Text("Contacter la nounou"),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              ElevatedButton(
+                onPressed: () => context.go('/home'),
+                child: const Text("Retour à l'accueil"),
+              ),
+            ],
+          ).animate().fadeIn(delay: 1000.ms),
+
+          const SizedBox(height: AppSpacing.xl),
+
+          Text(
+            "Vous recevrez une notification quand la nounou confirmera",
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ).animate().fadeIn(delay: 1100.ms),
+
+          const SizedBox(height: AppSpacing.xl),
+        ],
       ),
     );
   }

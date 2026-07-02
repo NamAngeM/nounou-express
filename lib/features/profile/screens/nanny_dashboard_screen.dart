@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../data/providers/data_providers.dart';
 import '../widgets/stats_card.dart';
 
-class NannyDashboardScreen extends StatefulWidget {
+class NannyDashboardScreen extends ConsumerStatefulWidget {
   const NannyDashboardScreen({super.key});
 
   @override
-  State<NannyDashboardScreen> createState() => _NannyDashboardScreenState();
+  ConsumerState<NannyDashboardScreen> createState() =>
+      _NannyDashboardScreenState();
 }
 
-class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
+class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
   bool _isAvailable = true;
 
   @override
@@ -119,50 +121,73 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
   }
 
   Widget _buildStatsGrid() {
-    final stats = MockData.nannyStats;
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: AppSpacing.md,
-      crossAxisSpacing: AppSpacing.md,
-      childAspectRatio: 1.2,
-      children: [
-        StatsCard(
-          value: stats["missionsMonth"],
-          label: "Missions / mois",
-          icon: Icons.calendar_today,
-          iconColor: Colors.blue,
-        ),
-        StatsCard(
-          value: stats["earningsMonth"],
-          label: "Revenus / mois",
-          icon: Icons.payments_outlined,
-          iconColor: Colors.green,
-        ),
-        StatsCard(
-          value: stats["avgRating"],
-          label: "Note moyenne",
-          icon: Icons.star_border,
-          iconColor: Colors.orange,
-        ),
-        StatsCard(
-          value: stats["acceptanceRate"],
-          label: "Taux d'acceptation",
-          icon: Icons.check_circle_outline,
-          iconColor: Colors.teal,
-        ),
-      ],
-    );
+    return ref
+        .watch(nannyStatsProvider)
+        .when(
+          data: (stats) => GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: AppSpacing.md,
+            crossAxisSpacing: AppSpacing.md,
+            childAspectRatio: 1.2,
+            children: [
+              StatsCard(
+                value: stats["missionsMonth"],
+                label: "Missions / mois",
+                icon: Icons.calendar_today,
+                iconColor: Colors.blue,
+              ),
+              StatsCard(
+                value: stats["earningsMonth"],
+                label: "Revenus / mois",
+                icon: Icons.payments_outlined,
+                iconColor: Colors.green,
+              ),
+              StatsCard(
+                value: stats["avgRating"],
+                label: "Note moyenne",
+                icon: Icons.star_border,
+                iconColor: Colors.orange,
+              ),
+              StatsCard(
+                value: stats["acceptanceRate"],
+                label: "Taux d'acceptation",
+                icon: Icons.check_circle_outline,
+                iconColor: Colors.teal,
+              ),
+            ],
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => _buildErrorText(
+            "Impossible de charger les statistiques",
+          ),
+        );
   }
 
   Widget _buildSectionTitle(String title) {
     return Text(title, style: AppTypography.h3);
   }
 
+  Widget _buildErrorText(String message) {
+    return Text(
+      message,
+      style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+    );
+  }
+
   Widget _buildUpcomingMissions() {
-    final missions = MockData.upcomingMissions;
-    return Column(children: missions.map((m) => _buildMissionCard(m)).toList());
+    return ref
+        .watch(upcomingMissionsProvider)
+        .when(
+          data: (missions) => Column(
+            children: missions.map((m) => _buildMissionCard(m)).toList(),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => _buildErrorText(
+            "Impossible de charger les missions",
+          ),
+        );
   }
 
   Widget _buildMissionCard(Map<String, dynamic> mission) {
@@ -272,8 +297,15 @@ class _NannyDashboardScreenState extends State<NannyDashboardScreen> {
   }
 
   Widget _buildRecentReviews() {
-    final reviews = MockData.recentReviews;
-    return Column(children: reviews.map((r) => _buildReviewCard(r)).toList());
+    return ref
+        .watch(recentReviewsProvider)
+        .when(
+          data: (reviews) => Column(
+            children: reviews.map((r) => _buildReviewCard(r)).toList(),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => _buildErrorText("Impossible de charger les avis"),
+        );
   }
 
   Widget _buildReviewCard(Map<String, dynamic> review) {

@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../data/models/mission_model.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../data/providers/data_providers.dart';
 
 // ---------------------------------------------------------------------------
 // Available Missions Screen
 // ---------------------------------------------------------------------------
 
-class AvailableMissionsScreen extends StatefulWidget {
+class AvailableMissionsScreen extends ConsumerStatefulWidget {
   const AvailableMissionsScreen({super.key});
 
   @override
-  State<AvailableMissionsScreen> createState() =>
+  ConsumerState<AvailableMissionsScreen> createState() =>
       _AvailableMissionsScreenState();
 }
 
-class _AvailableMissionsScreenState extends State<AvailableMissionsScreen> {
+class _AvailableMissionsScreenState
+    extends ConsumerState<AvailableMissionsScreen> {
   String _filter = 'Toutes';
 
   static const _filters = [
@@ -29,8 +33,8 @@ class _AvailableMissionsScreenState extends State<AvailableMissionsScreen> {
     'Week-end',
   ];
 
-  List<MissionModel> get _filteredMissions {
-    final pending = mockMissions
+  List<MissionModel> _filteredMissions(List<MissionModel> missions) {
+    final pending = missions
         .where((m) => m.status == MissionStatus.pending)
         .toList();
     switch (_filter) {
@@ -59,7 +63,7 @@ class _AvailableMissionsScreenState extends State<AvailableMissionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final missions = _filteredMissions;
+    final missionsAsync = ref.watch(missionsProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
@@ -71,21 +75,33 @@ class _AvailableMissionsScreenState extends State<AvailableMissionsScreen> {
             onSelected: (f) => setState(() => _filter = f),
           ),
           Expanded(
-            child: missions.isEmpty
-                ? _EmptyState(filter: _filter)
-                : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                      AppSpacing.xxl,
-                    ),
-                    itemCount: missions.length,
-                    separatorBuilder: (_, _) =>
-                        const SizedBox(height: AppSpacing.md),
-                    itemBuilder: (context, i) =>
-                        _MissionCard(mission: missions[i]),
-                  ),
+            child: missionsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(
+                child: Text(
+                  'Erreur de chargement des annonces',
+                  style: AppTypography.bodyMedium,
+                ),
+              ),
+              data: (allMissions) {
+                final missions = _filteredMissions(allMissions);
+                return missions.isEmpty
+                    ? _EmptyState(filter: _filter)
+                    : ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.lg,
+                          AppSpacing.md,
+                          AppSpacing.lg,
+                          AppSpacing.xxl,
+                        ),
+                        itemCount: missions.length,
+                        separatorBuilder: (_, _) =>
+                            const SizedBox(height: AppSpacing.md),
+                        itemBuilder: (context, i) =>
+                            _MissionCard(mission: missions[i]),
+                      );
+              },
+            ),
           ),
         ],
       ),
@@ -238,7 +254,7 @@ class _MissionCard extends StatelessWidget {
               icon: Icons.calendar_today_rounded,
               iconColor: AppColors.secondary,
               child: Text(
-                '${_formatDate(mission.date)}  •  '
+                '${AppFormatters.formatDateWithWeekday(mission.date)}  •  '
                 '${mission.startTime}–${mission.endTime} '
                 '(${_formatDuration(mission.plannedHours)})',
                 style: AppTypography.bodyMedium,
@@ -269,7 +285,7 @@ class _MissionCard extends StatelessWidget {
                 icon: Icons.payments_outlined,
                 iconColor: AppColors.success,
                 child: Text(
-                  'Budget max: ${_formatMoney(mission.maxBudgetPerHour!)} FCFA/h',
+                  'Budget max: ${_formatMoney(mission.maxBudgetPerHour!)} ${AppConstants.currency}/h',
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.success,
                     fontWeight: FontWeight.w600,
@@ -644,7 +660,7 @@ class _ApplySheetState extends State<_ApplySheet> {
                 const SizedBox(width: AppSpacing.sm),
                 Text('Votre tarif: ', style: AppTypography.bodyMedium),
                 Text(
-                  '2 500 FCFA/h',
+                  '2 500 ${AppConstants.currency}/h',
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w700,
@@ -751,26 +767,7 @@ class _EmptyState extends StatelessWidget {
 // Formatting helpers
 // ---------------------------------------------------------------------------
 
-String _formatDate(DateTime date) {
-  const weekdays = ['Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.', 'Dim.'];
-  const months = [
-    'janv.',
-    'févr.',
-    'mars',
-    'avr.',
-    'mai',
-    'juin',
-    'juil.',
-    'août',
-    'sept.',
-    'oct.',
-    'nov.',
-    'déc.',
-  ];
-  final wd = weekdays[date.weekday - 1];
-  final mo = months[date.month - 1];
-  return '$wd ${date.day} $mo';
-}
+// _formatDate supprimée : utiliser AppFormatters.formatDateWithWeekday()
 
 String _formatDuration(double hours) {
   if (hours == hours.truncate()) {

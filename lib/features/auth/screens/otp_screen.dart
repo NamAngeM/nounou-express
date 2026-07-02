@@ -57,9 +57,15 @@ class _OtpScreenState extends State<OtpScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final uri = Uri.parse(GoRouterState.of(context).uri.toString());
-    phone = uri.queryParameters['phone'] ?? '';
-    role = uri.queryParameters['role'] ?? 'parent';
+    final extra = GoRouterState.of(context).extra as Map<String, dynamic>?;
+    if (extra != null) {
+      phone = extra['phone'] as String? ?? '';
+      role = extra['role'] as String? ?? 'parent';
+    } else {
+      final uri = Uri.parse(GoRouterState.of(context).uri.toString());
+      phone = uri.queryParameters['phone'] ?? '';
+      role = uri.queryParameters['role'] ?? 'parent';
+    }
   }
 
   @override

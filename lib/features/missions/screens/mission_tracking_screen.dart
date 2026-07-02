@@ -1,27 +1,30 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../data/models/mission_model.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../data/providers/data_providers.dart';
 import 'delay_screen.dart';
 
 // ── View perspective toggle ───────────────────────────────────────────────────
 enum _ViewPerspective { parent, nanny }
 
-class MissionTrackingScreen extends StatefulWidget {
+class MissionTrackingScreen extends ConsumerStatefulWidget {
   final String missionId;
 
   const MissionTrackingScreen({super.key, required this.missionId});
 
   @override
-  State<MissionTrackingScreen> createState() => _MissionTrackingScreenState();
+  ConsumerState<MissionTrackingScreen> createState() => _MissionTrackingScreenState();
 }
 
-class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
+class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
   late MissionModel _mission;
   MissionStatus _status = MissionStatus.pending;
   _ViewPerspective _perspective = _ViewPerspective.parent;
@@ -32,16 +35,36 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
   @override
   void initState() {
     super.initState();
-    _mission = mockMissions.firstWhere(
-      (m) => m.id == widget.missionId,
-      orElse: () => mockMissions.first,
-    );
+    final missionAsync = ref.read(missionByIdProvider(widget.missionId));
+    _mission = missionAsync.valueOrNull ?? _fallbackMission();
     _status = _mission.status;
     if (_status == MissionStatus.inProgress ||
         _status == MissionStatus.delayed) {
       _startTimer();
     }
   }
+
+  /// Fallback minimal si le provider n'a pas encore résolu.
+  MissionModel _fallbackMission() => MissionModel(
+    id: widget.missionId,
+    parentId: '',
+    parentName: '',
+    parentPhotoUrl: '',
+    address: '',
+    locationType: LocationType.home,
+    date: DateTime.now(),
+    startTime: '08:00',
+    endTime: '12:00',
+    isUrgent: false,
+    childrenIds: const [],
+    childrenSummary: const [],
+    needs: const [],
+    hasPets: false,
+    paymentMethod: PaymentMethod.cash,
+    status: MissionStatus.pending,
+    applicantIds: const [],
+    publishedAt: DateTime.now(),
+  );
 
   @override
   void dispose() {
@@ -104,23 +127,7 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
     return (hours.ceilToDouble() * rate).toInt();
   }
 
-  String _formatDate(DateTime d) {
-    const months = [
-      'jan',
-      'fév',
-      'mar',
-      'avr',
-      'mai',
-      'juin',
-      'juil',
-      'août',
-      'sep',
-      'oct',
-      'nov',
-      'déc',
-    ];
-    return '${d.day} ${months[d.month - 1]} ${d.year}';
-  }
+
 
   // ── Timeline data ───────────────────────────────────────────────────────────
 
@@ -275,7 +282,7 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Suivi de mission', style: AppTypography.h4),
-          Text(_formatDate(_mission.date), style: AppTypography.caption),
+          Text(AppFormatters.formatShortDate(_mission.date), style: AppTypography.caption),
         ],
       ),
       bottom: PreferredSize(
@@ -441,8 +448,8 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
             ),
           ),
           const Spacer(),
-          Text('$formattedCost FCFA', style: AppTypography.price),
-          Text('  (${rate.toInt()} FCFA/h)', style: AppTypography.caption),
+          Text('$formattedCost ${AppConstants.currency}', style: AppTypography.price),
+          Text('  (${rate.toInt()} ${AppConstants.currency}/h)', style: AppTypography.caption),
         ],
       ),
     );

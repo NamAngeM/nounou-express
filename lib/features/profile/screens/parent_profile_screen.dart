@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_page_header.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../data/providers/data_providers.dart';
 import '../widgets/stats_card.dart';
 
-class ParentProfileScreen extends StatefulWidget {
+class ParentProfileScreen extends ConsumerStatefulWidget {
   const ParentProfileScreen({super.key});
 
   @override
-  State<ParentProfileScreen> createState() => _ParentProfileScreenState();
+  ConsumerState<ParentProfileScreen> createState() =>
+      _ParentProfileScreenState();
 }
 
-class _ParentProfileScreenState extends State<ParentProfileScreen> {
+class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
   bool _isDarkMode = false;
 
   @override
@@ -114,22 +116,38 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
   }
 
   Widget _buildStatsRow() {
-    final stats = MockData.parentStats;
-    return Row(
-      children: [
-        Expanded(
-          child: StatsCard(value: stats["bookings"], label: "Réservations"),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: StatsCard(value: stats["avgRating"], label: "Note donnée"),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: StatsCard(value: stats["favorites"], label: "Favorites"),
-        ),
-      ],
-    );
+    return ref
+        .watch(parentStatsProvider)
+        .when(
+          data: (stats) => Row(
+            children: [
+              Expanded(
+                child: StatsCard(
+                  value: stats["bookings"],
+                  label: "Réservations",
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: StatsCard(
+                  value: stats["avgRating"],
+                  label: "Note donnée",
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: StatsCard(value: stats["favorites"], label: "Favorites"),
+              ),
+            ],
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Text(
+            "Impossible de charger les statistiques",
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        );
   }
 
   Widget _buildMenuSection() {

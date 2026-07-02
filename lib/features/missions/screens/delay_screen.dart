@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../data/models/mission_model.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../data/providers/data_providers.dart';
 
 // ── Mode enum ─────────────────────────────────────────────────────────────────
 enum _DelayMode { nannyMode, parentMode }
 
-class DelayScreen extends StatefulWidget {
+class DelayScreen extends ConsumerStatefulWidget {
   final String missionId;
   final double hourlyRate;
 
@@ -20,25 +22,14 @@ class DelayScreen extends StatefulWidget {
   });
 
   @override
-  State<DelayScreen> createState() => _DelayScreenState();
+  ConsumerState<DelayScreen> createState() => _DelayScreenState();
 }
 
-class _DelayScreenState extends State<DelayScreen> {
+class _DelayScreenState extends ConsumerState<DelayScreen> {
   _DelayMode _mode = _DelayMode.nannyMode;
   int? _selectedMinutes;
   String? _parentChoice; // 'en_route' | 'bloque'
   bool _showDurationSelector = false;
-
-  late MissionModel _mission;
-
-  @override
-  void initState() {
-    super.initState();
-    _mission = mockMissions.firstWhere(
-      (m) => m.id == widget.missionId,
-      orElse: () => mockMissions.first,
-    );
-  }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -47,8 +38,8 @@ class _DelayScreenState extends State<DelayScreen> {
     return (hours * widget.hourlyRate).toInt();
   }
 
-  int _plannedCostFcfa() {
-    return (_mission.plannedHours * widget.hourlyRate).ceil().toInt();
+  int _plannedCostFcfa(MissionModel mission) {
+    return (mission.plannedHours * widget.hourlyRate).ceil().toInt();
   }
 
   String _minutesLabel(int minutes) {
@@ -66,11 +57,9 @@ class _DelayScreenState extends State<DelayScreen> {
     return amount.toString();
   }
 
-  String _plannedEndTime() => _mission.endTime;
-
-  int _minutesLate() {
+  int _minutesLate(MissionModel mission) {
     final now = DateTime.now();
-    final parts = _mission.endTime.split(':');
+    final parts = mission.endTime.split(':');
     final planned = DateTime(
       now.year,
       now.month,
@@ -86,36 +75,43 @@ class _DelayScreenState extends State<DelayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final missionAsync = ref.watch(missionByIdProvider(widget.missionId));
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
-      body: Column(
-        children: [
-          _buildModeToggle(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.lg,
-                vertical: AppSpacing.md,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildHeaderWarningCard(),
-                  const SizedBox(height: AppSpacing.lg),
-                  _mode == _DelayMode.nannyMode
-                      ? _buildNannyBody()
-                      : _buildParentBody(),
-                  const SizedBox(height: AppSpacing.lg),
-                  if (_selectedMinutes != null) _buildCostBreakdown(),
-                  const SizedBox(height: AppSpacing.lg),
-                  _buildEmergencyOption(),
-                  const SizedBox(height: AppSpacing.xxxl),
-                ],
+      body: missionAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(
+          child: Text('Mission introuvable', style: AppTypography.bodyMedium),
+        ),
+        data: (mission) => Column(
+          children: [
+            _buildModeToggle(),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildHeaderWarningCard(mission),
+                    const SizedBox(height: AppSpacing.lg),
+                    _mode == _DelayMode.nannyMode
+                        ? _buildNannyBody(mission)
+                        : _buildParentBody(mission),
+                    const SizedBox(height: AppSpacing.lg),
+                    if (_selectedMinutes != null) _buildCostBreakdown(mission),
+                    const SizedBox(height: AppSpacing.lg),
+                    _buildEmergencyOption(),
+                    const SizedBox(height: AppSpacing.xxxl),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -204,14 +200,15 @@ class _DelayScreenState extends State<DelayScreen> {
 
   // ── Header warning card ──────────────────────────────────────────────────────
 
-  Widget _buildHeaderWarningCard() {
+  Widget _buildHeaderWarningCard(MissionModel mission) {
     final isNanny = _mode == _DelayMode.nannyMode;
     final title = isNanny
         ? "L'heure de fin prévue est dépassée"
         : 'Vous êtes en retard !';
     final subtitle = isNanny
-        ? 'Heure de fin prévue : ${_plannedEndTime()}'
-        : 'Retard actuel : ${_minutesLate()} min — votre nounou attend';
+        ? 'Heure de fin prévue : ${mission.endTime}'
+        : 'Retard actuel : ${_minutesLate(mission)} min — '
+              'votre nounou attend';
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -256,7 +253,7 @@ class _DelayScreenState extends State<DelayScreen> {
 
   // ── Nanny body ───────────────────────────────────────────────────────────────
 
-  Widget _buildNannyBody() {
+  Widget _buildNannyBody(MissionModel mission) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -273,7 +270,7 @@ class _DelayScreenState extends State<DelayScreen> {
           height: 56,
           child: ElevatedButton.icon(
             onPressed: _selectedMinutes != null || _selectedMinutes == -1
-                ? _onNannySend
+                ? () => _onNannySend(mission)
                 : null,
             icon: const Icon(Icons.notifications_rounded, color: Colors.white),
             label: Text(
@@ -356,7 +353,7 @@ class _DelayScreenState extends State<DelayScreen> {
             ),
             if (extraCost != null)
               Text(
-                '+${_formatFcfa(extraCost)} FCFA',
+                '+${_formatFcfa(extraCost)} ${AppConstants.currency}',
                 style: AppTypography.labelLg.copyWith(color: AppColors.success),
               ),
           ],
@@ -365,7 +362,9 @@ class _DelayScreenState extends State<DelayScreen> {
     );
   }
 
-  void _onNannySend() {
+  Future<void> _onNannySend(MissionModel mission) async {
+    await _submitDelayRequest(mission, reason: 'autre');
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -383,7 +382,7 @@ class _DelayScreenState extends State<DelayScreen> {
 
   // ── Parent body ──────────────────────────────────────────────────────────────
 
-  Widget _buildParentBody() {
+  Widget _buildParentBody(MissionModel mission) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -409,7 +408,7 @@ class _DelayScreenState extends State<DelayScreen> {
         ),
         if (_parentChoice == 'en_route' && _showDurationSelector) ...[
           const SizedBox(height: AppSpacing.lg),
-          _buildParentDurationSelector(),
+          _buildParentDurationSelector(mission),
         ],
         if (_parentChoice == 'bloque') ...[
           const SizedBox(height: AppSpacing.lg),
@@ -482,7 +481,7 @@ class _DelayScreenState extends State<DelayScreen> {
     );
   }
 
-  Widget _buildParentDurationSelector() {
+  Widget _buildParentDurationSelector(MissionModel mission) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
@@ -522,7 +521,7 @@ class _DelayScreenState extends State<DelayScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                'Soit +${_formatFcfa(_extraCostFcfa(_selectedMinutes!))} FCFA supplémentaires',
+                'Soit +${_formatFcfa(_extraCostFcfa(_selectedMinutes!))} ${AppConstants.currency} supplémentaires',
                 style: AppTypography.labelLg.copyWith(color: AppColors.warning),
               ),
             ),
@@ -532,7 +531,9 @@ class _DelayScreenState extends State<DelayScreen> {
             width: double.infinity,
             height: 52,
             child: ElevatedButton.icon(
-              onPressed: _selectedMinutes != null ? _onParentConfirm : null,
+              onPressed: _selectedMinutes != null
+                  ? () => _onParentConfirm(mission)
+                  : null,
               icon: const Icon(Icons.send_rounded, color: Colors.white),
               label: Text(
                 'Confirmer et notifier la nounou',
@@ -553,7 +554,9 @@ class _DelayScreenState extends State<DelayScreen> {
     );
   }
 
-  void _onParentConfirm() {
+  Future<void> _onParentConfirm(MissionModel mission) async {
+    await _submitDelayRequest(mission, reason: 'en_route');
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -620,14 +623,41 @@ class _DelayScreenState extends State<DelayScreen> {
     );
   }
 
+  // ── Mutation ─────────────────────────────────────────────────────────────────
+
+  /// Persiste la demande de retard sur la mission (statut `delayed` +
+  /// ajout d'un [DelayRequest]) puis rafraîchit les providers.
+  Future<void> _submitDelayRequest(
+    MissionModel mission, {
+    required String reason,
+  }) async {
+    final minutes = (_selectedMinutes != null && _selectedMinutes! > 0)
+        ? _selectedMinutes!
+        : 0;
+    final updated = mission.copyWith(
+      status: MissionStatus.delayed,
+      delayRequests: [
+        ...mission.delayRequests,
+        DelayRequest(
+          requestedAt: DateTime.now(),
+          minutesRequested: minutes,
+          reason: reason,
+        ),
+      ],
+    );
+    await ref.read(missionRepositoryProvider).updateMission(updated);
+    ref.invalidate(missionByIdProvider(widget.missionId));
+    ref.invalidate(missionsProvider);
+  }
+
   // ── Cost breakdown ───────────────────────────────────────────────────────────
 
-  Widget _buildCostBreakdown() {
-    final plannedCost = _plannedCostFcfa();
+  Widget _buildCostBreakdown(MissionModel mission) {
+    final plannedCost = _plannedCostFcfa(mission);
     final hasExtra = _selectedMinutes != null && _selectedMinutes! > 0;
     final extraCost = hasExtra ? _extraCostFcfa(_selectedMinutes!) : 0;
     final totalCost = plannedCost + extraCost;
-    final plannedH = _mission.plannedHours
+    final plannedH = mission.plannedHours
         .toStringAsFixed(1)
         .replaceAll('.0', '');
 
@@ -648,14 +678,14 @@ class _DelayScreenState extends State<DelayScreen> {
           const SizedBox(height: AppSpacing.md),
           _costRow(
             label: 'Heures prévues : ${plannedH}h',
-            value: '${_formatFcfa(plannedCost)} FCFA',
+            value: '${_formatFcfa(plannedCost)} ${AppConstants.currency}',
             valueColor: AppColors.textPrimary,
           ),
           if (hasExtra) ...[
             const SizedBox(height: AppSpacing.sm),
             _costRow(
               label: 'Prolongation : +${_minutesLabel(_selectedMinutes!)}',
-              value: '+${_formatFcfa(extraCost)} FCFA',
+              value: '+${_formatFcfa(extraCost)} ${AppConstants.currency}',
               valueColor: AppColors.warning,
             ),
           ],
@@ -664,7 +694,7 @@ class _DelayScreenState extends State<DelayScreen> {
           const SizedBox(height: AppSpacing.md),
           _costRow(
             label: 'Total estimé',
-            value: '${_formatFcfa(totalCost)} FCFA',
+            value: '${_formatFcfa(totalCost)} ${AppConstants.currency}',
             valueColor: AppColors.primary,
             isBold: true,
           ),

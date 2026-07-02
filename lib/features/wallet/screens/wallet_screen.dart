@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -91,7 +92,7 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            "45 250 FCFA",
+            "45 250 ${AppConstants.currency}",
             style: AppTypography.h1.copyWith(
               color: Colors.white,
               fontSize: 40,
@@ -405,7 +406,7 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
           ),
           const SizedBox(height: 8),
           Text(
-            "Solde disponible : 45 250 FCFA",
+            "Solde disponible : 45 250 ${AppConstants.currency}",
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.textTertiary,
             ),
@@ -426,7 +427,7 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
                 fontWeight: FontWeight.w900,
               ),
               border: InputBorder.none,
-              suffixText: "FCFA",
+              suffixText: AppConstants.currency,
               suffixStyle: AppTypography.h4.copyWith(
                 color: AppColors.textTertiary,
                 fontWeight: FontWeight.bold,

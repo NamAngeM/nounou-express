@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -7,20 +8,20 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/nanny_card.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 import '../widgets/filter_bottom_sheet.dart';
 
 const _mockDistances = [1.2, 0.8, 2.5, 1.9, 3.1, 0.5, 4.2, 2.1, 1.7, 3.8];
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
   String _query = '';
   SearchFilters _filters = const SearchFilters();
@@ -35,15 +36,15 @@ class _SearchScreenState extends State<SearchScreen> {
   String _quartierOf(NannyModel n) =>
       n.quartier.isNotEmpty ? n.quartier : 'Libreville';
 
-  double _distanceOf(NannyModel n) {
-    final i = MockData.nannies.indexOf(n).clamp(0, _mockDistances.length - 1);
+  double _distanceOf(List<NannyModel> all, NannyModel n) {
+    final i = all.indexOf(n).clamp(0, _mockDistances.length - 1);
     return _mockDistances[i];
   }
 
-  List<NannyModel> get _results {
+  List<NannyModel> _results(List<NannyModel> all) {
     final q = _query.toLowerCase().trim();
 
-    var list = MockData.nannies.where((n) {
+    var list = all.where((n) {
       final quartier = _quartierOf(n);
 
       // Text search (name or quartier)
@@ -98,7 +99,9 @@ class _SearchScreenState extends State<SearchScreen> {
     // Sort
     switch (_sortBy) {
       case SortOption.distance:
-        list.sort((a, b) => _distanceOf(a).compareTo(_distanceOf(b)));
+        list.sort(
+          (a, b) => _distanceOf(all, a).compareTo(_distanceOf(all, b)),
+        );
       case SortOption.prixCroissant:
         list.sort((a, b) => a.hourlyRate.compareTo(b.hourlyRate));
       case SortOption.prixDecroissant:
@@ -119,68 +122,22 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final results = _results;
+    final nanniesAsync = ref.watch(nanniesProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
-      body: Column(
-        children: [
-          _buildCountAndSort(results.length),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async => await Future.delayed(1.seconds),
-              color: AppColors.primary,
-              child: results.isEmpty
-                  ? SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics(),
-                      ),
-                      child: EmptyState(
-                        icon: Icons.search_off_rounded,
-                        title: 'Aucune nounou trouvée',
-                        description:
-                            'Essayez de modifier vos filtres ou d\'élargir votre recherche.',
-                        actionLabel: 'Réinitialiser les filtres',
-                        onAction: () => setState(() {
-                          _filters = const SearchFilters();
-                          _query = '';
-                          _controller.clear();
-                        }),
-                      ),
-                    )
-                  : ListView.separated(
-                      physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics(),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.xl,
-                        AppSpacing.md,
-                        AppSpacing.xl,
-                        100,
-                      ),
-                      itemCount: results.length,
-                      separatorBuilder: (_, _) =>
-                          const SizedBox(height: AppSpacing.md),
-                      itemBuilder: (context, index) {
-                        final n = results[index];
-                        return NannyCard(
-                              nannyId: n.id,
-                              name: n.name,
-                              quartier: _quartierOf(n),
-                              rating: n.rating,
-                              hourlyRate: n.hourlyRate,
-                              distanceKm: _distanceOf(n),
-                              isVerified: n.isVerified,
-                            )
-                            .animate()
-                            .fadeIn(delay: (index * 50).ms, duration: 400.ms)
-                            .slideX(begin: 0.1, end: 0);
-                      },
-                    ),
-            ),
-          ),
-        ],
+      body: nanniesAsync.when(
+        data: (nannies) => _buildResults(nannies),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => EmptyState(
+          icon: Icons.error_outline_rounded,
+          title: 'Erreur de chargement',
+          description:
+              'Impossible de charger les nounous. Vérifiez votre connexion.',
+          actionLabel: 'Réessayer',
+          onAction: () => ref.invalidate(nanniesProvider),
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/search/map'),
@@ -196,6 +153,69 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildResults(List<NannyModel> nannies) {
+    final results = _results(nannies);
+
+    return Column(
+      children: [
+        _buildCountAndSort(results.length),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () => ref.refresh(nanniesProvider.future),
+            color: AppColors.primary,
+            child: results.isEmpty
+                ? SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    child: EmptyState(
+                      icon: Icons.search_off_rounded,
+                      title: 'Aucune nounou trouvée',
+                      description:
+                          'Essayez de modifier vos filtres ou d\'élargir votre recherche.',
+                      actionLabel: 'Réinitialiser les filtres',
+                      onAction: () => setState(() {
+                        _filters = const SearchFilters();
+                        _query = '';
+                        _controller.clear();
+                      }),
+                    ),
+                  )
+                : ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.xl,
+                      AppSpacing.md,
+                      AppSpacing.xl,
+                      100,
+                    ),
+                    itemCount: results.length,
+                    separatorBuilder: (_, _) =>
+                        const SizedBox(height: AppSpacing.md),
+                    itemBuilder: (context, index) {
+                      final n = results[index];
+                      return NannyCard(
+                            nannyId: n.id,
+                            name: n.name,
+                            quartier: _quartierOf(n),
+                            rating: n.rating,
+                            hourlyRate: n.hourlyRate,
+                            distanceKm: _distanceOf(nannies, n),
+                            isVerified: n.isVerified,
+                          )
+                          .animate()
+                          .fadeIn(delay: (index * 50).ms, duration: 400.ms)
+                          .slideX(begin: 0.1, end: 0);
+                    },
+                  ),
+          ),
+        ),
+      ],
     );
   }
 

@@ -1,55 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../data/models/application_model.dart';
 import '../../../data/models/mission_model.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../data/providers/data_providers.dart';
 
 // ── Sort options ──────────────────────────────────────────────────────────────
 enum _SortOption { rating, price, speed }
 
 // ── Screen ────────────────────────────────────────────────────────────────────
-class CandidaturesScreen extends StatefulWidget {
+class CandidaturesScreen extends ConsumerStatefulWidget {
   final String missionId;
 
   const CandidaturesScreen({super.key, required this.missionId});
 
   @override
-  State<CandidaturesScreen> createState() => _CandidaturesScreenState();
+  ConsumerState<CandidaturesScreen> createState() =>
+      _CandidaturesScreenState();
 }
 
-class _CandidaturesScreenState extends State<CandidaturesScreen> {
-  late List<ApplicationModel> _applications;
-  MissionModel? _mission;
+class _CandidaturesScreenState extends ConsumerState<CandidaturesScreen> {
   _SortOption _sortOption = _SortOption.rating;
 
-  @override
-  void initState() {
-    super.initState();
-    _mission = mockMissions.where((m) => m.id == widget.missionId).firstOrNull;
-    _applications = mockApplications
-        .where((a) => a.missionId == widget.missionId)
-        .toList();
-    _sort();
-  }
+  // État UI transitoire : surcouche locale sur les données des providers
+  // (le repository n'expose pas encore de mutation sur les candidatures).
+  String? _acceptedApplicationId;
+  final Set<String> _rejectedApplicationIds = {};
 
-  void _sort() {
+  List<ApplicationModel> _visibleApplications(List<ApplicationModel> all) {
+    final applications = all
+        .where((a) => !_rejectedApplicationIds.contains(a.id))
+        .map(
+          (a) => a.id == _acceptedApplicationId
+              ? a.copyWith(status: ApplicationStatus.accepted)
+              : a,
+        )
+        .toList();
     switch (_sortOption) {
       case _SortOption.rating:
-        _applications.sort((a, b) => b.nannyRating.compareTo(a.nannyRating));
+        applications.sort((a, b) => b.nannyRating.compareTo(a.nannyRating));
       case _SortOption.price:
-        _applications.sort((a, b) => a.hourlyRate.compareTo(b.hourlyRate));
+        applications.sort((a, b) => a.hourlyRate.compareTo(b.hourlyRate));
       case _SortOption.speed:
-        _applications.sort((a, b) => a.appliedAt.compareTo(b.appliedAt));
+        applications.sort((a, b) => a.appliedAt.compareTo(b.appliedAt));
     }
+    return applications;
   }
 
   void _setSortOption(_SortOption option) {
-    setState(() {
-      _sortOption = option;
-      _sort();
-    });
+    setState(() => _sortOption = option);
   }
 
   void _acceptApplication(ApplicationModel app) async {
@@ -91,14 +93,18 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
     );
 
     if (confirmed == true && mounted) {
-      setState(() {
-        final index = _applications.indexWhere((a) => a.id == app.id);
-        if (index != -1) {
-          _applications[index] = _applications[index].copyWith(
-            status: ApplicationStatus.accepted,
-          );
-        }
-      });
+      final mission = await ref.read(
+        missionByIdProvider(widget.missionId).future,
+      );
+      final updated = mission.copyWith(
+        status: MissionStatus.confirmed,
+        selectedNannyId: app.nannyId,
+      );
+      await ref.read(missionRepositoryProvider).updateMission(updated);
+      ref.invalidate(missionByIdProvider(widget.missionId));
+      ref.invalidate(missionsProvider);
+      if (!mounted) return;
+      setState(() => _acceptedApplicationId = app.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -133,7 +139,10 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
 
   void _rejectApplication(ApplicationModel app) {
     setState(() {
-      _applications.removeWhere((a) => a.id == app.id);
+      _rejectedApplicationIds.add(app.id);
+      if (_acceptedApplicationId == app.id) {
+        _acceptedApplicationId = null;
+      }
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -151,8 +160,8 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
   }
 
   // ── Widgets ───────────────────────────────────────────────────────────────
-  Widget _buildMissionSummaryCard() {
-    if (_mission == null) return const SizedBox.shrink();
+  Widget _buildMissionSummaryCard(MissionModel? mission) {
+    if (mission == null) return const SizedBox.shrink();
     return Container(
       margin: const EdgeInsets.fromLTRB(
         AppSpacing.xl,
@@ -178,15 +187,15 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: _mission!.isUrgent
+                  color: mission.isUrgent
                       ? AppColors.dangerSurface
                       : AppColors.accentSurface,
                   borderRadius: AppSpacing.chipBorderRadius,
                 ),
                 child: Text(
-                  _mission!.isUrgent ? 'Urgente' : 'Planifiée',
+                  mission.isUrgent ? 'Urgente' : 'Planifiée',
                   style: AppTypography.small.copyWith(
-                    color: _mission!.isUrgent
+                    color: mission.isUrgent
                         ? AppColors.danger
                         : AppColors.accent,
                     fontWeight: FontWeight.w600,
@@ -195,8 +204,8 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
               ),
               const Spacer(),
               Text(
-                '${_mission!.childrenSummary.length} enfant'
-                '${_mission!.childrenSummary.length > 1 ? 's' : ''}',
+                '${mission.childrenSummary.length} enfant'
+                '${mission.childrenSummary.length > 1 ? 's' : ''}',
                 style: AppTypography.caption,
               ),
             ],
@@ -212,7 +221,7 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(
-                  _mission!.address,
+                  mission.address,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textPrimary,
                   ),
@@ -232,7 +241,7 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
-                '${_mission!.startTime} – ${_mission!.endTime}',
+                '${mission.startTime} – ${mission.endTime}',
                 style: AppTypography.bodySmall,
               ),
               const SizedBox(width: AppSpacing.md),
@@ -243,9 +252,9 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
-                '${_mission!.date.day.toString().padLeft(2, '0')}/'
-                '${_mission!.date.month.toString().padLeft(2, '0')}/'
-                '${_mission!.date.year}',
+                '${mission.date.day.toString().padLeft(2, '0')}/'
+                '${mission.date.month.toString().padLeft(2, '0')}/'
+                '${mission.date.year}',
                 style: AppTypography.bodySmall,
               ),
             ],
@@ -359,6 +368,17 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mission = ref
+        .watch(missionByIdProvider(widget.missionId))
+        .asData
+        ?.value;
+    final applicationsAsync = ref.watch(
+      missionApplicationsProvider(widget.missionId),
+    );
+    final count = _visibleApplications(
+      applicationsAsync.asData?.value ?? const [],
+    ).length;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -377,8 +397,8 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
           children: [
             Text('Candidatures', style: AppTypography.h4),
             Text(
-              '${_applications.length} candidature'
-              '${_applications.length > 1 ? 's' : ''}',
+              '$count candidature'
+              '${count > 1 ? 's' : ''}',
               style: AppTypography.caption,
             ),
           ],
@@ -388,38 +408,52 @@ class _CandidaturesScreenState extends State<CandidaturesScreen> {
           child: Divider(height: 1, color: AppColors.border),
         ),
       ),
-      body: _applications.isEmpty
-          ? Column(
-              children: [
-                _buildMissionSummaryCard(),
-                Expanded(child: _buildEmptyState()),
-              ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildMissionSummaryCard(),
-                _buildSortRow(),
-                Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.xl,
-                      AppSpacing.sm,
-                      AppSpacing.xl,
-                      AppSpacing.xl,
+      body: applicationsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(
+          child: Text(
+            'Erreur de chargement des candidatures',
+            style: AppTypography.bodyMedium,
+          ),
+        ),
+        data: (allApplications) {
+          final applications = _visibleApplications(allApplications);
+          return applications.isEmpty
+              ? Column(
+                  children: [
+                    _buildMissionSummaryCard(mission),
+                    Expanded(child: _buildEmptyState()),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildMissionSummaryCard(mission),
+                    _buildSortRow(),
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.xl,
+                          AppSpacing.sm,
+                          AppSpacing.xl,
+                          AppSpacing.xl,
+                        ),
+                        itemCount: applications.length,
+                        separatorBuilder: (_, _) =>
+                            const SizedBox(height: AppSpacing.md),
+                        itemBuilder: (ctx, i) => _ApplicationCard(
+                          application: applications[i],
+                          onAccept: () =>
+                              _acceptApplication(applications[i]),
+                          onReject: () =>
+                              _rejectApplication(applications[i]),
+                        ),
+                      ),
                     ),
-                    itemCount: _applications.length,
-                    separatorBuilder: (_, _) =>
-                        const SizedBox(height: AppSpacing.md),
-                    itemBuilder: (ctx, i) => _ApplicationCard(
-                      application: _applications[i],
-                      onAccept: () => _acceptApplication(_applications[i]),
-                      onReject: () => _rejectApplication(_applications[i]),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                  ],
+                );
+        },
+      ),
     );
   }
 }
@@ -607,7 +641,7 @@ class _ApplicationCard extends StatelessWidget {
                       _buildStars(application.nannyRating),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        '${application.hourlyRate.toInt()} FCFA/h',
+                        '${application.hourlyRate.toInt()} ${AppConstants.currency}/h',
                         style: AppTypography.labelMd.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w700,

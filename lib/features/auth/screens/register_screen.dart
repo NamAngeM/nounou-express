@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/router/app_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -36,14 +38,14 @@ class _Reference {
 }
 
 // ── Main Screen ───────────────────────────────────────────────────────────────
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   String role = 'parent';
   int _currentStep = 0;
   final _scrollController = ScrollController();
@@ -309,8 +311,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _onSubmit() async {
-    await setUserRole(role);
-    await setAuthenticated(true);
+    await ref.read(authProvider.notifier).signIn(role: role);
     if (mounted) context.go('/home');
   }
 
@@ -1511,12 +1512,12 @@ class _Slider extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${value.round()} FCFA/h',
+              '${value.round()} ${AppConstants.currency}/h',
               style: AppTypography.h3.copyWith(color: AppColors.primary),
             ),
             if (showEstimate)
               Text(
-                '4h = ${(value * 4).round()} FCFA',
+                '4h = ${(value * 4).round()} ${AppConstants.currency}',
                 style: AppTypography.caption,
               ),
           ],
@@ -1533,8 +1534,8 @@ class _Slider extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('${min.round()} FCFA', style: AppTypography.caption),
-            Text('${max.round()} FCFA', style: AppTypography.caption),
+            Text('${min.round()} ${AppConstants.currency}', style: AppTypography.caption),
+            Text('${max.round()} ${AppConstants.currency}', style: AppTypography.caption),
           ],
         ),
       ],

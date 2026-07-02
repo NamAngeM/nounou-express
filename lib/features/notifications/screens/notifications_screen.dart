@@ -1,53 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_page_header.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../data/models/notification_model.dart';
+import '../../../data/providers/data_providers.dart';
 import '../widgets/notification_tile.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  late List<NotificationModel> _notifications;
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  /// Suppressions locales (swipe) : le repository n'expose pas encore de
+  /// méthode de suppression, on filtre donc côté écran.
+  final Set<String> _deletedIds = {};
 
-  @override
-  void initState() {
-    super.initState();
-    _notifications = List.from(MockData.notifications);
-  }
-
-  void _markAllAsRead() {
-    setState(() {
-      _notifications = _notifications
-          .map(
-            (n) => NotificationModel(
-              id: n.id,
-              userId: n.userId,
-              title: n.title,
-              body: n.body,
-              type: n.type,
-              isRead: true,
-              createdAt: n.createdAt,
-            ),
-          )
-          .toList();
-    });
+  Future<void> _markAllAsRead() async {
+    await ref.read(notificationRepositoryProvider).markAllAsRead();
+    ref.invalidate(notificationsProvider);
   }
 
   void _deleteNotification(String id) {
-    setState(() => _notifications.removeWhere((n) => n.id == id));
+    setState(() => _deletedIds.add(id));
   }
 
-  Map<String, List<NotificationModel>> _groupNotifications() {
+  Map<String, List<NotificationModel>> _groupNotifications(
+    List<NotificationModel> notifications,
+  ) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
@@ -60,7 +47,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       "Plus ancien": [],
     };
 
-    for (final n in _notifications) {
+    for (final n in notifications) {
       final date = DateTime(
         n.createdAt.year,
         n.createdAt.month,
@@ -82,8 +69,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final grouped = _groupNotifications();
-    final unread = _notifications.where((n) => !n.isRead).length;
+    final asyncNotifications = ref.watch(notificationsProvider);
+    final notifications = (asyncNotifications.valueOrNull ?? [])
+        .where((n) => !_deletedIds.contains(n.id))
+        .toList();
+    final unread = notifications.where((n) => !n.isRead).length;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -98,7 +88,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             icon: Icons.notifications_rounded,
             gradientColors: const [AppColors.primaryDark, AppColors.primary],
             actions: [
-              if (_notifications.any((n) => !n.isRead))
+              if (unread > 0)
                 _HeaderTextAction(label: 'Tout lire', onTap: _markAllAsRead),
             ],
           ),
@@ -106,22 +96,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           // ── Content ──────────────────────────────────────────────────────
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () async => await Future.delayed(1.seconds),
+              onRefresh: () => ref.refresh(notificationsProvider.future),
               color: AppColors.primary,
-              child: _notifications.isEmpty
-                  ? SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics(),
-                      ),
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        child: _buildEmptyState(),
-                      ),
-                    )
-                  : _buildList(grouped),
+              child: asyncNotifications.when(
+                data: (_) => notifications.isEmpty
+                    ? _buildScrollableEmptyState()
+                    : _buildList(_groupNotifications(notifications)),
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
+                error: (e, _) => _buildScrollableEmptyState(),
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildScrollableEmptyState() {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.6,
+        child: _buildEmptyState(),
       ),
     );
   }

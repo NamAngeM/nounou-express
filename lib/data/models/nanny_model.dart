@@ -29,4 +29,40 @@ class NannyModel extends UserModel {
     required this.bio,
     this.quartier = '',
   });
+
+  @override
+  Map<String, dynamic> toJson() => {
+    ...super.toJson(),
+    'experience': experience,
+    'hourlyRate': hourlyRate,
+    'rating': rating,
+    'totalMissions': totalMissions,
+    'badges': badges,
+    'skills': skills,
+    'isVerified': isVerified,
+    'bio': bio,
+    'quartier': quartier,
+  };
+
+  /// Désérialisation robuste : champs manquants → valeurs par défaut.
+  factory NannyModel.fromJson(Map<String, dynamic> json) => NannyModel(
+    id: json['id'] as String? ?? '',
+    name: json['name'] as String? ?? '',
+    email: json['email'] as String? ?? '',
+    phone: json['phone'] as String? ?? '',
+    role: json['role'] as String? ?? '',
+    avatar: json['avatar'] as String?,
+    createdAt:
+        DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+        DateTime.now(),
+    experience: (json['experience'] as num?)?.toInt() ?? 0,
+    hourlyRate: (json['hourlyRate'] as num?)?.toDouble() ?? 0,
+    rating: (json['rating'] as num?)?.toDouble() ?? 0,
+    totalMissions: (json['totalMissions'] as num?)?.toInt() ?? 0,
+    badges: (json['badges'] as List?)?.cast<String>() ?? const [],
+    skills: (json['skills'] as List?)?.cast<String>() ?? const [],
+    isVerified: json['isVerified'] as bool? ?? false,
+    bio: json['bio'] as String? ?? '',
+    quartier: json['quartier'] as String? ?? '',
+  );
 }

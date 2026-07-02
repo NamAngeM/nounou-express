@@ -33,6 +33,23 @@ class DelayRequest {
     if (minutesRequested <= 30) return 0.5;
     return (minutesRequested / 60).ceilToDouble();
   }
+
+  Map<String, dynamic> toJson() => {
+    'requestedAt': requestedAt.toIso8601String(),
+    'minutesRequested': minutesRequested,
+    'reason': reason,
+    'confirmedByNanny': confirmedByNanny,
+  };
+
+  /// Désérialisation robuste : champs manquants → valeurs par défaut.
+  factory DelayRequest.fromJson(Map<String, dynamic> json) => DelayRequest(
+    requestedAt:
+        DateTime.tryParse(json['requestedAt'] as String? ?? '') ??
+        DateTime.now(),
+    minutesRequested: (json['minutesRequested'] as num?)?.toInt() ?? 0,
+    reason: json['reason'] as String? ?? '',
+    confirmedByNanny: json['confirmedByNanny'] as bool? ?? false,
+  );
 }
 
 class MissionModel {
@@ -187,6 +204,96 @@ class MissionModel {
       now.day,
       int.parse(parts[0]),
       int.parse(parts[1]),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'parentId': parentId,
+    'parentName': parentName,
+    'parentPhotoUrl': parentPhotoUrl,
+    'address': address,
+    'locationType': locationType.name,
+    'accessInstructions': accessInstructions,
+    'lat': lat,
+    'lng': lng,
+    'date': date.toIso8601String(),
+    'startTime': startTime,
+    'endTime': endTime,
+    'isUrgent': isUrgent,
+    'childrenIds': childrenIds,
+    'childrenSummary': childrenSummary,
+    'notes': notes,
+    'needs': needs,
+    'hasPets': hasPets,
+    'petsDescription': petsDescription,
+    'paymentMethod': paymentMethod.name,
+    'maxBudgetPerHour': maxBudgetPerHour,
+    'status': status.name,
+    'selectedNannyId': selectedNannyId,
+    'applicantIds': applicantIds,
+    'publishedAt': publishedAt.toIso8601String(),
+    'actualStartTime': actualStartTime?.toIso8601String(),
+    'actualEndTime': actualEndTime?.toIso8601String(),
+    'delayRequests': delayRequests.map((e) => e.toJson()).toList(),
+    'hourlyRateSnapshot': hourlyRateSnapshot,
+  };
+
+  /// Désérialisation robuste : champs manquants → valeurs par défaut.
+  factory MissionModel.fromJson(Map<String, dynamic> json) {
+    final locationTypeName = json['locationType'] as String? ?? '';
+    final paymentMethodName = json['paymentMethod'] as String? ?? '';
+    final statusName = json['status'] as String? ?? '';
+    return MissionModel(
+      id: json['id'] as String? ?? '',
+      parentId: json['parentId'] as String? ?? '',
+      parentName: json['parentName'] as String? ?? '',
+      parentPhotoUrl: json['parentPhotoUrl'] as String? ?? '',
+      address: json['address'] as String? ?? '',
+      locationType: LocationType.values.firstWhere(
+        (v) => v.name == locationTypeName,
+        orElse: () => LocationType.home,
+      ),
+      accessInstructions: json['accessInstructions'] as String?,
+      lat: (json['lat'] as num?)?.toDouble(),
+      lng: (json['lng'] as num?)?.toDouble(),
+      date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
+      startTime: json['startTime'] as String? ?? '',
+      endTime: json['endTime'] as String? ?? '',
+      isUrgent: json['isUrgent'] as bool? ?? false,
+      childrenIds: (json['childrenIds'] as List?)?.cast<String>() ?? const [],
+      childrenSummary:
+          (json['childrenSummary'] as List?)?.cast<String>() ?? const [],
+      notes: json['notes'] as String?,
+      needs: (json['needs'] as List?)?.cast<String>() ?? const [],
+      hasPets: json['hasPets'] as bool? ?? false,
+      petsDescription: json['petsDescription'] as String?,
+      paymentMethod: PaymentMethod.values.firstWhere(
+        (v) => v.name == paymentMethodName,
+        orElse: () => PaymentMethod.cash,
+      ),
+      maxBudgetPerHour: (json['maxBudgetPerHour'] as num?)?.toDouble(),
+      status: MissionStatus.values.firstWhere(
+        (v) => v.name == statusName,
+        orElse: () => MissionStatus.pending,
+      ),
+      selectedNannyId: json['selectedNannyId'] as String?,
+      applicantIds: (json['applicantIds'] as List?)?.cast<String>() ?? const [],
+      publishedAt:
+          DateTime.tryParse(json['publishedAt'] as String? ?? '') ??
+          DateTime.now(),
+      actualStartTime: json['actualStartTime'] == null
+          ? null
+          : DateTime.tryParse(json['actualStartTime'] as String? ?? ''),
+      actualEndTime: json['actualEndTime'] == null
+          ? null
+          : DateTime.tryParse(json['actualEndTime'] as String? ?? ''),
+      delayRequests:
+          (json['delayRequests'] as List?)
+              ?.map((e) => DelayRequest.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      hourlyRateSnapshot: (json['hourlyRateSnapshot'] as num?)?.toDouble(),
     );
   }
 }

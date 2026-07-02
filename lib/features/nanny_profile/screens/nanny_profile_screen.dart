@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/rating_stars.dart';
 import '../../../core/widgets/avatar_widget.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 
 // ─────────────────────────────────────── Mock helpers ──
 
@@ -96,38 +98,37 @@ class _SkillStyle {
 
 // ─────────────────────────────────────── Screen ──
 
-class NannyProfileScreen extends StatefulWidget {
+class NannyProfileScreen extends ConsumerStatefulWidget {
   final String nannyId;
   const NannyProfileScreen({super.key, required this.nannyId});
 
   @override
-  State<NannyProfileScreen> createState() => _NannyProfileScreenState();
+  ConsumerState<NannyProfileScreen> createState() =>
+      _NannyProfileScreenState();
 }
 
-class _NannyProfileScreenState extends State<NannyProfileScreen> {
+class _NannyProfileScreenState extends ConsumerState<NannyProfileScreen> {
   bool _isFavorite = false;
-
-  NannyModel? get _nanny {
-    try {
-      return MockData.nannies.firstWhere((n) => n.id == widget.nannyId);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  String get _quartier =>
-      _nanny?.quartier.isNotEmpty == true ? _nanny!.quartier : 'Libreville';
 
   @override
   Widget build(BuildContext context) {
-    final nanny = _nanny;
-    if (nanny == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: Text('Nounou introuvable')),
-      );
-    }
+    return ref
+        .watch(nannyByIdProvider(widget.nannyId))
+        .when(
+          data: _buildProfile,
+          loading: () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          ),
+          // L'état error couvre aussi le cas « nounou introuvable ».
+          error: (e, _) => Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: Text('Nounou introuvable')),
+          ),
+        );
+  }
 
+  Widget _buildProfile(NannyModel nanny) {
+    final quartier = nanny.quartier.isNotEmpty ? nanny.quartier : 'Libreville';
     final reviews = _mockReviews(nanny);
     final memberSince = DateTime.now().subtract(
       Duration(days: (nanny.experience * 365).round()),
@@ -144,7 +145,7 @@ class _NannyProfileScreenState extends State<NannyProfileScreen> {
               children: [
                 _InfoSection(
                       nanny: nanny,
-                      quartier: _quartier,
+                      quartier: quartier,
                       memberSince: memberSince,
                     )
                     .animate()
@@ -506,7 +507,7 @@ class _TarifCard extends StatelessWidget {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: '${hourlyRate.toStringAsFixed(0)} FCFA',
+                          text: '${hourlyRate.toStringAsFixed(0)} ${AppConstants.currency}',
                           style: AppTypography.h2.copyWith(color: Colors.white),
                         ),
                         TextSpan(
@@ -520,7 +521,7 @@ class _TarifCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Tarif de nuit : $nightRate FCFA/h',
+                    'Tarif de nuit : $nightRate ${AppConstants.currency}/h',
                     style: AppTypography.small.copyWith(
                       color: Colors.white.withValues(alpha: 0.85),
                     ),
@@ -1018,7 +1019,7 @@ class _BottomBookingBar extends StatelessWidget {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: '${nanny.hourlyRate.toStringAsFixed(0)} FCFA',
+                      text: '${nanny.hourlyRate.toStringAsFixed(0)} ${AppConstants.currency}',
                       style: AppTypography.h3.copyWith(
                         color: AppColors.primary,
                       ),

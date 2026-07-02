@@ -1,39 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_page_header.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../data/models/conversation_model.dart';
+import '../../../data/providers/data_providers.dart';
 import '../widgets/conversation_tile.dart';
 
-class ConversationsScreen extends StatefulWidget {
+class ConversationsScreen extends ConsumerStatefulWidget {
   const ConversationsScreen({super.key});
 
   @override
-  State<ConversationsScreen> createState() => _ConversationsScreenState();
+  ConsumerState<ConversationsScreen> createState() =>
+      _ConversationsScreenState();
 }
 
-class _ConversationsScreenState extends State<ConversationsScreen> {
-  late List<ConversationModel> _conversations;
-
-  @override
-  void initState() {
-    super.initState();
-    _conversations = List.from(MockData.conversations);
-  }
+class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
+  /// Suppressions/archivages locaux (mock assumé : pas encore persistés).
+  final Set<String> _removedIds = {};
 
   void _removeConversation(String id) {
     setState(() {
-      _conversations.removeWhere((c) => c.id == id);
+      _removedIds.add(id);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final unread = _conversations.where((c) => c.unreadCount > 0).length;
+    final conversationsAsync = ref.watch(conversationsProvider);
+    final conversations = (conversationsAsync.valueOrNull ??
+            const <ConversationModel>[])
+        .where((c) => !_removedIds.contains(c.id))
+        .toList();
+    final unread = conversations.where((c) => c.unreadCount > 0).length;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -52,20 +54,32 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
 
           // ── Content ──────────────────────────────────────────────────────
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async => await Future.delayed(1.seconds),
-              color: AppColors.accent,
-              child: _conversations.isEmpty
-                  ? SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics(),
-                      ),
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        child: _buildEmptyState(context),
-                      ),
-                    )
-                  : _buildConversationsList(),
+            child: conversationsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(
+                child: Text(
+                  'Impossible de charger les conversations.',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              data: (_) => RefreshIndicator(
+                onRefresh: () => ref.refresh(conversationsProvider.future),
+                color: AppColors.accent,
+                child: conversations.isEmpty
+                    ? SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: _buildEmptyState(context),
+                        ),
+                      )
+                    : _buildConversationsList(conversations),
+              ),
             ),
           ),
         ],
@@ -73,12 +87,12 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     );
   }
 
-  Widget _buildConversationsList() {
+  Widget _buildConversationsList(List<ConversationModel> conversations) {
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
-      itemCount: _conversations.length,
+      itemCount: conversations.length,
       separatorBuilder: (context, index) => Divider(
         height: 1,
         indent: AppSpacing.lg + 56 + AppSpacing.md,
@@ -86,7 +100,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
         color: AppColors.border,
       ),
       itemBuilder: (context, index) {
-        final conversation = _conversations[index];
+        final conversation = conversations[index];
         return ConversationTile(
               conversation: conversation,
               onDelete: () => _removeConversation(conversation.id),

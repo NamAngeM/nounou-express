@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/avatar_widget.dart';
 import '../../../core/widgets/rating_stars.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 
 const _mockQuartiers = [
   'Akanda',
@@ -24,188 +26,215 @@ const _mockQuartiers = [
 
 const _mockDistances = [1.2, 0.8, 2.5, 1.9, 3.1, 0.5, 4.2, 2.1, 1.7, 3.8];
 
-class MapScreen extends StatelessWidget {
+class MapScreen extends ConsumerWidget {
   const MapScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nanniesAsync = ref.watch(nanniesProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          // ── Map placeholder ──────────────────────────────────────────
-          _MapPlaceholder(),
+      body: nanniesAsync.when(
+        data: (nannies) => _MapBody(nannies: nannies),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Text(
+              'Impossible de charger les nounous.\n$e',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
-          // ── Top bar ─────────────────────────────────────────────────
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Row(
-                children: [
-                  // Back / Liste button
-                  GestureDetector(
-                    onTap: () => context.canPop()
-                        ? context.pop()
-                        : context.go('/search'),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.lg,
-                        vertical: AppSpacing.sm,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.badgeRadius,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.secondary.withValues(alpha: 0.12),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.list_rounded,
-                            size: 18,
-                            color: AppColors.textPrimary,
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            'Liste',
-                            style: AppTypography.bodyMedium.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  // Result count chip
-                  Container(
+class _MapBody extends StatelessWidget {
+  final List<NannyModel> nannies;
+  const _MapBody({required this.nannies});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // ── Map placeholder ──────────────────────────────────────────
+        _MapPlaceholder(),
+
+        // ── Top bar ─────────────────────────────────────────────────
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Row(
+              children: [
+                // Back / Liste button
+                GestureDetector(
+                  onTap: () => context.canPop()
+                      ? context.pop()
+                      : context.go('/search'),
+                  child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.lg,
                       vertical: AppSpacing.sm,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(
                         AppSpacing.badgeRadius,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.secondary.withValues(alpha: 0.12),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      '${MockData.nannies.length} nounous',
-                      style: AppTypography.caption.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.list_rounded,
+                          size: 18,
+                          color: AppColors.textPrimary,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          'Liste',
+                          style: AppTypography.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                // Result count chip
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.badgeRadius,
+                    ),
+                  ),
+                  child: Text(
+                    '${nannies.length} nounous',
+                    style: AppTypography.caption.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // ── Draggable bottom sheet ───────────────────────────────────
+        DraggableScrollableSheet(
+          initialChildSize: 0.38,
+          minChildSize: 0.18,
+          maxChildSize: 0.82,
+          snap: true,
+          snapSizes: const [0.18, 0.38, 0.82],
+          builder: (context, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x18000000),
+                    blurRadius: 20,
+                    offset: Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Handle
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: AppSpacing.md,
+                      bottom: AppSpacing.sm,
+                    ),
+                    child: Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
+                    ),
+                  ),
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xl,
+                    ),
+                    child: Row(
+                      children: [
+                        Text('Nounous à proximité', style: AppTypography.h3),
+                        const Spacer(),
+                        const Icon(
+                          Icons.keyboard_arrow_up_rounded,
+                          color: AppColors.textSecondary,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  // List
+                  Expanded(
+                    child: ListView.separated(
+                      controller: scrollController,
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.xl,
+                        AppSpacing.sm,
+                        AppSpacing.xl,
+                        AppSpacing.xxxl,
+                      ),
+                      itemCount: nannies.length,
+                      separatorBuilder: (_, _) =>
+                          const SizedBox(height: AppSpacing.sm),
+                      itemBuilder: (context, index) {
+                        final n = nannies[index];
+                        final quartier =
+                            _mockQuartiers[index.clamp(
+                              0,
+                              _mockQuartiers.length - 1,
+                            )];
+                        final distance =
+                            _mockDistances[index.clamp(
+                              0,
+                              _mockDistances.length - 1,
+                            )];
+                        return _NannyMapCard(
+                          nanny: n,
+                          quartier: quartier,
+                          distance: distance,
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-
-          // ── Draggable bottom sheet ───────────────────────────────────
-          DraggableScrollableSheet(
-            initialChildSize: 0.38,
-            minChildSize: 0.18,
-            maxChildSize: 0.82,
-            snap: true,
-            snapSizes: const [0.18, 0.38, 0.82],
-            builder: (context, scrollController) {
-              return Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x18000000),
-                      blurRadius: 20,
-                      offset: Offset(0, -4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    // Handle
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        top: AppSpacing.md,
-                        bottom: AppSpacing.sm,
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Header
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xl,
-                      ),
-                      child: Row(
-                        children: [
-                          Text('Nounous à proximité', style: AppTypography.h3),
-                          const Spacer(),
-                          const Icon(
-                            Icons.keyboard_arrow_up_rounded,
-                            color: AppColors.textSecondary,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    // List
-                    Expanded(
-                      child: ListView.separated(
-                        controller: scrollController,
-                        padding: const EdgeInsets.fromLTRB(
-                          AppSpacing.xl,
-                          AppSpacing.sm,
-                          AppSpacing.xl,
-                          AppSpacing.xxxl,
-                        ),
-                        itemCount: MockData.nannies.length,
-                        separatorBuilder: (_, _) =>
-                            const SizedBox(height: AppSpacing.sm),
-                        itemBuilder: (context, index) {
-                          final n = MockData.nannies[index];
-                          final quartier =
-                              _mockQuartiers[index.clamp(
-                                0,
-                                _mockQuartiers.length - 1,
-                              )];
-                          final distance =
-                              _mockDistances[index.clamp(
-                                0,
-                                _mockDistances.length - 1,
-                              )];
-                          return _NannyMapCard(
-                            nanny: n,
-                            quartier: quartier,
-                            distance: distance,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
@@ -440,7 +469,7 @@ class _NannyMapCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'FCFA/h',
+                  '${AppConstants.currency}/h',
                   style: AppTypography.small.copyWith(color: AppColors.primary),
                 ),
                 const SizedBox(height: AppSpacing.sm),

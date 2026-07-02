@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void _onReceiveCode() {
     final phone = _phoneController.text.replaceAll(' ', '');
     if (phone.length >= 8) {
-      context.go('/auth/otp?phone=$phone&role=${role ?? ''}');
+      context.go('/auth/otp', extra: {'phone': phone, 'role': role ?? 'parent'});
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

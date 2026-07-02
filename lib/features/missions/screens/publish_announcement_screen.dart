@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -633,7 +634,7 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
                 Text(
                   'Durée : ${_formatHours(hours)}  →  '
                   '~${(estimatedMin / 1000).toStringAsFixed(0)} 000 – '
-                  '${(estimatedMax / 1000).toStringAsFixed(0)} 000 FCFA',
+                  '${(estimatedMax / 1000).toStringAsFixed(0)} 000 ${AppConstants.currency}',
                   style: AppTypography.labelMd.copyWith(
                     color: AppColors.primary,
                     fontSize: 12,
@@ -810,7 +811,7 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
           children: [
             Text('Budget max / heure', style: AppTypography.labelMd),
             Text(
-              '${_budgetPerHour.round()} FCFA',
+              '${_budgetPerHour.round()} ${AppConstants.currency}',
               style: AppTypography.labelMd.copyWith(color: AppColors.primary),
             ),
           ],
@@ -827,8 +828,8 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('1 000 FCFA', style: AppTypography.small),
-            Text('10 000 FCFA', style: AppTypography.small),
+            Text('1 000 ${AppConstants.currency}', style: AppTypography.small),
+            Text('10 000 ${AppConstants.currency}', style: AppTypography.small),
           ],
         ),
         const SizedBox(height: AppSpacing.xxl),

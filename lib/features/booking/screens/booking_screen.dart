@@ -1,28 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../data/models/booking_model.dart';
 import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 import '../widgets/children_selector.dart';
 import '../widgets/price_summary.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/avatar_widget.dart';
 
-class BookingScreen extends StatefulWidget {
+class BookingScreen extends ConsumerStatefulWidget {
   final String nannyId;
   const BookingScreen({super.key, required this.nannyId});
 
   @override
-  State<BookingScreen> createState() => _BookingScreenState();
+  ConsumerState<BookingScreen> createState() => _BookingScreenState();
 }
 
-class _BookingScreenState extends State<BookingScreen> {
+class _BookingScreenState extends ConsumerState<BookingScreen> {
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 0;
-  late NannyModel _nanny;
+  bool _isSubmitting = false;
 
   // Step 1 data
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
@@ -31,20 +34,11 @@ class _BookingScreenState extends State<BookingScreen> {
   int _childrenCount = 1;
   List<int> _childrenAges = [5];
   final _addressController = TextEditingController();
-  String _selectedNeighborhood = MockData.quartiers.first;
+  String? _selectedNeighborhood;
   final _notesController = TextEditingController();
 
   // Step 2 data
   String _paymentMethod = 'cash';
-
-  @override
-  void initState() {
-    super.initState();
-    _nanny = MockData.nannies.firstWhere(
-      (n) => n.id == widget.nannyId,
-      orElse: () => MockData.nannies.first,
-    );
-  }
 
   @override
   void dispose() {
@@ -66,12 +60,16 @@ class _BookingScreenState extends State<BookingScreen> {
   bool get _isNight =>
       _startTime.hour >= 20 || _endTime.hour >= 20 || _startTime.hour < 6;
 
-  void _nextStep() {
+  String _formatTime(TimeOfDay time) =>
+      '${time.hour.toString().padLeft(2, '0')}:'
+      '${time.minute.toString().padLeft(2, '0')}';
+
+  void _nextStep(NannyModel nanny) {
     if (_currentStep == 0) {
       if (!_formKey.currentState!.validate()) return;
       setState(() => _currentStep++);
     } else {
-      _confirmBooking();
+      _confirmBooking(nanny);
     }
   }
 
@@ -83,49 +81,90 @@ class _BookingScreenState extends State<BookingScreen> {
     }
   }
 
-  void _confirmBooking() {
+  Future<void> _confirmBooking(NannyModel nanny) async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
     final bookingId =
         'NE-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-    context.go(
-      '/booking/confirmation/$bookingId',
-      extra: {
-        'nanny': _nanny,
-        'date': _selectedDate,
-        'startTime': _startTime,
-        'endTime': _endTime,
-        'address': '${_addressController.text}, $_selectedNeighborhood',
-      },
+
+    // Même barème que PriceSummary.
+    final baseTotal = nanny.hourlyRate * _totalHours;
+    final nightSurcharge = _isNight ? baseTotal * 0.2 : 0.0;
+    final weekendSurcharge = _isWeekend ? baseTotal * 0.1 : 0.0;
+    final subtotal = baseTotal + nightSurcharge + weekendSurcharge;
+    final commission = subtotal * 0.15;
+
+    final notes = _notesController.text.trim();
+    final booking = BookingModel(
+      id: bookingId,
+      parentId: 'p1',
+      nannyId: nanny.id,
+      date: _selectedDate,
+      startTime: _formatTime(_startTime),
+      endTime: _formatTime(_endTime),
+      numberOfChildren: _childrenCount,
+      childrenAges: _childrenAges,
+      totalPrice: subtotal + commission,
+      commission: commission,
+      status: 'À venir',
+      address:
+          '${_addressController.text}'
+          '${_selectedNeighborhood != null ? ', $_selectedNeighborhood' : ''}',
+      notes: notes.isEmpty ? null : notes,
     );
+
+    try {
+      await ref.read(bookingRepositoryProvider).createBooking(booking);
+      ref.invalidate(bookingsProvider);
+      if (!mounted) return;
+      context.go('/booking/confirmation/$bookingId');
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
-      body: Column(
-        children: [
-          _buildStepper(),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: AppSpacing.screenPaddingV,
-              child: Form(
-                key: _formKey,
-                child: _currentStep == 0
-                    ? _buildStepDetails()
-                    : _buildStepSummary(),
+    final nannyAsync = ref.watch(nannyByIdProvider(widget.nannyId));
+
+    return nannyAsync.when(
+      loading: () => const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(backgroundColor: AppColors.background),
+        body: Center(child: Text('Erreur : $e')),
+      ),
+      data: (nanny) => Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: _buildAppBar(nanny),
+        body: Column(
+          children: [
+            _buildStepper(),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: AppSpacing.screenPaddingV,
+                child: Form(
+                  key: _formKey,
+                  child: _currentStep == 0
+                      ? _buildStepDetails()
+                      : _buildStepSummary(nanny),
+                ),
               ),
             ),
-          ),
-          _buildBottomBar(),
-        ],
+            _buildBottomBar(nanny),
+          ],
+        ),
       ),
     );
   }
 
   // ── AppBar ─────────────────────────────────────────────────────────────────
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(NannyModel nanny) {
     return AppBar(
       backgroundColor: AppColors.background,
       leading: GestureDetector(
@@ -145,11 +184,11 @@ class _BookingScreenState extends State<BookingScreen> {
       ),
       title: Row(
         children: [
-          AppAvatar(name: _nanny.name, size: 32),
+          AppAvatar(name: nanny.name, size: 32),
           const SizedBox(width: AppSpacing.sm),
           Flexible(
             child: Text(
-              'Réserver · ${_nanny.name.split(' ').first}',
+              'Réserver · ${nanny.name.split(' ').first}',
               style: AppTypography.h4,
               overflow: TextOverflow.ellipsis,
             ),
@@ -314,18 +353,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     : null,
               ),
               const SizedBox(height: AppSpacing.md),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedNeighborhood,
-                items: MockData.quartiers
-                    .map((q) => DropdownMenuItem(value: q, child: Text(q)))
-                    .toList(),
-                onChanged: (val) =>
-                    setState(() => _selectedNeighborhood = val!),
-                decoration: const InputDecoration(
-                  labelText: 'Quartier',
-                  prefixIcon: Icon(Icons.map_outlined),
-                ),
-              ),
+              _buildNeighborhoodDropdown(),
             ],
           ),
         ),
@@ -346,6 +374,31 @@ class _BookingScreenState extends State<BookingScreen> {
         ),
         const SizedBox(height: AppSpacing.lg),
       ],
+    );
+  }
+
+  Widget _buildNeighborhoodDropdown() {
+    final quartiersAsync = ref.watch(quartiersProvider);
+
+    return quartiersAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Text('Erreur : $e'),
+      data: (quartiers) {
+        _selectedNeighborhood ??= quartiers.isNotEmpty
+            ? quartiers.first
+            : null;
+        return DropdownButtonFormField<String>(
+          initialValue: _selectedNeighborhood,
+          items: quartiers
+              .map((q) => DropdownMenuItem(value: q, child: Text(q)))
+              .toList(),
+          onChanged: (val) => setState(() => _selectedNeighborhood = val!),
+          decoration: const InputDecoration(
+            labelText: 'Quartier',
+            prefixIcon: Icon(Icons.map_outlined),
+          ),
+        );
+      },
     );
   }
 
@@ -483,7 +536,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   // ── Step 2: Summary ────────────────────────────────────────────────────────
-  Widget _buildStepSummary() {
+  Widget _buildStepSummary(NannyModel nanny) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -515,15 +568,15 @@ class _BookingScreenState extends State<BookingScreen> {
                 ),
                 child: Row(
                   children: [
-                    AppAvatar(name: _nanny.name, size: 48, showRing: true),
+                    AppAvatar(name: nanny.name, size: 48, showRing: true),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(_nanny.name, style: AppTypography.h4),
+                          Text(nanny.name, style: AppTypography.h4),
                           Text(
-                            '${_nanny.hourlyRate.toStringAsFixed(0)} FCFA/h · $_totalHours h',
+                            '${nanny.hourlyRate.toStringAsFixed(0)} ${AppConstants.currency}/h · $_totalHours h',
                             style: AppTypography.caption.copyWith(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
@@ -579,7 +632,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     _buildSummaryRow(
                       Icons.location_on_outlined,
                       'Adresse',
-                      '${_addressController.text.isEmpty ? 'Non précisée' : _addressController.text}, $_selectedNeighborhood',
+                      '${_addressController.text.isEmpty ? 'Non précisée' : _addressController.text}, ${_selectedNeighborhood ?? ''}',
                     ),
                     if (_notesController.text.isNotEmpty)
                       _buildSummaryRow(
@@ -598,7 +651,7 @@ class _BookingScreenState extends State<BookingScreen> {
 
         // Price breakdown
         PriceSummary(
-          nanny: _nanny,
+          nanny: nanny,
           hours: _totalHours,
           isWeekend: _isWeekend,
           isNight: _isNight,
@@ -648,7 +701,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   // ── Bottom action bar ──────────────────────────────────────────────────────
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(NannyModel nanny) {
     return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
@@ -686,7 +739,8 @@ class _BookingScreenState extends State<BookingScreen> {
               icon: _currentStep == 0
                   ? Icons.arrow_forward_rounded
                   : Icons.check_rounded,
-              onPressed: _nextStep,
+              onPressed: () => _nextStep(nanny),
+              isLoading: _isSubmitting,
               type: AppButtonType.primary,
             ),
           ),

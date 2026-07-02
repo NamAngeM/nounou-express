@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_page_header.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../data/models/booking_model.dart';
+import '../../../data/providers/data_providers.dart';
 
-class BookingsListScreen extends StatelessWidget {
+class BookingsListScreen extends ConsumerWidget {
   const BookingsListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final total = MockData.bookings.length;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bookingsAsync = ref.watch(bookingsProvider);
+    final total = bookingsAsync.valueOrNull?.length ?? 0;
 
     return DefaultTabController(
       length: 4,
@@ -60,7 +62,7 @@ class BookingsListScreen extends StatelessWidget {
             ),
 
             // ── Tab content ────────────────────────────────────────────────
-            Expanded(
+            const Expanded(
               child: TabBarView(
                 children: [
                   _BookingsList(status: 'À venir'),
@@ -78,80 +80,91 @@ class BookingsListScreen extends StatelessWidget {
 }
 
 // ── List per tab ─────────────────────────────────────────────────────────────
-class _BookingsList extends StatelessWidget {
+class _BookingsList extends ConsumerWidget {
   final String status;
   const _BookingsList({required this.status});
 
   @override
-  Widget build(BuildContext context) {
-    final bookings = MockData.bookings
-        .where((b) => b.status == status)
-        .toList();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bookingsAsync = ref.watch(bookingsProvider);
 
-    if (bookings.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xxxl),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.calendar_today_outlined,
-                  size: 40,
-                  color: AppColors.textSecondary.withValues(alpha: 0.4),
-                ),
+    return bookingsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Erreur : $e')),
+      data: (allBookings) {
+        final bookings = allBookings.where((b) => b.status == status).toList();
+
+        if (bookings.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.xxxl),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceVariant,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.calendar_today_outlined,
+                      size: 40,
+                      color: AppColors.textSecondary.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    'Aucune réservation',
+                    style: AppTypography.h3,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'dans la catégorie "$status"',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                'Aucune réservation',
-                style: AppTypography.h3,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'dans la catégorie "$status"',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => ref.refresh(bookingsProvider.future),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.lg,
+              100,
+            ),
+            itemCount: bookings.length,
+            itemBuilder: (context, index) =>
+                _BookingCard(booking: bookings[index])
+                    .animate()
+                    .fadeIn(delay: (index * 70).ms, duration: 350.ms)
+                    .slideY(begin: 0.06, end: 0),
           ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg,
-        100,
-      ),
-      itemCount: bookings.length,
-      itemBuilder: (context, index) => _BookingCard(booking: bookings[index])
-          .animate()
-          .fadeIn(delay: (index * 70).ms, duration: 350.ms)
-          .slideY(begin: 0.06, end: 0),
+        );
+      },
     );
   }
 }
 
 // ── Booking card ─────────────────────────────────────────────────────────────
-class _BookingCard extends StatelessWidget {
+class _BookingCard extends ConsumerWidget {
   final BookingModel booking;
   const _BookingCard({required this.booking});
 
   @override
-  Widget build(BuildContext context) {
-    final nanny = MockData.nannies.firstWhere((n) => n.id == booking.nannyId);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nanny = ref.watch(nannyByIdProvider(booking.nannyId)).valueOrNull;
     final statusInfo = _statusInfo(booking.status);
 
     return Container(
@@ -189,7 +202,7 @@ class _BookingCard extends StatelessWidget {
                         radius: 22,
                         backgroundColor: AppColors.surfaceVariant,
                         backgroundImage: NetworkImage(
-                          'https://i.pravatar.cc/150?u=${nanny.id}',
+                          'https://i.pravatar.cc/150?u=${booking.nannyId}',
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
@@ -198,7 +211,7 @@ class _BookingCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              nanny.name,
+                              nanny?.name ?? '…',
                               style: AppTypography.bodyLarge.copyWith(
                                 fontWeight: FontWeight.w700,
                               ),

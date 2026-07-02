@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../data/mock/mock_data.dart';
+import '../../../data/models/nanny_model.dart';
+import '../../../data/providers/data_providers.dart';
 
 // ─────────────────────────────────────── Models ──
 
@@ -81,15 +84,16 @@ class FilterBottomSheet {
 
 // ─────────────────────────────────────── Sheet content ──
 
-class _FilterSheetContent extends StatefulWidget {
+class _FilterSheetContent extends ConsumerStatefulWidget {
   final SearchFilters current;
   const _FilterSheetContent({required this.current});
 
   @override
-  State<_FilterSheetContent> createState() => _FilterSheetContentState();
+  ConsumerState<_FilterSheetContent> createState() =>
+      _FilterSheetContentState();
 }
 
-class _FilterSheetContentState extends State<_FilterSheetContent> {
+class _FilterSheetContentState extends ConsumerState<_FilterSheetContent> {
   late SearchFilters _f;
 
   static const _quartierOptions = [
@@ -120,8 +124,8 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
     _f = widget.current;
   }
 
-  int get _resultCount {
-    return MockData.nannies.where((n) {
+  int _resultCount(List<NannyModel> nannies) {
+    return nannies.where((n) {
       if (n.hourlyRate < _f.priceRange.start ||
           n.hourlyRate > _f.priceRange.end) {
         return false;
@@ -181,7 +185,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildSection('Quartier', _buildQuartierChips()),
-                      _buildSection('Tarif (FCFA/h)', _buildPriceRange()),
+                      _buildSection('Tarif (${AppConstants.currency}/h)', _buildPriceRange()),
                       _buildSection('Note minimum', _buildRatingPicker()),
                       _buildSection('Expérience', _buildExpChips()),
                       _buildSection('Disponibilité', _buildAvailability()),
@@ -334,7 +338,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
         border: Border.all(color: AppColors.border),
       ),
       child: Text(
-        '$value FCFA/h',
+        '$value ${AppConstants.currency}/h',
         style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600),
       ),
     );
@@ -440,7 +444,9 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
 
   // ── Apply button ──
   Widget _buildApplyButton() {
-    final count = _resultCount;
+    final nannies =
+        ref.watch(nanniesProvider).valueOrNull ?? const <NannyModel>[];
+    final count = _resultCount(nannies);
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
