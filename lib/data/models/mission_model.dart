@@ -122,10 +122,7 @@ class MissionModel {
   double get plannedHours => plannedDuration.inMinutes / 60.0;
 
   double estimatedCost(double hourlyRate) =>
-      (plannedHours * hourlyRate).ceilToDouble() *
-      hourlyRate ~/
-      hourlyRate *
-      hourlyRate;
+      (plannedHours * hourlyRate).ceilToDouble();
 
   Duration? get actualDuration {
     if (actualStartTime == null || actualEndTime == null) return null;
@@ -193,73 +190,3 @@ class MissionModel {
     );
   }
 }
-
-// ── Mock data ─────────────────────────────────────────────────────────────────
-final List<MissionModel> mockMissions = [
-  MissionModel(
-    id: 'm1',
-    parentId: 'p1',
-    parentName: 'Mme Ondo',
-    parentPhotoUrl: '',
-    address: 'Résidence Angondjé, Bât B Apt 12',
-    locationType: LocationType.home,
-    date: DateTime.now().add(const Duration(hours: 3)),
-    startTime: '18:00',
-    endTime: '22:00',
-    isUrgent: false,
-    childrenIds: ['c1'],
-    childrenSummary: ['Léa, 3 ans'],
-    needs: ['Repas', 'Bain', 'Dodo'],
-    hasPets: false,
-    paymentMethod: PaymentMethod.airtelMoney,
-    maxBudgetPerHour: 3000,
-    status: MissionStatus.pending,
-    applicantIds: [],
-    publishedAt: DateTime.now().subtract(const Duration(minutes: 10)),
-  ),
-  MissionModel(
-    id: 'm2',
-    parentId: 'p2',
-    parentName: 'M. Moussavou',
-    parentPhotoUrl: '',
-    address: 'Quartier Glass, Rue de la Paix',
-    locationType: LocationType.home,
-    date: DateTime.now().add(const Duration(hours: 1)),
-    startTime: '14:00',
-    endTime: '17:00',
-    isUrgent: true,
-    childrenIds: ['c2', 'c3'],
-    childrenSummary: ['Tom, 5 ans', 'Nina, 2 ans'],
-    needs: ['Repas', 'Activités'],
-    hasPets: true,
-    petsDescription: 'Un chien',
-    paymentMethod: PaymentMethod.cash,
-    maxBudgetPerHour: 4000,
-    status: MissionStatus.pending,
-    applicantIds: [],
-    publishedAt: DateTime.now().subtract(const Duration(minutes: 5)),
-  ),
-  MissionModel(
-    id: 'm3',
-    parentId: 'p3',
-    parentName: 'Mme Nzigou',
-    parentPhotoUrl: '',
-    address: 'Libreville Centre, Av. Bouët',
-    locationType: LocationType.home,
-    date: DateTime.now(),
-    startTime: '08:00',
-    endTime: '17:00',
-    isUrgent: false,
-    childrenIds: ['c4'],
-    childrenSummary: ['Max, 8 ans'],
-    needs: ['Devoirs', 'Repas'],
-    hasPets: false,
-    paymentMethod: PaymentMethod.moovMoney,
-    maxBudgetPerHour: 2500,
-    status: MissionStatus.inProgress,
-    selectedNannyId: 'n1',
-    applicantIds: ['n1', 'n2'],
-    publishedAt: DateTime.now().subtract(const Duration(hours: 2)),
-    actualStartTime: DateTime.now().subtract(const Duration(hours: 2)),
-  ),
-];

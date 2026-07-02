@@ -21,8 +21,18 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    # Règles additionnelles (audit 2026-07) — sévérité "info" : visibles dans
+    # l'IDE et `flutter analyze`, sans faire échouer la CI actuelle.
+    - unawaited_futures
+    - avoid_dynamic_calls
+    - prefer_final_locals
+    - prefer_final_in_for_each
+    - avoid_redundant_argument_values
+    - use_super_parameters
+    - require_trailing_commas
+    - directives_ordering
+    - unnecessary_lambdas
+    - avoid_unused_constructor_parameters
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

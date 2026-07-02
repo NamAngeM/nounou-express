@@ -1,0 +1,24 @@
+rules_version = '2';
+
+// Règles Firestore — Nounou Express
+//
+// VERROUILLAGE PAR DÉFAUT : l'application n'utilise pas encore Firestore
+// (couche données mockée). Tant que le backend n'est pas implémenté avec de
+// vraies règles par rôle, toute lecture/écriture est refusée.
+//
+// À l'implémentation du backend (voir AUDIT.md, Phase 3) :
+//  - exiger request.auth != null partout ;
+//  - porter le rôle (parent/nounou) en custom claims, jamais côté client ;
+//  - restreindre chaque collection (users, nannies, missions, bookings,
+//    conversations, notifications) au propriétaire ou aux participants ;
+//  - ne JAMAIS stocker les documents CNI dans Firestore (utiliser un bucket
+//    Storage dédié à accès restreint).
+//
+// Déploiement : firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

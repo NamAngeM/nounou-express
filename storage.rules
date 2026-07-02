@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// Règles Cloud Storage — Nounou Express
+//
+// VERROUILLAGE PAR DÉFAUT : aucun upload n'est encore implémenté dans l'app.
+// À l'implémentation (photos de profil, CNI — voir AUDIT.md, Phase 3) :
+//  - photos de profil : écriture limitée au propriétaire authentifié,
+//    lecture publique acceptable ;
+//  - CNI recto/verso : bucket ou préfixe dédié, lecture/écriture refusées aux
+//    clients (accès uniquement via backend/admin), durée de conservation
+//    limitée (RGPD / loi gabonaise n°001/2011).
+//
+// Déploiement : firebase deploy --only storage
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

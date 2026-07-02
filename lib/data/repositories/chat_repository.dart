@@ -1,3 +1,0 @@
-class ChatRepository {
-  // Implementation here
-}

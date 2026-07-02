@@ -1,3 +1,0 @@
-class NotificationRepository {
-  // Implementation here
-}

@@ -29,11 +29,15 @@ import '../../features/missions/screens/available_missions_screen.dart';
 import '../../features/missions/screens/candidatures_screen.dart';
 import '../../features/missions/screens/mission_tracking_screen.dart';
 import '../../features/missions/screens/delay_screen.dart';
+import '../constants/app_constants.dart';
 import 'app_router_observer.dart';
 
 // Mock Auth State (persisted via SharedPreferences)
 bool _isAuthenticated = false;
 String _userRole = 'parent'; // 'parent' | 'nanny'
+
+/// État d'authentification courant (lecture seule pour les écrans).
+bool get isAuthenticated => _isAuthenticated;
 
 /// Load auth state from SharedPreferences (call before runApp).
 Future<void> loadAuthState() async {
@@ -62,7 +66,7 @@ final GoRouter appRouter = GoRouter(
   redirect: (context, state) {
     final bool isAuthPath =
         state.uri.path.startsWith('/auth') ||
-        state.uri.path == '/splash' ||
+        state.uri.path == '/' || // splash
         state.uri.path == '/onboarding';
 
     if (!_isAuthenticated && !isAuthPath) {
@@ -177,9 +181,8 @@ final GoRouter appRouter = GoRouter(
           BookingConfirmationScreen(bookingId: s.pathParameters['id']!),
     ),
     GoRoute(
-      path: '/chat/:conversationId',
-      builder: (c, s) =>
-          ChatScreen(nannyId: s.pathParameters['conversationId']),
+      path: '/chat/:nannyId',
+      builder: (c, s) => ChatScreen(nannyId: s.pathParameters['nannyId']),
     ),
     GoRoute(
       path: '/profile/edit',
@@ -215,7 +218,8 @@ final GoRouter appRouter = GoRouter(
       builder: (c, s) => DelayScreen(
         missionId: s.pathParameters['missionId']!,
         hourlyRate:
-            double.tryParse(s.uri.queryParameters['rate'] ?? '2500') ?? 2500,
+            double.tryParse(s.uri.queryParameters['rate'] ?? '') ??
+            AppConstants.defaultHourlyRate,
       ),
     ),
   ],

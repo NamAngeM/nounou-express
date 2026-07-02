@@ -1,3 +1,0 @@
-class NannyRepository {
-  // Implementation here
-}
