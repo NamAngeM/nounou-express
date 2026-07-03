@@ -103,8 +103,7 @@ class NannyProfileScreen extends ConsumerStatefulWidget {
   const NannyProfileScreen({super.key, required this.nannyId});
 
   @override
-  ConsumerState<NannyProfileScreen> createState() =>
-      _NannyProfileScreenState();
+  ConsumerState<NannyProfileScreen> createState() => _NannyProfileScreenState();
 }
 
 class _NannyProfileScreenState extends ConsumerState<NannyProfileScreen> {
@@ -116,9 +115,8 @@ class _NannyProfileScreenState extends ConsumerState<NannyProfileScreen> {
         .watch(nannyByIdProvider(widget.nannyId))
         .when(
           data: _buildProfile,
-          loading: () => const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          ),
+          loading: () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
           // L'état error couvre aussi le cas « nounou introuvable ».
           error: (e, _) => Scaffold(
             appBar: AppBar(),
@@ -507,7 +505,8 @@ class _TarifCard extends StatelessWidget {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: '${hourlyRate.toStringAsFixed(0)} ${AppConstants.currency}',
+                          text:
+                              '${hourlyRate.toStringAsFixed(0)} ${AppConstants.currency}',
                           style: AppTypography.h2.copyWith(color: Colors.white),
                         ),
                         TextSpan(
@@ -1019,7 +1018,8 @@ class _BottomBookingBar extends StatelessWidget {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: '${nanny.hourlyRate.toStringAsFixed(0)} ${AppConstants.currency}',
+                      text:
+                          '${nanny.hourlyRate.toStringAsFixed(0)} ${AppConstants.currency}',
                       style: AppTypography.h3.copyWith(
                         color: AppColors.primary,
                       ),

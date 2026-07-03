@@ -23,8 +23,8 @@ class MockChatRepository implements ChatRepository {
 
   final Map<String, List<MessageModel>> _messagesByUser = {};
 
-  List<MessageModel> _threadFor(String otherUserId) =>
-      _messagesByUser.putIfAbsent(otherUserId, () => List.of(MockData.messages));
+  List<MessageModel> _threadFor(String otherUserId) => _messagesByUser
+      .putIfAbsent(otherUserId, () => List.of(MockData.messages));
 
   @override
   Future<List<ConversationModel>> getConversations() =>
@@ -46,11 +46,9 @@ class MockChatRepository implements ChatRepository {
   );
 
   @override
-  Future<MessageModel> sendMessage(MessageModel message) => Future.delayed(
-    _latency,
-    () {
-      _threadFor(message.receiverId).add(message);
-      return message;
-    },
-  );
+  Future<MessageModel> sendMessage(MessageModel message) =>
+      Future.delayed(_latency, () {
+        _threadFor(message.receiverId).add(message);
+        return message;
+      });
 }

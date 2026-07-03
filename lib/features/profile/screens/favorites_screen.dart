@@ -34,9 +34,8 @@ class FavoritesScreen extends ConsumerWidget {
       body: ref
           .watch(favoriteNanniesProvider)
           .when(
-            data: (favorites) => favorites.isEmpty
-                ? _buildEmptyState()
-                : _buildList(favorites),
+            data: (favorites) =>
+                favorites.isEmpty ? _buildEmptyState() : _buildList(favorites),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => _buildEmptyState(),
           ),
@@ -49,20 +48,17 @@ class FavoritesScreen extends ConsumerWidget {
       itemCount: favorites.length,
       itemBuilder: (context, index) {
         return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-              child: NannyCard(
-                nannyId: favorites[index].id,
-                name: favorites[index].name,
-                quartier: favorites[index].quartier,
-                rating: favorites[index].rating,
-                hourlyRate: favorites[index].hourlyRate,
-                isVerified: favorites[index].isVerified,
-                avatarUrl: favorites[index].avatar,
-              ),
-            )
-            .animate()
-            .fadeIn(delay: (index * 100).ms)
-            .slideX(begin: 0.1, end: 0);
+          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+          child: NannyCard(
+            nannyId: favorites[index].id,
+            name: favorites[index].name,
+            quartier: favorites[index].quartier,
+            rating: favorites[index].rating,
+            hourlyRate: favorites[index].hourlyRate,
+            isVerified: favorites[index].isVerified,
+            avatarUrl: favorites[index].avatar,
+          ),
+        ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: 0.1, end: 0);
       },
     );
   }

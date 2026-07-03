@@ -26,10 +26,8 @@ class BookingConfirmationScreen extends ConsumerWidget {
         child: bookingAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(child: Text('Erreur : $e')),
-          data: (booking) => _BookingConfirmationBody(
-            bookingId: bookingId,
-            booking: booking,
-          ),
+          data: (booking) =>
+              _BookingConfirmationBody(bookingId: bookingId, booking: booking),
         ),
       ),
     );
@@ -112,9 +110,7 @@ class _BookingConfirmationBody extends ConsumerWidget {
           const SizedBox(height: AppSpacing.xl),
 
           // ── Booking ID badge ────────────────────────────────────────
-          _BookingIdBadge(
-            bookingId: bookingId,
-          ).animate().fadeIn(delay: 200.ms),
+          _BookingIdBadge(bookingId: bookingId).animate().fadeIn(delay: 200.ms),
 
           const SizedBox(height: AppSpacing.xl),
 

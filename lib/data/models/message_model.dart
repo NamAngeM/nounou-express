@@ -28,8 +28,7 @@ class MessageModel {
     receiverId: json['receiverId'] as String? ?? '',
     content: json['content'] as String? ?? '',
     timestamp:
-        DateTime.tryParse(json['timestamp'] as String? ?? '') ??
-        DateTime.now(),
+        DateTime.tryParse(json['timestamp'] as String? ?? '') ?? DateTime.now(),
     isRead: json['isRead'] as bool? ?? false,
   );
 }

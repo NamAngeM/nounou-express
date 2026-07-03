@@ -215,12 +215,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ).animate().fadeIn(delay: 200.ms),
             const SizedBox(height: AppSpacing.md),
             _NearbyScroll(
-                  nannies: _filteredNannies(nannies),
-                  allNannies: nannies,
-                )
-                .animate()
-                .fadeIn(delay: 250.ms)
-                .slideX(begin: 0.05, end: 0),
+              nannies: _filteredNannies(nannies),
+              allNannies: nannies,
+            ).animate().fadeIn(delay: 250.ms).slideX(begin: 0.05, end: 0),
             const SizedBox(height: AppSpacing.xxl),
           ],
         ),

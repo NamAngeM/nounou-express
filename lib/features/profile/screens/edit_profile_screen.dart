@@ -225,12 +225,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   )
                   .animate()
                   .fadeIn(delay: 240.ms, duration: 400.ms)
-                  .slideY(
-                    begin: 0.12,
-                    end: 0,
-                    delay: 240.ms,
-                    duration: 400.ms,
-                  ),
+                  .slideY(begin: 0.12, end: 0, delay: 240.ms, duration: 400.ms),
             ],
 
             const SizedBox(height: AppSpacing.xxl),
@@ -242,9 +237,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   gradient: AppColors.primaryGradientH,
-                  borderRadius: BorderRadius.circular(
-                    AppSpacing.buttonRadius,
-                  ),
+                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                   boxShadow: AppColors.primaryShadow,
                 ),
                 child: ElevatedButton(

@@ -43,8 +43,18 @@ class AppFormatters {
   /// Format court pour les listes et cartes (ex: "3 juil 2026").
   static String formatShortDate(DateTime date) {
     const months = [
-      'jan', 'fév', 'mar', 'avr', 'mai', 'juin',
-      'juil', 'août', 'sep', 'oct', 'nov', 'déc',
+      'jan',
+      'fév',
+      'mar',
+      'avr',
+      'mai',
+      'juin',
+      'juil',
+      'août',
+      'sep',
+      'oct',
+      'nov',
+      'déc',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
@@ -53,8 +63,18 @@ class AppFormatters {
   static String formatDateWithWeekday(DateTime date) {
     const weekdays = ['Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.', 'Dim.'];
     const months = [
-      'janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
-      'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.',
+      'janv.',
+      'févr.',
+      'mars',
+      'avr.',
+      'mai',
+      'juin',
+      'juil.',
+      'août',
+      'sept.',
+      'oct.',
+      'nov.',
+      'déc.',
     ];
     final wd = weekdays[date.weekday - 1];
     final mo = months[date.month - 1];

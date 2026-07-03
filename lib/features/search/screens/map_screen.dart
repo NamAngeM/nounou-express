@@ -74,9 +74,8 @@ class _MapBody extends StatelessWidget {
               children: [
                 // Back / Liste button
                 GestureDetector(
-                  onTap: () => context.canPop()
-                      ? context.pop()
-                      : context.go('/search'),
+                  onTap: () =>
+                      context.canPop() ? context.pop() : context.go('/search'),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.lg,
@@ -123,9 +122,7 @@ class _MapBody extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.badgeRadius,
-                    ),
+                    borderRadius: BorderRadius.circular(AppSpacing.badgeRadius),
                   ),
                   child: Text(
                     '${nannies.length} nounous',

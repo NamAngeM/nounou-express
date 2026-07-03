@@ -91,12 +91,13 @@ L'app est conçue pour traiter : CNI recto/verso, photos, téléphone, **donnée
 
 ## 8. Plan d'amélioration (suite)
 
-### Phase 2 — Fondations d'architecture (2-3 semaines)
-- Interfaces repository + implémentation mock derrière l'interface ; les écrans ne doivent plus importer `MockData` directement.
-- Adoption réelle de Riverpod : `AsyncNotifier`/`AsyncValue` (loading/error/data), `refreshListenable` sur GoRouter, suppression des variables globales d'auth.
-- Sérialisation des modèles (`json_serializable`, `fromFirestore`/`toFirestore`, `Timestamp`).
-- i18n (`flutter_localizations` + `.arb`) et design system branché sur `Theme.of(context)` (ou retrait du `darkTheme`).
-- Découpage de `register_screen.dart` en étapes + validation `Form`.
+### Phase 2 — Fondations d'architecture ✅ RÉALISÉE (2026-07-03)
+- ✅ Interfaces repository (7) + implémentations mock derrière l'interface ; plus aucun écran n'importe `MockData` directement (providers dans `lib/data/providers/data_providers.dart`).
+- ✅ Adoption réelle de Riverpod : `AsyncValue` (loading/error/data) sur tous les écrans data, `refreshListenable` sur GoRouter, variables globales d'auth remplacées par `AuthNotifier` (`lib/features/auth/providers/auth_provider.dart`).
+- ✅ Sérialisation manuelle toJson/fromJson robuste sur les 11 modèles (le mapping `Timestamp` Firestore restera à ajouter en Phase 3).
+- ✅ Dark mode retiré (décision : design system non branché sur Theme) ; i18n différée (marché FR/Gabon).
+- ✅ Validé : `flutter analyze` 0 erreur/0 warning, `dart format`, `flutter test` OK (SDK 3.44.4 local).
+- ⏳ Restant Phase 2 : découpage de `register_screen.dart` (2 288 lignes) en étapes + validation `Form` avec les `Validators` existants.
 
 ### Phase 3 — Backend réel (4-8 semaines, ~60 % du travail restant)
 - Auth Firebase réelle (`verifyPhoneNumber`), rôle en **custom claims**, session via `authStateChanges`, téléphone via `state.extra` (jamais en query string).

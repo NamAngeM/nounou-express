@@ -21,7 +21,8 @@ class MissionTrackingScreen extends ConsumerStatefulWidget {
   const MissionTrackingScreen({super.key, required this.missionId});
 
   @override
-  ConsumerState<MissionTrackingScreen> createState() => _MissionTrackingScreenState();
+  ConsumerState<MissionTrackingScreen> createState() =>
+      _MissionTrackingScreenState();
 }
 
 class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
@@ -126,8 +127,6 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
     final hours = _elapsed.inMinutes / 60.0;
     return (hours.ceilToDouble() * rate).toInt();
   }
-
-
 
   // ── Timeline data ───────────────────────────────────────────────────────────
 
@@ -282,7 +281,10 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Suivi de mission', style: AppTypography.h4),
-          Text(AppFormatters.formatShortDate(_mission.date), style: AppTypography.caption),
+          Text(
+            AppFormatters.formatShortDate(_mission.date),
+            style: AppTypography.caption,
+          ),
         ],
       ),
       bottom: PreferredSize(
@@ -448,8 +450,14 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
             ),
           ),
           const Spacer(),
-          Text('$formattedCost ${AppConstants.currency}', style: AppTypography.price),
-          Text('  (${rate.toInt()} ${AppConstants.currency}/h)', style: AppTypography.caption),
+          Text(
+            '$formattedCost ${AppConstants.currency}',
+            style: AppTypography.price,
+          ),
+          Text(
+            '  (${rate.toInt()} ${AppConstants.currency}/h)',
+            style: AppTypography.caption,
+          ),
         ],
       ),
     );

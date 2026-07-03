@@ -31,11 +31,9 @@ class MockBookingRepository implements BookingRepository {
   );
 
   @override
-  Future<BookingModel> createBooking(BookingModel booking) => Future.delayed(
-    _latency,
-    () {
-      _bookings.insert(0, booking);
-      return booking;
-    },
-  );
+  Future<BookingModel> createBooking(BookingModel booking) =>
+      Future.delayed(_latency, () {
+        _bookings.insert(0, booking);
+        return booking;
+      });
 }

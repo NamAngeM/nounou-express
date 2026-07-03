@@ -31,10 +31,10 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
   @override
   Widget build(BuildContext context) {
     final conversationsAsync = ref.watch(conversationsProvider);
-    final conversations = (conversationsAsync.valueOrNull ??
-            const <ConversationModel>[])
-        .where((c) => !_removedIds.contains(c.id))
-        .toList();
+    final conversations =
+        (conversationsAsync.valueOrNull ?? const <ConversationModel>[])
+            .where((c) => !_removedIds.contains(c.id))
+            .toList();
     final unread = conversations.where((c) => c.unreadCount > 0).length;
 
     return Scaffold(

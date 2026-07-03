@@ -1,5 +1,23 @@
 # Changelog
 
+## [Non publié] — 2026-07-03 (Phase 2 : fondations d'architecture)
+
+### Architecture
+- Couche repository réelle : interfaces `AuthRepository`, `NannyRepository`, `BookingRepository`, `ChatRepository`, `MissionRepository`, `NotificationRepository`, `ProfileRepository` + implémentations mock (latence simulée, mutations en mémoire) — `lib/data/repositories/`.
+- Providers Riverpod centralisés (`lib/data/providers/data_providers.dart`) : un point de bascule unique vers Firestore en Phase 3.
+- Adoption réelle de Riverpod : les 19 écrans/widgets consommant `MockData` directement passent désormais par des `FutureProvider`/`AsyncValue` (états loading/error/data systématiques) ; mutations via repositories + `ref.invalidate`.
+- Auth : suppression des variables globales mutables du routeur ; `AuthNotifier` (session chargée avant `runApp`, injectée par override) ; GoRouter réactif via `refreshListenable`.
+- Sérialisation JSON manuelle (toJson/fromJson robustes aux champs manquants) sur les 11 modèles + `DelayRequest` — prêts pour le mapping Firestore.
+- `mockApplications` déplacé de `application_model.dart` vers `mock_data.dart`.
+
+### Décisions
+- Dark mode retiré (`darkTheme`/`ThemeMode.system`) : inopérant tant que le design system n'est pas branché sur `Theme.of(context)` (869 refs directes à `AppColors`).
+- i18n différée : marché FR/Gabon uniquement — à réévaluer avant toute expansion.
+
+### Qualité
+- `pubspec.lock` régénéré (SDK Flutter 3.44.4 / Dart 3.12.2).
+- `flutter analyze` : 0 erreur, 0 warning ; `dart format` appliqué sur tout le projet ; `flutter test` : OK.
+
 ## [Non publié] — 2026-07-02 (audit)
 
 ### Sécurité

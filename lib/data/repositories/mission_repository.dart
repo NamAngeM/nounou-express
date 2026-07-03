@@ -47,24 +47,20 @@ class MockMissionRepository implements MissionRepository {
       );
 
   @override
-  Future<MissionModel> publishMission(MissionModel mission) => Future.delayed(
-    _latency,
-    () {
-      _missions.insert(0, mission);
-      return mission;
-    },
-  );
+  Future<MissionModel> publishMission(MissionModel mission) =>
+      Future.delayed(_latency, () {
+        _missions.insert(0, mission);
+        return mission;
+      });
 
   @override
-  Future<MissionModel> updateMission(MissionModel mission) => Future.delayed(
-    _latency,
-    () {
-      final index = _missions.indexWhere((m) => m.id == mission.id);
-      if (index == -1) {
-        throw StateError('Mission introuvable : ${mission.id}');
-      }
-      _missions[index] = mission;
-      return mission;
-    },
-  );
+  Future<MissionModel> updateMission(MissionModel mission) =>
+      Future.delayed(_latency, () {
+        final index = _missions.indexWhere((m) => m.id == mission.id);
+        if (index == -1) {
+          throw StateError('Mission introuvable : ${mission.id}');
+        }
+        _missions[index] = mission;
+        return mission;
+      });
 }

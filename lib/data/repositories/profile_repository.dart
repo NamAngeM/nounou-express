@@ -33,8 +33,6 @@ class MockProfileRepository implements ProfileRepository {
   );
 
   @override
-  Future<List<Map<String, dynamic>>> getRecentReviews() => Future.delayed(
-    _latency,
-    () => List.unmodifiable(MockData.recentReviews),
-  );
+  Future<List<Map<String, dynamic>>> getRecentReviews() =>
+      Future.delayed(_latency, () => List.unmodifiable(MockData.recentReviews));
 }

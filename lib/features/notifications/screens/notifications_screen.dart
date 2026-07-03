@@ -102,8 +102,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 data: (_) => notifications.isEmpty
                     ? _buildScrollableEmptyState()
                     : _buildList(_groupNotifications(notifications)),
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => _buildScrollableEmptyState(),
               ),
             ),

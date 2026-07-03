@@ -159,9 +159,8 @@ class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
             ],
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => _buildErrorText(
-            "Impossible de charger les statistiques",
-          ),
+          error: (e, _) =>
+              _buildErrorText("Impossible de charger les statistiques"),
         );
   }
 
@@ -184,9 +183,8 @@ class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
             children: missions.map((m) => _buildMissionCard(m)).toList(),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => _buildErrorText(
-            "Impossible de charger les missions",
-          ),
+          error: (e, _) =>
+              _buildErrorText("Impossible de charger les missions"),
         );
   }
 

@@ -99,9 +99,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     // Sort
     switch (_sortBy) {
       case SortOption.distance:
-        list.sort(
-          (a, b) => _distanceOf(all, a).compareTo(_distanceOf(all, b)),
-        );
+        list.sort((a, b) => _distanceOf(all, a).compareTo(_distanceOf(all, b)));
       case SortOption.prixCroissant:
         list.sort((a, b) => a.hourlyRate.compareTo(b.hourlyRate));
       case SortOption.prixDecroissant:

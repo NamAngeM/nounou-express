@@ -53,8 +53,7 @@ class NannyModel extends UserModel {
     role: json['role'] as String? ?? '',
     avatar: json['avatar'] as String?,
     createdAt:
-        DateTime.tryParse(json['createdAt'] as String? ?? '') ??
-        DateTime.now(),
+        DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
     experience: (json['experience'] as num?)?.toInt() ?? 0,
     hourlyRate: (json['hourlyRate'] as num?)?.toDouble() ?? 0,
     rating: (json['rating'] as num?)?.toDouble() ?? 0,

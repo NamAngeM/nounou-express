@@ -384,9 +384,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Text('Erreur : $e'),
       data: (quartiers) {
-        _selectedNeighborhood ??= quartiers.isNotEmpty
-            ? quartiers.first
-            : null;
+        _selectedNeighborhood ??= quartiers.isNotEmpty ? quartiers.first : null;
         return DropdownButtonFormField<String>(
           initialValue: _selectedNeighborhood,
           items: quartiers

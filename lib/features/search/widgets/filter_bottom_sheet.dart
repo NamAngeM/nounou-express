@@ -185,7 +185,10 @@ class _FilterSheetContentState extends ConsumerState<_FilterSheetContent> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildSection('Quartier', _buildQuartierChips()),
-                      _buildSection('Tarif (${AppConstants.currency}/h)', _buildPriceRange()),
+                      _buildSection(
+                        'Tarif (${AppConstants.currency}/h)',
+                        _buildPriceRange(),
+                      ),
                       _buildSection('Note minimum', _buildRatingPicker()),
                       _buildSection('Expérience', _buildExpChips()),
                       _buildSection('Disponibilité', _buildAvailability()),

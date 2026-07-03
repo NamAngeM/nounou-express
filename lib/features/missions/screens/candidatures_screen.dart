@@ -18,8 +18,7 @@ class CandidaturesScreen extends ConsumerStatefulWidget {
   const CandidaturesScreen({super.key, required this.missionId});
 
   @override
-  ConsumerState<CandidaturesScreen> createState() =>
-      _CandidaturesScreenState();
+  ConsumerState<CandidaturesScreen> createState() => _CandidaturesScreenState();
 }
 
 class _CandidaturesScreenState extends ConsumerState<CandidaturesScreen> {
@@ -443,10 +442,8 @@ class _CandidaturesScreenState extends ConsumerState<CandidaturesScreen> {
                             const SizedBox(height: AppSpacing.md),
                         itemBuilder: (ctx, i) => _ApplicationCard(
                           application: applications[i],
-                          onAccept: () =>
-                              _acceptApplication(applications[i]),
-                          onReject: () =>
-                              _rejectApplication(applications[i]),
+                          onAccept: () => _acceptApplication(applications[i]),
+                          onReject: () => _rejectApplication(applications[i]),
                         ),
                       ),
                     ),

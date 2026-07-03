@@ -1534,8 +1534,14 @@ class _Slider extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('${min.round()} ${AppConstants.currency}', style: AppTypography.caption),
-            Text('${max.round()} ${AppConstants.currency}', style: AppTypography.caption),
+            Text(
+              '${min.round()} ${AppConstants.currency}',
+              style: AppTypography.caption,
+            ),
+            Text(
+              '${max.round()} ${AppConstants.currency}',
+              style: AppTypography.caption,
+            ),
           ],
         ),
       ],

@@ -151,8 +151,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/booking/new/:nannyId',
-        builder: (c, s) =>
-            BookingScreen(nannyId: s.pathParameters['nannyId']!),
+        builder: (c, s) => BookingScreen(nannyId: s.pathParameters['nannyId']!),
       ),
       GoRoute(
         path: '/booking/:id',
