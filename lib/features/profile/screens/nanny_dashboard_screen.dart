@@ -179,9 +179,8 @@ class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
     return ref
         .watch(upcomingMissionsProvider)
         .when(
-          data: (missions) => Column(
-            children: missions.map((m) => _buildMissionCard(m)).toList(),
-          ),
+          data: (missions) =>
+              Column(children: missions.map(_buildMissionCard).toList()),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) =>
               _buildErrorText("Impossible de charger les missions"),
@@ -298,9 +297,8 @@ class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
     return ref
         .watch(recentReviewsProvider)
         .when(
-          data: (reviews) => Column(
-            children: reviews.map((r) => _buildReviewCard(r)).toList(),
-          ),
+          data: (reviews) =>
+              Column(children: reviews.map(_buildReviewCard).toList()),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => _buildErrorText("Impossible de charger les avis"),
         );

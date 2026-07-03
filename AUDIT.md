@@ -96,8 +96,11 @@ L'app est conçue pour traiter : CNI recto/verso, photos, téléphone, **donnée
 - ✅ Adoption réelle de Riverpod : `AsyncValue` (loading/error/data) sur tous les écrans data, `refreshListenable` sur GoRouter, variables globales d'auth remplacées par `AuthNotifier` (`lib/features/auth/providers/auth_provider.dart`).
 - ✅ Sérialisation manuelle toJson/fromJson robuste sur les 11 modèles (le mapping `Timestamp` Firestore restera à ajouter en Phase 3).
 - ✅ Dark mode retiré (décision : design system non branché sur Theme) ; i18n différée (marché FR/Gabon).
-- ✅ Validé : `flutter analyze` 0 erreur/0 warning, `dart format`, `flutter test` OK (SDK 3.44.4 local).
-- ⏳ Restant Phase 2 : découpage de `register_screen.dart` (2 288 lignes) en étapes + validation `Form` avec les `Validators` existants.
+- ✅ `register_screen.dart` découpé : 2 288 → 196 lignes + 10 widgets d'étapes (`lib/features/auth/widgets/register/`), avec validation `Form` par étape branchée sur les `Validators` existants (téléphone gabonais, email, CNI, champs requis, cases obligatoires).
+- ✅ API `Radio` dépréciée migrée vers `RadioGroup` (price_summary).
+- ✅ Validé : `flutter analyze` → **« No issues found! »** (0 erreur/warning/info), `dart format` propre, `flutter test` OK (SDK 3.44.4 local).
+
+**Phase 2 : 100 % terminée (2026-07-03).**
 
 ### Phase 3 — Backend réel (4-8 semaines, ~60 % du travail restant)
 - Auth Firebase réelle (`verifyPhoneNumber`), rôle en **custom claims**, session via `authStateChanges`, téléphone via `state.extra` (jamais en query string).

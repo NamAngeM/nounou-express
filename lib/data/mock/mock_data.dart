@@ -1,9 +1,9 @@
 import '../models/application_model.dart';
-import '../models/mission_model.dart';
-import '../models/nanny_model.dart';
 import '../models/booking_model.dart';
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
+import '../models/mission_model.dart';
+import '../models/nanny_model.dart';
 import '../models/notification_model.dart';
 
 class MockData {
@@ -217,7 +217,6 @@ class MockData {
       lastMessageTime: DateTime.now().subtract(const Duration(hours: 2)),
       unreadCount: 2,
       isLastMessageRead: false,
-      isOnline: false,
       lastSeen: DateTime.now().subtract(const Duration(minutes: 15)),
     ),
     ConversationModel(
@@ -529,7 +528,6 @@ final List<ApplicationModel> mockApplications = [
     hourlyRate: 2000,
     experienceYears: 2,
     skills: ['Cuisine', 'Dodo nourrissons', 'Activités créatives'],
-    message: null,
     appliedAt: DateTime.now().subtract(const Duration(minutes: 15)),
   ),
   ApplicationModel(

@@ -7,8 +7,8 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../core/widgets/rating_stars.dart';
 import '../../../core/widgets/avatar_widget.dart';
+import '../../../core/widgets/rating_stars.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
 
@@ -197,8 +197,6 @@ class _NannyProfileScreenState extends ConsumerState<NannyProfileScreen> {
         const SizedBox(width: AppSpacing.sm),
       ],
       flexibleSpace: FlexibleSpaceBar(
-        collapseMode: CollapseMode.parallax,
-        stretchModes: const [StretchMode.zoomBackground],
         background: _HeaderBackground(nanny: nanny),
       ),
     );
@@ -271,7 +269,7 @@ class _HeaderBackground extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    RatingStars(rating: nanny.rating, size: 16),
+                    RatingStars(rating: nanny.rating),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
                       '${nanny.rating} · ${nanny.totalMissions} avis',
@@ -483,8 +481,6 @@ class _TarifCard extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [AppColors.primary, Color(0xFFFF9A6C)],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
           ),
           borderRadius: AppSpacing.cardBorderRadius,
         ),

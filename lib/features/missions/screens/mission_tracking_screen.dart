@@ -858,7 +858,6 @@ class _TimelineTile extends StatelessWidget {
             BoxShadow(
               color: color.withValues(alpha: 0.35),
               blurRadius: 8,
-              spreadRadius: 0,
               offset: const Offset(0, 3),
             ),
           ],

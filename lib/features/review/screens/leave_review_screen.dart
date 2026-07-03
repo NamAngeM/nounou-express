@@ -149,13 +149,13 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                   // Submit button
                   AppButton(
                     label: 'Soumettre mon avis',
-                    onPressed: _rating == 0 ? null : () => _submitReview(),
+                    onPressed: _rating == 0 ? null : _submitReview,
                   ),
                   const SizedBox(height: AppSpacing.md),
 
                   // Report a problem
                   TextButton.icon(
-                    onPressed: () => _showReportDialog(),
+                    onPressed: _showReportDialog,
                     icon: const Icon(
                       Icons.flag_outlined,
                       size: 16,

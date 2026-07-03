@@ -16,7 +16,9 @@
 
 ### Qualité
 - `pubspec.lock` régénéré (SDK Flutter 3.44.4 / Dart 3.12.2).
-- `flutter analyze` : 0 erreur, 0 warning ; `dart format` appliqué sur tout le projet ; `flutter test` : OK.
+- `register_screen.dart` découpé (2 288 → 196 lignes + 10 widgets d'étapes) avec validation `Form` par étape (Validators existants enfin branchés) ; fuite de controllers corrigée à la suppression d'un enfant.
+- API `Radio` dépréciée migrée vers `RadioGroup` (`price_summary.dart`).
+- `dart fix` : 67 corrections de lint automatiques ; `flutter analyze` : **« No issues found! »** ; `dart format` ; `flutter test` : OK.
 
 ## [Non publié] — 2026-07-02 (audit)
 

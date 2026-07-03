@@ -420,7 +420,7 @@ class _NannyMapCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            AppAvatar(name: nanny.name, size: 48),
+            AppAvatar(name: nanny.name),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(

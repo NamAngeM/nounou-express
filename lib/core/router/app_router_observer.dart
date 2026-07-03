@@ -14,7 +14,8 @@ class AppRouterObserver extends NavigatorObserver {
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    if (kDebugMode)
+    if (kDebugMode) {
       debugPrint('Router: Replaced with ${newRoute?.settings.name}');
+    }
   }
 }

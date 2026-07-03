@@ -275,10 +275,7 @@ class _SosScreenState extends State<SosScreen>
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.25),
-            width: 1,
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -394,10 +391,7 @@ class _StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(50),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.4),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
       ),
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),

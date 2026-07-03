@@ -262,7 +262,7 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
           style: AppTypography.bodyMedium,
         ),
         const SizedBox(height: AppSpacing.lg),
-        ..._durationOptions.map((minutes) => _buildNannyDurationCard(minutes)),
+        ..._durationOptions.map(_buildNannyDurationCard),
         _buildNannyDurationCard(null), // "Je ne sais pas"
         const SizedBox(height: AppSpacing.lg),
         SizedBox(

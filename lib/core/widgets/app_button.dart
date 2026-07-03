@@ -53,8 +53,6 @@ class AppButton extends StatelessWidget {
     AppButtonType.primary => AppColors.primaryGradientH,
     AppButtonType.danger => const LinearGradient(
       colors: [AppColors.danger, Color(0xFFEF5350)],
-      begin: Alignment.centerLeft,
-      end: Alignment.centerRight,
     ),
     _ => null,
   };

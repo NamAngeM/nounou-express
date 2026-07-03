@@ -555,11 +555,7 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
               lastDate: DateTime.now().add(const Duration(days: 60)),
               builder: (ctx, child) => Theme(
                 data: Theme.of(ctx).copyWith(
-                  colorScheme: ColorScheme.light(
-                    primary: AppColors.primary,
-                    onPrimary: AppColors.surface,
-                    surface: AppColors.surface,
-                  ),
+                  colorScheme: ColorScheme.light(primary: AppColors.primary),
                 ),
                 child: child!,
               ),

@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
-import 'scale_tap.dart';
 import 'avatar_widget.dart';
 import 'badge_widget.dart';
 import 'rating_stars.dart';
+import 'scale_tap.dart';
 
 class NannyCard extends StatelessWidget {
   final String nannyId;
@@ -46,7 +46,6 @@ class NannyCard extends StatelessWidget {
           border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // ── Avatar with hero ────────────────────────────────────────────
             Hero(

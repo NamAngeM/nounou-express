@@ -302,11 +302,7 @@ class _BottomControls extends StatelessWidget {
                       ? const EdgeInsets.symmetric(horizontal: AppSpacing.xl)
                       : EdgeInsets.zero,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: data.gradientColors,
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
+                    gradient: LinearGradient(colors: data.gradientColors),
                     borderRadius: AppSpacing.chipBorderRadius,
                     boxShadow: [
                       BoxShadow(

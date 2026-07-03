@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/avatar_widget.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
 import '../widgets/children_selector.dart';
 import '../widgets/price_summary.dart';
-import '../../../core/widgets/app_button.dart';
-import '../../../core/widgets/avatar_widget.dart';
 
 class BookingScreen extends ConsumerStatefulWidget {
   final String nannyId;
@@ -557,8 +558,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       AppColors.surfaceVariant,
                       AppColors.primarySurface,
                     ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
                   ),
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(AppSpacing.cardRadius),
@@ -566,7 +565,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 ),
                 child: Row(
                   children: [
-                    AppAvatar(name: nanny.name, size: 48, showRing: true),
+                    AppAvatar(name: nanny.name, showRing: true),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
@@ -723,7 +722,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 icon: Icons.arrow_back_rounded,
                 onPressed: _previousStep,
                 type: AppButtonType.ghost,
-                size: AppButtonSize.medium,
               ),
             ),
             const SizedBox(width: AppSpacing.md),
@@ -739,7 +737,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   : Icons.check_rounded,
               onPressed: () => _nextStep(nanny),
               isLoading: _isSubmitting,
-              type: AppButtonType.primary,
             ),
           ),
         ],

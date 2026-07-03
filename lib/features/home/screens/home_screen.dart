@@ -614,7 +614,6 @@ class _NannyCompactCard extends StatelessWidget {
           border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // ── Top gradient header ──────────────────────────────────────────
             Container(

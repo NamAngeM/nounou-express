@@ -11,7 +11,7 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('fr_FR', null);
+  await initializeDateFormatting('fr_FR');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Session chargée avant le premier frame pour que le redirect du routeur

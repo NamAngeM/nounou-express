@@ -85,7 +85,7 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        ...List.generate(_count, (index) => _buildAgeDropdown(index)),
+        ...List.generate(_count, _buildAgeDropdown),
       ],
     );
   }
@@ -128,14 +128,10 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
             ),
           ),
           Expanded(
-            flex: 1,
             child: DropdownButtonFormField<int>(
               initialValue: _ages[index],
               decoration: const InputDecoration(
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: 0,
-                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
               ),
               items: List.generate(13, (i) => i).map((age) {
                 return DropdownMenuItem<int>(

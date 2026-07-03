@@ -159,7 +159,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         label: "Numéro de téléphone",
                         icon: Icons.phone_outlined,
                         keyboardType: TextInputType.phone,
-                        validator: (val) => Validators.validatePhone(val),
+                        validator: Validators.validatePhone,
                       ),
                     ],
                   ),
@@ -353,10 +353,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.20),
               borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.40),
-                width: 1,
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.40)),
             ),
             child: Text(
               _isNanny ? "Nounou" : "Parent",
@@ -461,10 +458,7 @@ class _ProfileSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.10),
               border: Border(
-                bottom: BorderSide(
-                  color: color.withValues(alpha: 0.20),
-                  width: 1,
-                ),
+                bottom: BorderSide(color: color.withValues(alpha: 0.20)),
               ),
             ),
             child: Row(

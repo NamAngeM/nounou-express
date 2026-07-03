@@ -59,8 +59,6 @@ abstract final class AppColors {
 
   static const LinearGradient primaryGradientH = LinearGradient(
     colors: [primaryDark, primary],
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
   );
 
   static const LinearGradient heroGradient = LinearGradient(
@@ -77,14 +75,10 @@ abstract final class AppColors {
 
   static const LinearGradient accentGradient = LinearGradient(
     colors: [accentDark, accent],
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
   );
 
   static const LinearGradient orangeGradient = LinearGradient(
     colors: [Color(0xFFE06A10), gold],
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
   );
 
   // ── Shadows ────────────────────────────────────────────────────────────────
@@ -92,13 +86,11 @@ abstract final class AppColors {
     BoxShadow(
       color: const Color(0xFF2D3192).withValues(alpha: 0.07),
       blurRadius: 16,
-      spreadRadius: 0,
       offset: const Offset(0, 4),
     ),
     BoxShadow(
       color: const Color(0xFF2D3192).withValues(alpha: 0.03),
       blurRadius: 4,
-      spreadRadius: 0,
       offset: const Offset(0, 1),
     ),
   ];
@@ -107,7 +99,6 @@ abstract final class AppColors {
     BoxShadow(
       color: primary.withValues(alpha: 0.30),
       blurRadius: 16,
-      spreadRadius: 0,
       offset: const Offset(0, 6),
     ),
   ];
@@ -116,7 +107,6 @@ abstract final class AppColors {
     BoxShadow(
       color: const Color(0xFF2D3192).withValues(alpha: 0.12),
       blurRadius: 24,
-      spreadRadius: 0,
       offset: const Offset(0, 8),
     ),
   ];

@@ -60,9 +60,23 @@ class PriceSummary extends StatelessWidget {
           style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildPaymentOption("Espèces", Icons.payments_outlined, "cash"),
-        _buildPaymentOption("Airtel Money", Icons.phone_android, "airtel"),
-        _buildPaymentOption("Moov Money", Icons.phone_android, "moov"),
+        RadioGroup<String>(
+          groupValue: paymentMethod,
+          onChanged: (val) {
+            if (val != null) onPaymentMethodChanged(val);
+          },
+          child: Column(
+            children: [
+              _buildPaymentOption("Espèces", Icons.payments_outlined, "cash"),
+              _buildPaymentOption(
+                "Airtel Money",
+                Icons.phone_android,
+                "airtel",
+              ),
+              _buildPaymentOption("Moov Money", Icons.phone_android, "moov"),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -150,12 +164,7 @@ class PriceSummary extends StatelessWidget {
                 ),
               ),
             ),
-            Radio<String>(
-              value: value,
-              groupValue: paymentMethod,
-              onChanged: (val) => onPaymentMethodChanged(val!),
-              activeColor: AppColors.primary,
-            ),
+            Radio<String>(value: value, activeColor: AppColors.primary),
           ],
         ),
       ),

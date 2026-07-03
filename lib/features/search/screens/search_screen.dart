@@ -44,7 +44,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   List<NannyModel> _results(List<NannyModel> all) {
     final q = _query.toLowerCase().trim();
 
-    var list = all.where((n) {
+    final list = all.where((n) {
       final quartier = _quartierOf(n);
 
       // Text search (name or quartier)
@@ -126,7 +126,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
       body: nanniesAsync.when(
-        data: (nannies) => _buildResults(nannies),
+        data: _buildResults,
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => EmptyState(
           icon: Icons.error_outline_rounded,

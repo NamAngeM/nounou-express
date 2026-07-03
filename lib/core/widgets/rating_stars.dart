@@ -34,7 +34,7 @@ class RatingStars extends StatelessWidget {
             ? AppColors.border
             : AppColors.warning;
 
-        Widget star = Icon(icon, size: size, color: color);
+        final Widget star = Icon(icon, size: size, color: color);
 
         if (isInteractive) {
           return GestureDetector(
