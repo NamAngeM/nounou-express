@@ -1,10 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Session utilisateur.
-///
-/// Implémentation actuelle : mock persisté en SharedPreferences.
-/// À terme (Phase 3 de l'audit) : session Firebase Auth (`authStateChanges`),
-/// rôle porté par des custom claims côté serveur.
 class AuthSession {
   final bool isAuthenticated;
   final String role; // 'parent' | 'nanny'
@@ -19,19 +17,54 @@ class AuthSession {
   bool get isNanny => role == 'nanny';
 }
 
+/// Résultat d'une confirmation OTP.
+class OtpResult {
+  final AuthSession session;
+
+  /// `true` si un profil existe déjà pour ce numéro (connexion) :
+  /// l'écran OTP redirige alors vers /home au lieu de l'inscription.
+  final bool hasProfile;
+
+  const OtpResult({required this.session, required this.hasProfile});
+}
+
+/// Levée quand la confirmation OTP échoue (code invalide, expiré...).
+class OtpException implements Exception {
+  final String message;
+  const OtpException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 /// Contrat d'accès à l'authentification.
 abstract class AuthRepository {
   Future<AuthSession> loadSession();
 
+  /// Démarre la vérification du numéro (envoi du SMS OTP).
+  /// [phone] : 9 chiffres gabonais sans indicatif (le +241 est ajouté).
+  Future<void> startPhoneVerification(
+    String phone, {
+    required void Function() onCodeSent,
+    required void Function(String message) onError,
+  });
+
+  /// Confirme le code OTP reçu par SMS.
+  /// Lève [OtpException] si le code est invalide ou expiré.
+  Future<OtpResult> confirmOtp(String smsCode, {required String role});
+
+  /// Finalise l'inscription : persiste le rôle (et le profil à terme).
   Future<AuthSession> signIn({required String role});
 
   Future<void> signOut();
 }
 
 /// Implémentation mock : un booléen + un rôle en SharedPreferences.
+/// N'importe quel code OTP passe (bandeau « mode démo » affiché par l'UI).
 class MockAuthRepository implements AuthRepository {
   static const String _kAuthenticated = 'isAuthenticated';
   static const String _kRole = 'userRole';
+  static const Duration _latency = Duration(milliseconds: 300);
 
   @override
   Future<AuthSession> loadSession() async {
@@ -39,6 +72,27 @@ class MockAuthRepository implements AuthRepository {
     return AuthSession(
       isAuthenticated: prefs.getBool(_kAuthenticated) ?? false,
       role: prefs.getString(_kRole) ?? 'parent',
+    );
+  }
+
+  @override
+  Future<void> startPhoneVerification(
+    String phone, {
+    required void Function() onCodeSent,
+    required void Function(String message) onError,
+  }) async {
+    await Future<void>.delayed(_latency);
+    onCodeSent();
+  }
+
+  @override
+  Future<OtpResult> confirmOtp(String smsCode, {required String role}) async {
+    await Future<void>.delayed(_latency);
+    // Mode démo : tout code à 4 chiffres passe ; le profil n'existe jamais,
+    // l'utilisateur poursuit vers l'inscription (comportement historique).
+    return OtpResult(
+      session: AuthSession(isAuthenticated: false, role: role),
+      hasProfile: false,
     );
   }
 
@@ -54,5 +108,120 @@ class MockAuthRepository implements AuthRepository {
   Future<void> signOut() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kAuthenticated, false);
+  }
+}
+
+/// Implémentation Firebase : OTP réel via `verifyPhoneNumber`, rôle persisté
+/// dans `users/{uid}` (à migrer vers des custom claims quand un backend
+/// d'administration existera — voir AUDIT.md Phase 3).
+class FirebaseAuthRepository implements AuthRepository {
+  FirebaseAuthRepository({FirebaseAuth? auth, FirebaseFirestore? firestore})
+    : _auth = auth ?? FirebaseAuth.instance,
+      _db = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _db;
+
+  String? _verificationId;
+  int? _resendToken;
+
+  DocumentReference<Map<String, dynamic>> _userDoc(String uid) =>
+      _db.collection('users').doc(uid);
+
+  @override
+  Future<AuthSession> loadSession() async {
+    final user = _auth.currentUser;
+    if (user == null) return AuthSession.unauthenticated;
+    final snapshot = await _userDoc(user.uid).get();
+    final role = snapshot.data()?['role'] as String? ?? 'parent';
+    return AuthSession(isAuthenticated: true, role: role);
+  }
+
+  @override
+  Future<void> startPhoneVerification(
+    String phone, {
+    required void Function() onCodeSent,
+    required void Function(String message) onError,
+  }) async {
+    final number = '+241${phone.replaceAll(' ', '')}';
+    await _auth.verifyPhoneNumber(
+      phoneNumber: number,
+      forceResendingToken: _resendToken,
+      verificationCompleted: (credential) async {
+        // Android uniquement : vérification automatique du SMS.
+        await _auth.signInWithCredential(credential);
+      },
+      verificationFailed: (e) => onError(_frenchAuthMessage(e)),
+      codeSent: (verificationId, resendToken) {
+        _verificationId = verificationId;
+        _resendToken = resendToken;
+        onCodeSent();
+      },
+      codeAutoRetrievalTimeout: (verificationId) {
+        _verificationId = verificationId;
+      },
+    );
+  }
+
+  @override
+  Future<OtpResult> confirmOtp(String smsCode, {required String role}) async {
+    final verificationId = _verificationId;
+    User? user = _auth.currentUser;
+
+    if (user == null) {
+      if (verificationId == null) {
+        throw const OtpException(
+          'Aucune vérification en cours. Renvoyez le code.',
+        );
+      }
+      try {
+        final credential = PhoneAuthProvider.credential(
+          verificationId: verificationId,
+          smsCode: smsCode,
+        );
+        user = (await _auth.signInWithCredential(credential)).user;
+      } on FirebaseAuthException catch (e) {
+        throw OtpException(_frenchAuthMessage(e));
+      }
+    }
+    if (user == null) {
+      throw const OtpException('Connexion impossible. Réessayez.');
+    }
+
+    final snapshot = await _userDoc(user.uid).get();
+    final hasProfile = snapshot.exists;
+    final storedRole = snapshot.data()?['role'] as String? ?? role;
+    return OtpResult(
+      session: AuthSession(isAuthenticated: true, role: storedRole),
+      hasProfile: hasProfile,
+    );
+  }
+
+  @override
+  Future<AuthSession> signIn({required String role}) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw const OtpException('Vérifiez votre numéro avant de continuer.');
+    }
+    await _userDoc(user.uid).set({
+      'role': role,
+      'phone': user.phoneNumber,
+      'createdAt': DateTime.now().toIso8601String(),
+    }, SetOptions(merge: true));
+    return AuthSession(isAuthenticated: true, role: role);
+  }
+
+  @override
+  Future<void> signOut() => _auth.signOut();
+
+  static String _frenchAuthMessage(FirebaseAuthException e) {
+    return switch (e.code) {
+      'invalid-verification-code' => 'Code invalide. Vérifiez et réessayez.',
+      'session-expired' => 'Code expiré. Renvoyez un nouveau code.',
+      'invalid-phone-number' => 'Numéro de téléphone invalide.',
+      'too-many-requests' => 'Trop de tentatives. Réessayez plus tard.',
+      'quota-exceeded' => 'Service momentanément indisponible.',
+      _ => 'Erreur d\'authentification (${e.code}).',
+    };
   }
 }

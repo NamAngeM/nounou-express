@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/backend_config.dart';
 import '../models/application_model.dart';
 import '../models/booking_model.dart';
 import '../models/conversation_model.dart';
@@ -9,6 +10,12 @@ import '../models/nanny_model.dart';
 import '../models/notification_model.dart';
 import '../repositories/booking_repository.dart';
 import '../repositories/chat_repository.dart';
+import '../repositories/firestore/firestore_booking_repository.dart';
+import '../repositories/firestore/firestore_chat_repository.dart';
+import '../repositories/firestore/firestore_mission_repository.dart';
+import '../repositories/firestore/firestore_nanny_repository.dart';
+import '../repositories/firestore/firestore_notification_repository.dart';
+import '../repositories/firestore/firestore_profile_repository.dart';
 import '../repositories/mission_repository.dart';
 import '../repositories/nanny_repository.dart';
 import '../repositories/notification_repository.dart';
@@ -19,27 +26,39 @@ import '../repositories/profile_repository.dart';
 // implémentations Firestore (Phase 3 de l'audit) sans toucher aux écrans.
 
 final nannyRepositoryProvider = Provider<NannyRepository>(
-  (ref) => MockNannyRepository(),
+  (ref) => BackendConfig.useFirebase
+      ? FirestoreNannyRepository()
+      : MockNannyRepository(),
 );
 
 final bookingRepositoryProvider = Provider<BookingRepository>(
-  (ref) => MockBookingRepository(),
+  (ref) => BackendConfig.useFirebase
+      ? FirestoreBookingRepository()
+      : MockBookingRepository(),
 );
 
 final chatRepositoryProvider = Provider<ChatRepository>(
-  (ref) => MockChatRepository(),
+  (ref) => BackendConfig.useFirebase
+      ? FirestoreChatRepository()
+      : MockChatRepository(),
 );
 
 final missionRepositoryProvider = Provider<MissionRepository>(
-  (ref) => MockMissionRepository(),
+  (ref) => BackendConfig.useFirebase
+      ? FirestoreMissionRepository()
+      : MockMissionRepository(),
 );
 
 final notificationRepositoryProvider = Provider<NotificationRepository>(
-  (ref) => MockNotificationRepository(),
+  (ref) => BackendConfig.useFirebase
+      ? FirestoreNotificationRepository()
+      : MockNotificationRepository(),
 );
 
 final profileRepositoryProvider = Provider<ProfileRepository>(
-  (ref) => MockProfileRepository(),
+  (ref) => BackendConfig.useFirebase
+      ? FirestoreProfileRepository()
+      : MockProfileRepository(),
 );
 
 // ── Nounous ───────────────────────────────────────────────────────────────────

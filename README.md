@@ -2,8 +2,18 @@
 
 Application mobile (Flutter) de mise en relation entre **nounous** et **familles** au Gabon : recherche de nounous, réservations, missions/annonces, chat, notifications, wallet mobile money, bouton SOS.
 
-> ⚠️ **État du projet : prototype UI (maquette haute-fidélité).**
-> Les données sont mockées (`lib/data/mock/`), l'authentification est factice et Firebase n'est initialisé que superficiellement. Voir [AUDIT.md](AUDIT.md) pour l'état des lieux complet et le plan d'implémentation du backend.
+> ℹ️ **État du projet : double backend derrière un feature flag.**
+> Par défaut l'app tourne en **mode démo** (données mockées, OTP factice). Le backend **Firebase réel** (Auth téléphone + Firestore) est implémenté et s'active avec `--dart-define=USE_FIREBASE=true`, après configuration de la console (voir AUDIT.md §7). Historique complet : [AUDIT.md](AUDIT.md).
+
+## Lancer
+
+```bash
+# Mode démo (mocks, par défaut)
+flutter run
+
+# Backend Firebase réel (prérequis console : Phone Auth, SHA, règles déployées)
+flutter run --dart-define=USE_FIREBASE=true
+```
 
 ## Stack
 

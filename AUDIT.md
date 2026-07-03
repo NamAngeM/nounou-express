@@ -102,11 +102,12 @@ L'app est conçue pour traiter : CNI recto/verso, photos, téléphone, **donnée
 
 **Phase 2 : 100 % terminée (2026-07-03).**
 
-### Phase 3 — Backend réel (4-8 semaines, ~60 % du travail restant)
-- Auth Firebase réelle (`verifyPhoneNumber`), rôle en **custom claims**, session via `authStateChanges`, téléphone via `state.extra` (jamais en query string).
-- Firestore par ordre de valeur : profils/recherche → booking → chat temps réel → notifications FCM → missions → wallet (paiements mobile money côté serveur uniquement — le param `rate` de l'URL ne doit jamais faire foi).
-- Vraie carte (google_maps_flutter + geolocator + permissions manifest/Info.plist), vrai flux CNI (Storage restreint ou KYC).
-- Failures typées, Crashlytics, `FlutterError.onError`, logger structuré.
+### Phase 3 — Backend réel — ✅ SOCLE RÉALISÉ (2026-07-03)
+- ✅ Auth Firebase réelle (`verifyPhoneNumber` + confirmation serveur du code, renvoi avec `forceResendingToken`, erreurs en français) derrière l'interface `AuthRepository` ; rôle dans `users/{uid}` (⏳ custom claims quand un backend d'admin existera) ; téléphone via `state.extra`.
+- ✅ Implémentations Firestore des 6 repositories (`lib/data/repositories/firestore/`) + index composite (`firestore.indexes.json`) + règles de sécurité par rôle/propriétaire (`firestore.rules` — catch-all deny conservé).
+- ✅ **Feature flag `USE_FIREBASE`** (`lib/core/constants/backend_config.dart`, `--dart-define=USE_FIREBASE=true`) : mock par défaut, bascule Firebase sans toucher aux écrans. Prérequis console avant activation : Phone Auth + empreintes SHA, `firebase deploy --only firestore:rules,firestore:indexes`, App Check, doc `config/quartiers`.
+- ✅ Gestion d'erreurs globale (`FlutterError.onError`, `PlatformDispatcher.onError`) — Crashlytics en Phase 4.
+- ⏳ Restant Phase 3 : chat temps réel en streams (actuellement fetch + invalidate), notifications FCM (handlers + tokens), vraie carte (google_maps_flutter + permissions manifest/Info.plist), flux CNI (Storage restreint ou KYC), wallet/paiements mobile money (côté serveur uniquement — le param `rate` de l'URL ne doit jamais faire foi), profil complet écrit dans `users/{uid}` à l'inscription.
 
 ### Phase 4 — Production-ready (en parallèle)
 - Tests : unitaires (modèles, providers, redirects), widget tests par écran, 1-2 flux d'intégration ; viser > 60 % sur la logique.

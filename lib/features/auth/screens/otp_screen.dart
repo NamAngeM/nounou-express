@@ -3,21 +3,25 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/backend_config.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../data/repositories/auth_repository.dart';
+import '../providers/auth_provider.dart';
 
-class OtpScreen extends StatefulWidget {
+class OtpScreen extends ConsumerStatefulWidget {
   const OtpScreen({super.key});
 
   @override
-  State<OtpScreen> createState() => _OtpScreenState();
+  ConsumerState<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen>
+class _OtpScreenState extends ConsumerState<OtpScreen>
     with SingleTickerProviderStateMixin {
   final List<TextEditingController> _controllers = List.generate(
     4,
@@ -31,6 +35,8 @@ class _OtpScreenState extends State<OtpScreen>
   String role = '';
   bool _hasError = false;
   bool _isComplete = false;
+  bool _isVerifying = false;
+  bool _codeRequested = false;
   late AnimationController _shakeController;
 
   @override
@@ -66,6 +72,26 @@ class _OtpScreenState extends State<OtpScreen>
       phone = uri.queryParameters['phone'] ?? '';
       role = uri.queryParameters['role'] ?? 'parent';
     }
+    if (!_codeRequested) {
+      _codeRequested = true;
+      _sendCode();
+    }
+  }
+
+  /// Envoi (ou renvoi) du SMS de vérification via le repository d'auth.
+  void _sendCode() {
+    ref
+        .read(authProvider.notifier)
+        .startPhoneVerification(
+          phone,
+          onCodeSent: () {},
+          onError: (message) {
+            if (!mounted) return;
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(message)));
+          },
+        );
   }
 
   @override
@@ -108,15 +134,33 @@ class _OtpScreenState extends State<OtpScreen>
     }
   }
 
-  void _onVerify() {
+  Future<void> _onVerify() async {
+    if (_isVerifying) return;
     final otp = _controllers.map((c) => c.text).join();
     if (otp.length < 4) {
       setState(() => _hasError = true);
       _shake();
       return;
     }
-    // Mock: any 4-digit code passes
-    context.go('/auth/register?role=$role');
+    setState(() => _isVerifying = true);
+    try {
+      final result = await ref
+          .read(authProvider.notifier)
+          .confirmOtp(otp, role: role);
+      if (!mounted) return;
+      // Profil existant → connexion directe ; sinon → inscription.
+      context.go(result.hasProfile ? '/home' : '/auth/register?role=$role');
+    } on OtpException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _hasError = true;
+        _isVerifying = false;
+      });
+      _shake();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
+    }
   }
 
   void _shake() {
@@ -317,7 +361,10 @@ class _OtpScreenState extends State<OtpScreen>
                                   ),
                                 )
                               : GestureDetector(
-                                  onTap: _startTimer,
+                                  onTap: () {
+                                    _sendCode();
+                                    _startTimer();
+                                  },
                                   child: Text(
                                     'Renvoyer le code',
                                     style: AppTypography.bodySmall.copyWith(
@@ -336,47 +383,48 @@ class _OtpScreenState extends State<OtpScreen>
                   const SizedBox(height: AppSpacing.xxxl),
 
                   AppButton(
-                    label: 'Vérifier',
+                    label: _isVerifying ? 'Vérification...' : 'Vérifier',
                     icon: Icons.verified_rounded,
                     onPressed: _onVerify,
                   ).animate().fadeIn(delay: 380.ms),
 
                   const SizedBox(height: AppSpacing.xl),
 
-                  // ── Demo hint — distinct chip with accentSurface ─────────
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.lg,
-                        vertical: AppSpacing.sm,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentSurface,
-                        borderRadius: AppSpacing.chipBorderRadius,
-                        border: Border.all(
-                          color: AppColors.accent.withValues(alpha: 0.25),
+                  // ── Demo hint — affiché uniquement sur le backend mock ───
+                  if (!BackendConfig.useFirebase)
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.sm,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.accentSurface,
+                          borderRadius: AppSpacing.chipBorderRadius,
+                          border: Border.all(
+                            color: AppColors.accent.withValues(alpha: 0.25),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.info_outline_rounded,
+                              size: 14,
+                              color: AppColors.accent,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Mode demo : entrez n\'importe quel code',
+                              style: AppTypography.small.copyWith(
+                                color: AppColors.accentDark,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.info_outline_rounded,
-                            size: 14,
-                            color: AppColors.accent,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Mode demo : entrez n\'importe quel code',
-                            style: AppTypography.small.copyWith(
-                              color: AppColors.accentDark,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ).animate().fadeIn(delay: 440.ms),
+                    ).animate().fadeIn(delay: 440.ms),
 
                   const SizedBox(height: AppSpacing.xl),
 

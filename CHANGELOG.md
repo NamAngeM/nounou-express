@@ -1,5 +1,22 @@
 # Changelog
 
+## [Non publié] — 2026-07-03 (Phase 3 : backend réel derrière feature flag)
+
+### Architecture
+- **Feature flag `USE_FIREBASE`** (`lib/core/constants/backend_config.dart`) : `flutter run --dart-define=USE_FIREBASE=true` bascule l'app des mocks vers Firebase — par défaut l'app reste en mode démo.
+- **Auth téléphone réelle** : `FirebaseAuthRepository` (envoi SMS via `verifyPhoneNumber`, confirmation du code côté serveur, renvoi avec `forceResendingToken`, messages d'erreur en français). Rôle persisté dans `users/{uid}` (custom claims prévus en Phase 4). Écran OTP branché : le code est réellement vérifié, un profil existant connecte directement (`/home`), le bandeau « mode démo » n'apparaît que sur le backend mock.
+- **Implémentations Firestore des 6 repositories** (`lib/data/repositories/firestore/`) : nannies, bookings (index composite parentId+date dans `firestore.indexes.json`), chat (messages `chats/{threadId}/messages` + index de conversations miroir chez les deux participants, envoi en WriteBatch atomique), missions/candidatures, notifications, dashboard. Dates stockées en ISO-8601 (v1), `normalizeDoc` tolère les `Timestamp`.
+- **Règles Firestore réelles** (`firestore.rules`) : accès par propriétaire/participant, missions lisibles par les connectés, notifications/dashboard en écriture backend uniquement, catch-all deny. Storage reste deny-all (aucun upload implémenté).
+- **Gestion d'erreurs globale** dans `main.dart` (`FlutterError.onError` + `PlatformDispatcher.onError`) — Crashlytics prévu en Phase 4.
+
+### Qualité
+- `flutter analyze` : « No issues found! » ; `dart format` ; `flutter test` OK.
+
+### Prérequis console avant d'activer le flag (voir AUDIT.md §7)
+- Activer Phone Auth (+ numéros de test), enregistrer les SHA-1/SHA-256 Android.
+- `firebase deploy --only firestore:rules,firestore:indexes`.
+- Restreindre les clés API, activer App Check, provisionner `config/quartiers`.
+
 ## [Non publié] — 2026-07-03 (Phase 2 : fondations d'architecture)
 
 ### Architecture

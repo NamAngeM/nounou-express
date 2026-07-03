@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/backend_config.dart';
 import '../../../data/repositories/auth_repository.dart';
 
 /// Session chargée avant `runApp` (voir `main.dart`) et injectée via
@@ -10,12 +11,40 @@ final initialSessionProvider = Provider<AuthSession>(
 );
 
 final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => MockAuthRepository(),
+  (ref) => BackendConfig.useFirebase
+      ? FirebaseAuthRepository()
+      : MockAuthRepository(),
 );
 
 class AuthNotifier extends Notifier<AuthSession> {
   @override
   AuthSession build() => ref.watch(initialSessionProvider);
+
+  /// Envoi (ou renvoi) du SMS de vérification.
+  Future<void> startPhoneVerification(
+    String phone, {
+    required void Function() onCodeSent,
+    required void Function(String message) onError,
+  }) {
+    return ref
+        .read(authRepositoryProvider)
+        .startPhoneVerification(
+          phone,
+          onCodeSent: onCodeSent,
+          onError: onError,
+        );
+  }
+
+  /// Confirme le code OTP. Lève [OtpException] si le code est refusé.
+  Future<OtpResult> confirmOtp(String smsCode, {required String role}) async {
+    final result = await ref
+        .read(authRepositoryProvider)
+        .confirmOtp(smsCode, role: role);
+    if (result.session.isAuthenticated) {
+      state = result.session;
+    }
+    return result;
+  }
 
   Future<void> signIn({required String role}) async {
     state = await ref.read(authRepositoryProvider).signIn(role: role);
