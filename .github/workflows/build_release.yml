@@ -1,9 +1,13 @@
 name: Build Release
 
+# Workflow de release : à la demande (Actions → Run workflow) ou sur tag v*.
+# La validation continue (analyze/tests/web/AAB) est déjà couverte par ci.yml
+# à chaque push — inutile de builder deux fois par commit.
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -32,15 +36,16 @@ jobs:
       - name: Run Tests
         run: flutter test
 
-      - name: Decode Keystore
+      # Secrets requis (voir docs/KEYSTORE.md) :
+      #  - KEYSTORE_BASE64 : le fichier .jks encodé en base64
+      #  - KEY_PROPERTIES  : le contenu complet de android/key.properties
+      - name: Decode keystore
         run: |
-          # Note : Dans un vrai projet, utilisez les GitHub Secrets pour encoder le keystore en base64
-          # echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
-          # echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
-          # echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-          # echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
-          # echo "storeFile=upload-keystore.jks" >> android/key.properties
-          echo "Simulate Key Decoding"
+          mkdir -p keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore/nounou-express-release.jks
+
+      - name: Create key.properties
+        run: echo "${{ secrets.KEY_PROPERTIES }}" > android/key.properties
 
       - name: Build AAB
         run: flutter build appbundle --release
