@@ -49,3 +49,7 @@ app.*.map.json
 *.py
 emulators_output.txt
 lib/features/auth/screens/*.bak
+
+# ── Release signing (Phase 4) ────────────────────────────────────────────────
+keystore/
+android/key.properties

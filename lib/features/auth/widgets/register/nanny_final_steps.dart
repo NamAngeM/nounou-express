@@ -122,6 +122,18 @@ class NannyEngagementStep extends StatelessWidget {
             .fadeIn(duration: 400.ms, delay: 160.ms)
             .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 160.ms),
         RegisterCheckTile(
+              label: 'J\'accepte la Politique de Confidentialité *',
+              value: data.acceptPrivacyNanny,
+              requiredMessage: 'Veuillez cocher cette case pour continuer.',
+              onChanged: (v) {
+                data.acceptPrivacyNanny = v;
+                onChanged();
+              },
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 190.ms)
+            .slideY(begin: 0.08, end: 0, duration: 400.ms, delay: 190.ms),
+        RegisterCheckTile(
               label: 'J\'autorise Nounou Express à vérifier mon identité *',
               value: data.acceptVerification,
               requiredMessage: 'Veuillez cocher cette case pour continuer.',

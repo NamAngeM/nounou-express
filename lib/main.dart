@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,18 +16,31 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Gestion d'erreurs globale — Crashlytics prendra le relais en Phase 4.
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    debugPrint('FlutterError: ${details.exceptionAsString()}');
-  };
-  PlatformDispatcher.instance.onError = (error, stack) {
-    debugPrint('Erreur non interceptée: $error\n$stack');
-    return true;
-  };
-
-  await initializeDateFormatting('fr_FR');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // ── Crashlytics ───────────────────────────────────────────────────────────
+  // En debug, les erreurs restent dans la console ; en release, elles sont
+  // envoyées à Crashlytics pour le monitoring en production.
+  if (kReleaseMode) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  } else {
+    // Mode debug : garde le comportement console classique.
+    FlutterError.onError = (details) {
+      FlutterError.presentError(details);
+      debugPrint('FlutterError: ${details.exceptionAsString()}');
+    };
+    PlatformDispatcher.instance.onError = (error, stack) {
+      debugPrint('Erreur non interceptée: $error\n$stack');
+      return true;
+    };
+    // Désactive Crashlytics en debug pour ne pas polluer le dashboard.
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+  }
+  await initializeDateFormatting('fr_FR');
   await PushNotificationsService.initialize();
 
   // Session chargée avant le premier frame pour que le redirect du routeur

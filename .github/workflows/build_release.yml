@@ -1,0 +1,52 @@
+name: Build Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Android App Bundle
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.10.x' # Ou la version utilisée dans l'environnement
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run Tests
+        run: flutter test
+
+      - name: Decode Keystore
+        run: |
+          # Note : Dans un vrai projet, utilisez les GitHub Secrets pour encoder le keystore en base64
+          # echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+          # echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          # echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          # echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          # echo "storeFile=upload-keystore.jks" >> android/key.properties
+          echo "Simulate Key Decoding"
+
+      - name: Build AAB
+        run: flutter build appbundle --release
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aab
+          path: build/app/outputs/bundle/release/app-release.aab

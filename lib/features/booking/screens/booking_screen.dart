@@ -13,6 +13,7 @@ import '../../../data/models/booking_model.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
 import '../widgets/children_selector.dart';
+import '../widgets/mock_payment_gateway.dart';
 import '../widgets/price_summary.dart';
 
 class BookingScreen extends ConsumerStatefulWidget {
@@ -65,12 +66,32 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       '${time.hour.toString().padLeft(2, '0')}:'
       '${time.minute.toString().padLeft(2, '0')}';
 
-  void _nextStep(NannyModel nanny) {
+  double _calculateTotal(NannyModel nanny) {
+    final baseTotal = nanny.hourlyRate * _totalHours;
+    final nightSurcharge = _isNight ? baseTotal * 0.2 : 0.0;
+    final weekendSurcharge = _isWeekend ? baseTotal * 0.1 : 0.0;
+    final subtotal = baseTotal + nightSurcharge + weekendSurcharge;
+    final commission = subtotal * 0.15;
+    return subtotal + commission;
+  }
+
+  void _nextStep(NannyModel nanny) async {
     if (_currentStep == 0) {
       if (!_formKey.currentState!.validate()) return;
       setState(() => _currentStep++);
     } else {
-      _confirmBooking(nanny);
+      if (_paymentMethod == 'airtel' || _paymentMethod == 'moov') {
+        final success = await MockPaymentGateway.show(
+          context,
+          provider: _paymentMethod,
+          amount: _calculateTotal(nanny),
+        );
+        if (success == true) {
+          await _confirmBooking(nanny);
+        }
+      } else {
+        await _confirmBooking(nanny);
+      }
     }
   }
 

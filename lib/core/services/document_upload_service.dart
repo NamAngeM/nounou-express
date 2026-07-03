@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../constants/backend_config.dart';
+import 'kyc_ocr_service.dart';
 
 /// Sélection et upload des documents d'identité (KYC) vers Cloud Storage.
 ///
@@ -33,7 +34,9 @@ abstract final class DocumentUploadService {
   ///  - `null` si l'utilisateur annule la sélection.
   ///
   /// Lève [StateError] si Firebase est actif sans utilisateur authentifié.
-  static Future<String?> pickAndUploadDocument({required String slot}) async {
+  /// Retourne un Record avec le chemin et éventuellement les données OCR.
+  static Future<({String path, Map<String, dynamic>? ocrData})?>
+  pickAndUploadDocument({required String slot}) async {
     final XFile? picked = await _picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 70,
@@ -41,9 +44,15 @@ abstract final class DocumentUploadService {
     );
     if (picked == null) return null;
 
+    Map<String, dynamic>? ocrResult;
+    if (slot == 'cni_recto') {
+      final bytes = await picked.readAsBytes();
+      ocrResult = await KycOcrService.extractMrzData(bytes, picked.name);
+    }
+
     if (!BackendConfig.useFirebase) {
       // Mode démo : aucun backend, on mémorise simplement le fichier choisi.
-      return picked.path;
+      return (path: picked.path, ocrData: ocrResult);
     }
 
     final User? user = FirebaseAuth.instance.currentUser;
@@ -66,6 +75,6 @@ abstract final class DocumentUploadService {
     } else {
       await ref.putFile(File(picked.path), metadata);
     }
-    return ref.fullPath;
+    return (path: ref.fullPath, ocrData: ocrResult);
   }
 }

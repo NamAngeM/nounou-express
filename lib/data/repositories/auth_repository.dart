@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,6 +65,9 @@ abstract class AuthRepository {
   });
 
   Future<void> signOut();
+
+  /// Supprime toutes les données associées à l'utilisateur et son compte.
+  Future<void> deleteAccount();
 }
 
 /// Implémentation mock : un booléen + un rôle en SharedPreferences.
@@ -119,6 +123,12 @@ class MockAuthRepository implements AuthRepository {
   Future<void> signOut() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kAuthenticated, false);
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear all mock data
   }
 }
 
@@ -242,11 +252,35 @@ class FirebaseAuthRepository implements AuthRepository {
         'createdAt': DateTime.now().toIso8601String(),
       }, SetOptions(merge: true));
     }
+
+    // Force refresh the token to retrieve custom claims right away.
+    // However, the Cloud Function might take a second to write the claim,
+    // so we fall back to the selected role during the initial session.
+    try {
+      await user.getIdTokenResult(true);
+    } catch (_) {}
+
     return AuthSession(isAuthenticated: true, role: role);
   }
 
   @override
   Future<void> signOut() => _auth.signOut();
+
+  @override
+  Future<void> deleteAccount() async {
+    // Appel de la Cloud Function de suppression (définie dans functions/src/index.ts)
+    // qui supprimera Auth, Firestore (users, nannies, etc.) et Storage (KYC).
+    try {
+      final callable = FirebaseFunctions.instance.httpsCallable(
+        'deleteUserData',
+      );
+      await callable();
+      // AuthRepository state will be updated by signOut/session reload.
+      await signOut();
+    } catch (e) {
+      throw Exception('Erreur lors de la suppression du compte: $e');
+    }
+  }
 
   static String _frenchAuthMessage(FirebaseAuthException e) {
     return switch (e.code) {

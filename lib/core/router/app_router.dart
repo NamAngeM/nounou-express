@@ -13,8 +13,11 @@ import '../../features/booking/screens/booking_screen.dart';
 import '../../features/booking/screens/bookings_list_screen.dart';
 import '../../features/chat/screens/chat_screen.dart';
 import '../../features/chat/screens/conversations_screen.dart';
+import '../../features/chat/screens/video_call_screen.dart';
 import '../../features/home/screens/home_screen.dart';
 import '../../features/home/screens/main_shell.dart';
+import '../../features/legal/screens/privacy_policy_screen.dart';
+import '../../features/legal/screens/terms_screen.dart';
 import '../../features/missions/screens/available_missions_screen.dart';
 import '../../features/missions/screens/candidatures_screen.dart';
 import '../../features/missions/screens/delay_screen.dart';
@@ -26,6 +29,7 @@ import '../../features/onboarding/screens/onboarding_screen.dart';
 import '../../features/profile/screens/edit_profile_screen.dart';
 import '../../features/profile/screens/nanny_dashboard_screen.dart';
 import '../../features/profile/screens/parent_profile_screen.dart';
+import '../../features/profile/screens/wallet_screen.dart';
 import '../../features/search/screens/map_screen.dart';
 import '../../features/search/screens/search_screen.dart';
 import '../../features/sos/screens/sos_screen.dart';
@@ -49,6 +53,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final session = ref.read(authProvider);
       final bool isAuthPath =
           state.uri.path.startsWith('/auth') ||
+          state.uri.path.startsWith('/legal') ||
           state.uri.path == '/' || // splash
           state.uri.path == '/onboarding';
 
@@ -67,6 +72,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/onboarding',
         pageBuilder: (c, s) => _fadeTransition(const OnboardingScreen()),
       ),
+
+      // --- Legal Routes ---
+      GoRoute(
+        path: '/legal/privacy',
+        builder: (c, s) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(path: '/legal/terms', builder: (c, s) => const TermsScreen()),
 
       // --- Auth Routes ---
       GoRoute(
@@ -205,6 +217,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               AppConstants.defaultHourlyRate,
         ),
       ),
+      GoRoute(
+        path: '/video-call',
+        builder: (c, s) => VideoCallScreen(
+          peerName: s.uri.queryParameters['name'] ?? 'Utilisateur',
+        ),
+      ),
+      GoRoute(path: '/wallet', builder: (c, s) => const WalletScreen()),
     ],
   );
 });

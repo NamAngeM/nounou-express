@@ -9,14 +9,21 @@ jobs:
     name: Build & Deploy Web
     runs-on: ubuntu-latest
 
+    # Requires a Firebase service account key stored as a secret.
+    # See: https://github.com/FirebaseExtended/action-hosting-deploy
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Flutter (latest stable)
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: '3.44.4'
           cache: true
 
       - name: Install dependencies
@@ -25,10 +32,10 @@ jobs:
       - name: Build web (release)
         run: flutter build web --release
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-
       - name: Deploy to Firebase Hosting
-        run: firebase deploy --only hosting --project nounou-express-2112b --token "$FIREBASE_TOKEN" --non-interactive
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: nounou-express-2112b

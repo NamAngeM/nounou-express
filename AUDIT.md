@@ -115,7 +115,11 @@ L'app est conçue pour traiter : CNI recto/verso, photos, téléphone, **donnée
 
 **Phase 3 (périmètre code) : terminée le 2026-07-03.**
 
-### Phase 4 — Production-ready (en parallèle)
-- Tests : unitaires (modèles, providers, redirects), widget tests par écran, 1-2 flux d'intégration ; viser > 60 % sur la logique.
-- Release : keystore prod, R8/minify, permissions Android + usage descriptions iOS, build AAB signé en CI, service account Firebase (remplacer `--token`), épingler la version Flutter en CI.
-- Conformité (§4), accessibilité (`Semantics`), incrément de version + CHANGELOG à chaque livraison.
+### Phase 4 — Production-ready — 🔶 LARGEMENT ENTAMÉE (2026-07-03)
+- ✅ **Tests** : 93 tests passent (modèles + sérialisation, repositories mock, AuthNotifier, widget tests login) — base à étendre écran par écran.
+- ✅ **Release Android** : signing config release via `key.properties` (keystore hors git, `.gitignore` à jour, doc `docs/KEYSTORE.md`), CI épinglée Flutter 3.44.4, **build AAB signé** dans `.github/workflows/build_release.yml` (secrets KEYSTORE_BASE64...).
+- ✅ **Crashlytics** : branché dans `main.dart` (release → Crashlytics, debug → console, collection désactivée en debug) + plugin Gradle `com.google.firebase.crashlytics` déclaré.
+- ✅ **Custom claims** : Cloud Function `setUserRole` (trigger onCreate `users/{uid}`) injecte le rôle dans le token — `firestore.rules` lit `request.auth.token.role` (infalsifiable). À déployer : `firebase deploy --only functions`.
+- ✅ **Conformité RGPD/APDP** : `AIPD.md` (analyse d'impact), écrans Politique de confidentialité + CGU (`/legal/*`), **suppression de compte** (dialog + callable `deleteUserData` qui purge Auth, Firestore et Storage KYC).
+- ✅ Divers : service OCR MRZ (backend Python à déployer, URL à configurer), passerelle de paiement mock (UI en attendant les contrats Airtel/Moov), écran d'appel vidéo (UI).
+- ⏳ Restant : accessibilité (`Semantics`), R8/minify explicite, iOS (keystore/APNs/TestFlight — nécessite un Mac), déploiement des Cloud Functions + backend OCR, couverture de tests par écran, incrément de version/CHANGELOG à chaque livraison.

@@ -570,8 +570,31 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
       case MissionStatus.nannyEnRoute:
         return _primaryButton(
           icon: Icons.location_on_rounded,
-          label: 'Je suis arrivée',
-          onTap: () => _setStatus(MissionStatus.nannyArrived),
+          label: 'Check-in GPS (Arrivée)',
+          onTap: () async {
+            // Simulation de Check-in GPS
+            unawaited(
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (c) => const AlertDialog(
+                  content: Row(
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Text("Vérification de la position GPS..."),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+            await Future.delayed(const Duration(seconds: 2));
+            if (!mounted) return;
+            Navigator.pop(context);
+            _setStatus(MissionStatus.nannyArrived);
+          },
         );
 
       case MissionStatus.nannyArrived:

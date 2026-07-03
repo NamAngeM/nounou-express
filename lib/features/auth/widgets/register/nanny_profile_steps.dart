@@ -58,16 +58,16 @@ class _NannyKycStepState extends State<NannyKycStep> {
   /// Annulation du picker : aucun changement. Échec d'upload : SnackBar.
   Future<void> _pickDocument(
     String slot,
-    void Function(String path) onPicked,
+    void Function(String path, Map<String, dynamic>? ocrData) onPicked,
   ) async {
     if (_uploading.contains(slot)) return;
     setState(() => _uploading.add(slot));
     try {
-      final String? path = await DocumentUploadService.pickAndUploadDocument(
+      final result = await DocumentUploadService.pickAndUploadDocument(
         slot: slot,
       );
-      if (path != null) {
-        onPicked(path);
+      if (result != null) {
+        onPicked(result.path, result.ocrData);
         widget.onChanged();
       }
     } catch (_) {
@@ -108,8 +108,20 @@ class _NannyKycStepState extends State<NannyKycStep> {
               icon: Icons.credit_card_rounded,
               uploaded: data.hasCNIRecto,
               uploading: _uploading.contains('cni_recto'),
-              onTap: () =>
-                  _pickDocument('cni_recto', (p) => data.cniRectoPath = p),
+              onTap: () => _pickDocument('cni_recto', (p, ocr) {
+                data.cniRectoPath = p;
+                if (ocr != null) {
+                  if (ocr['names'] != null) {
+                    data.lastName.text = ocr['names'];
+                  }
+                  if (ocr['surname'] != null) {
+                    data.firstName.text = ocr['surname'];
+                  }
+                  if (ocr['number'] != null) {
+                    data.cniNumber.text = ocr['number'];
+                  }
+                }
+              }),
             )
             .animate()
             .fadeIn(duration: 400.ms, delay: 100.ms)
@@ -120,7 +132,7 @@ class _NannyKycStepState extends State<NannyKycStep> {
               uploaded: data.hasCNIVerso,
               uploading: _uploading.contains('cni_verso'),
               onTap: () =>
-                  _pickDocument('cni_verso', (p) => data.cniVersoPath = p),
+                  _pickDocument('cni_verso', (p, _) => data.cniVersoPath = p),
             )
             .animate()
             .fadeIn(duration: 400.ms, delay: 160.ms)
@@ -130,7 +142,8 @@ class _NannyKycStepState extends State<NannyKycStep> {
               icon: Icons.face_rounded,
               uploaded: data.hasSelfie,
               uploading: _uploading.contains('selfie'),
-              onTap: () => _pickDocument('selfie', (p) => data.selfiePath = p),
+              onTap: () =>
+                  _pickDocument('selfie', (p, _) => data.selfiePath = p),
               subtitle: 'Visage visible, bonne luminosité',
             )
             .animate()
@@ -143,7 +156,7 @@ class _NannyKycStepState extends State<NannyKycStep> {
               uploading: _uploading.contains('casier_judiciaire'),
               onTap: () => _pickDocument(
                 'casier_judiciaire',
-                (p) => data.criminalRecordPath = p,
+                (p, _) => data.criminalRecordPath = p,
               ),
               subtitle: 'Optionnel à l\'inscription — requis sous 7 jours',
               required: false,

@@ -137,7 +137,7 @@ class BookingDetailScreen extends ConsumerWidget {
           _buildTimeline(),
 
           const SizedBox(height: AppSpacing.xl * 2),
-          _buildActionButtons(booking),
+          _buildActionButtons(context, booking, ref),
         ],
       ),
     );
@@ -294,24 +294,65 @@ class BookingDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButtons(BookingModel booking) {
+  Widget _buildActionButtons(
+    BuildContext context,
+    BookingModel booking,
+    WidgetRef ref,
+  ) {
+    final buttons = <Widget>[];
+
     if (booking.status == "En attente" ||
         booking.status == "Confirmée" ||
         booking.status == "À venir") {
-      return OutlinedButton(
-        onPressed: () {},
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.danger,
-          side: const BorderSide(color: AppColors.danger),
+      buttons.add(
+        ElevatedButton.icon(
+          onPressed: () {
+            final nannyAsync = ref.read(nannyByIdProvider(booking.nannyId));
+            final name = nannyAsync.valueOrNull?.name ?? 'la Nounou';
+            context.push('/video-call?name=$name');
+          },
+          icon: const Icon(Icons.videocam_rounded),
+          label: const Text("Entretien Vidéo"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+          ),
         ),
-        child: const Text("Annuler la réservation"),
+      );
+      buttons.add(const SizedBox(height: AppSpacing.sm));
+      buttons.add(
+        OutlinedButton(
+          onPressed: () {},
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.danger,
+            side: const BorderSide(color: AppColors.danger),
+          ),
+          child: const Text("Annuler la réservation"),
+        ),
       );
     } else if (booking.status == "Terminée") {
-      return ElevatedButton(
-        onPressed: () {},
-        child: const Text("Noter la nounou"),
+      buttons.add(
+        ElevatedButton.icon(
+          onPressed: () => context.push('/booking/new/${booking.nannyId}'),
+          icon: const Icon(Icons.refresh_rounded),
+          label: const Text("Re-réserver"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+          ),
+        ),
+      );
+      buttons.add(const SizedBox(height: AppSpacing.sm));
+      buttons.add(
+        OutlinedButton(onPressed: () {}, child: const Text("Noter la nounou")),
       );
     }
-    return const SizedBox.shrink();
+
+    if (buttons.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: buttons,
+    );
   }
 }

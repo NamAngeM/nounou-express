@@ -1,5 +1,22 @@
 # Changelog
 
+## [Non publié] — 2026-07-03 (Phase 4 : production-ready)
+
+### Ajouté
+- **Tests** : 93 tests (modèles/sérialisation, repositories mock, AuthNotifier, widgets login) avec mocktail.
+- **Release Android** : signing via `key.properties` (keystore hors git, doc `docs/KEYSTORE.md`), workflow `build_release.yml` (AAB signé), CI épinglée Flutter 3.44.4.
+- **Crashlytics** (release uniquement, console en debug) + plugin Gradle.
+- **Custom claims** : Cloud Function `setUserRole` (functions/) ; les règles Firestore lisent `request.auth.token.role`.
+- **RGPD/APDP** : AIPD.md, écrans `/legal/privacy` et `/legal/terms`, suppression de compte (callable `deleteUserData` : purge Auth + Firestore + Storage KYC).
+- Service OCR MRZ (backend à déployer), passerelle de paiement mock, écran d'appel vidéo (UI).
+
+### Corrigé (revue du lot)
+- `AppColors.error` → `AppColors.danger` (le getter n'existait pas), `const` invalides sur des styles non-const, `AppButton.backgroundColor` inexistant, `_tile(context)` manquant, plugin Gradle Crashlytics absent, `http_parser: any` épinglé.
+- Tests réécrits contre les vraies APIs (`AuthSession`, `DelayRequest`, `BookingModel.commission`, login monté sous GoRouter).
+
+### Qualité
+- `flutter analyze` : « No issues found! » ; `dart format` ; **93/93 tests passent**.
+
 ## [Non publié] — 2026-07-03 (Phase 3 : backend réel derrière feature flag)
 
 ### Architecture

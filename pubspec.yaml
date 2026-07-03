@@ -38,6 +38,8 @@ dependencies:
   cloud_firestore: ^5.6.9           # Implémentations Firestore des repositories
   firebase_messaging: ^15.2.5      # Notifications push (tokens + handlers)
   firebase_storage: ^12.4.5        # Upload CNI (bucket à accès restreint)
+  firebase_crashlytics: ^4.3.5     # Crash reporting (Phase 4)
+  cloud_functions: ^5.2.5          # Callable functions (deleteUserData)
 
   # ── Médias ───────────────────────────────────────────────────────────────────
   image_picker: ^1.1.2             # Sélection photo CNI
@@ -48,12 +50,15 @@ dependencies:
   # ── Utilitaires ──────────────────────────────────────────────────────────────
   intl: ^0.19.0                    # Dates, monnaie (fr_FR)
   url_launcher: ^6.3.1             # Appels téléphoniques (écran SOS)
+  http: ^1.2.0                     # Appels API OCR
+  http_parser: ^4.0.2              # MediaType pour l'upload multipart OCR
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_native_splash: ^2.4.4
+  mocktail: ^1.0.3
 
 flutter:
   uses-material-design: true

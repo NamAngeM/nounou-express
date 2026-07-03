@@ -556,12 +556,52 @@ class _BottomRow extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 void _showApplySheet(BuildContext context, MissionModel mission) {
+  // Simulation blocage KYC pour la démo Investisseur (Point 3 : Onboarding progressif)
+  showDialog(
+    context: context,
+    builder: (c) => AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.security_rounded, color: AppColors.warning),
+          SizedBox(width: 8),
+          Text('Vérification requise'),
+        ],
+      ),
+      content: const Text(
+        'Pour postuler à cette mission, vous devez d\'abord vérifier votre identité (KYC). Veuillez compléter votre profil avec une pièce d\'identité valide.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(c),
+          child: const Text(
+            'Plus tard',
+            style: TextStyle(color: AppColors.textSecondary),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(c);
+            // Rediriger vers l'édition de profil ou une page KYC
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Vérifier mon identité'),
+        ),
+      ],
+    ),
+  );
+  // Le code en dessous était pour le bottom sheet d'application classique,
+  // qui est maintenant bloqué par le KYC dans cette démo.
+  /*
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (_) => _ApplySheet(mission: mission),
   );
+  */
 }
 
 class _ApplySheet extends StatefulWidget {

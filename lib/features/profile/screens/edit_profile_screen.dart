@@ -10,6 +10,7 @@ import '../../../core/utils/validators.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
+import '../widgets/delete_account_dialog.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -258,6 +259,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   child: Text(
                     "Sauvegarder les modifications",
                     style: AppTypography.buttonLabel,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            // ── Delete Account Button (RGPD) ─────────────────────────────
+            Center(
+              child: TextButton.icon(
+                onPressed: () => DeleteAccountDialog.show(context),
+                icon: const Icon(Icons.delete_outline, color: AppColors.danger),
+                label: Text(
+                  "Supprimer mon compte",
+                  style: AppTypography.buttonLabelSm.copyWith(
+                    color: AppColors.danger,
                   ),
                 ),
               ),

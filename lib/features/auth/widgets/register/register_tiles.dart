@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -84,7 +85,7 @@ class RegisterCheckTile extends StatelessWidget {
     if (requiredMessage == null) {
       return Padding(
         padding: const EdgeInsets.only(bottom: AppSpacing.md),
-        child: _tile(),
+        child: _tile(context),
       );
     }
     return Padding(
@@ -94,7 +95,7 @@ class RegisterCheckTile extends StatelessWidget {
         builder: (state) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _tile(),
+            _tile(context),
             if (state.hasError) FormFieldError(state.errorText!),
           ],
         ),
@@ -102,7 +103,7 @@ class RegisterCheckTile extends StatelessWidget {
     );
   }
 
-  Widget _tile() {
+  Widget _tile(BuildContext context) {
     return GestureDetector(
       onTap: () => onChanged(!value),
       child: Container(
@@ -139,16 +140,67 @@ class RegisterCheckTile extends StatelessWidget {
                   : null,
             ),
             const SizedBox(width: AppSpacing.md),
-            Expanded(
+            Expanded(child: _buildLabel(context)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabel(BuildContext context) {
+    if (label.contains('Conditions Générales d\'Utilisation')) {
+      return _buildClickableLabel(
+        context,
+        text: 'J\'accepte les ',
+        linkText: 'Conditions Générales d\'Utilisation',
+        suffix: ' *',
+        route: '/legal/terms',
+      );
+    } else if (label.contains('Politique de Confidentialité')) {
+      return _buildClickableLabel(
+        context,
+        text: 'J\'accepte la ',
+        linkText: 'Politique de Confidentialité',
+        suffix: ' *',
+        route: '/legal/privacy',
+      );
+    }
+    return Text(
+      label,
+      style: AppTypography.bodySmall.copyWith(color: AppColors.textPrimary),
+    );
+  }
+
+  Widget _buildClickableLabel(
+    BuildContext context, {
+    required String text,
+    required String linkText,
+    required String suffix,
+    required String route,
+  }) {
+    // Note: go_router import is at the top of the file
+    return RichText(
+      text: TextSpan(
+        style: AppTypography.bodySmall.copyWith(color: AppColors.textPrimary),
+        children: [
+          TextSpan(text: text),
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: GestureDetector(
+              onTap: () => context.push(route),
               child: Text(
-                label,
+                linkText,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textPrimary,
+                  color: AppColors.primary,
+                  decoration: TextDecoration.underline,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          TextSpan(text: suffix),
+        ],
       ),
     );
   }

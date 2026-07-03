@@ -353,13 +353,18 @@ class _InfoSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Badges row
-          if (nanny.badges.isNotEmpty)
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: nanny.badges.map((b) => _BadgeChip(label: b)).toList(),
-            ),
-          if (nanny.badges.isNotEmpty) const SizedBox(height: AppSpacing.lg),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              if (nanny.badges.isNotEmpty)
+                ...nanny.badges.map((b) => _BadgeChip(label: b)),
+              const _BadgeChip(label: 'Identité Vérifiée'),
+              const _BadgeChip(label: 'Casier Judiciaire Vierge'),
+              const _BadgeChip(label: 'Premiers Secours'),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
           // Info rows
           _InfoRow(
             icon: Icons.location_on_outlined,

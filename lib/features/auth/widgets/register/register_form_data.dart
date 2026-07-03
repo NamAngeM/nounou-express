@@ -136,6 +136,7 @@ class RegisterFormData {
   // Section 8 Nanny — Engagement
   bool certifyNanny = false;
   bool acceptCGUNanny = false;
+  bool acceptPrivacyNanny = false;
   bool acceptVerification = false;
   bool acceptCharter = false;
 

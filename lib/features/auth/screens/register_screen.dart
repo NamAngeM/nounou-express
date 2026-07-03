@@ -10,7 +10,6 @@ import '../providers/auth_provider.dart';
 import '../widgets/register/identity_step.dart';
 import '../widgets/register/nanny_final_steps.dart';
 import '../widgets/register/nanny_profile_steps.dart';
-import '../widgets/register/nanny_work_steps.dart';
 import '../widgets/register/parent_children_step.dart';
 import '../widgets/register/parent_steps.dart';
 import '../widgets/register/register_form_data.dart';
@@ -38,16 +37,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     'Urgence',
     'Vérification',
   ];
-  static const _nannyStepTitles = [
-    'Identité',
-    'KYC',
-    'Compétences',
-    'Bio',
-    'Disponibilités',
-    'Paiement',
-    'Références',
-    'Engagement',
-  ];
+  static const _nannyStepTitles = ['Identité', 'Compétences', 'Engagement'];
 
   String role = 'parent';
   int _currentStep = 0;
@@ -58,7 +48,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   /// courante est valide (seul le `Form` de l'étape affichée est monté).
   final _formKeys = List.generate(_maxSteps, (_) => GlobalKey<FormState>());
 
-  int get _totalSteps => role == 'nanny' ? 8 : 5;
+  int get _totalSteps => role == 'nanny' ? 3 : 5;
   List<String> get _stepTitles =>
       role == 'nanny' ? _nannyStepTitles : _parentStepTitles;
 
@@ -230,13 +220,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     } else {
       return switch (_currentStep) {
         0 => IdentityStep(data: _formData, isNanny: true, onChanged: _refresh),
-        1 => NannyKycStep(data: _formData, onChanged: _refresh),
-        2 => NannySkillsStep(data: _formData, onChanged: _refresh),
-        3 => NannyBioStep(data: _formData, onChanged: _refresh),
-        4 => NannyAvailabilityStep(data: _formData, onChanged: _refresh),
-        5 => NannyPaymentStep(data: _formData, onChanged: _refresh),
-        6 => NannyReferencesStep(data: _formData, onChanged: _refresh),
-        7 => NannyEngagementStep(data: _formData, onChanged: _refresh),
+        1 => NannySkillsStep(data: _formData, onChanged: _refresh),
+        2 => NannyEngagementStep(data: _formData, onChanged: _refresh),
         _ => const SizedBox(),
       };
     }

@@ -14,8 +14,9 @@ rules_version = '2';
 //   chats/{threadId}/messages/{id}       threadId = uids triés joints par '_'
 //   config/{doc}                         référentiels (quartiers...) lecture seule
 //
-// NOTE : le rôle vit dans users/{uid}.role (modifiable par le propriétaire).
-// À durcir avec des custom claims dès qu'un backend d'admin existe (Phase 4).
+// Le rôle est désormais injecté comme custom claim par la Cloud Function
+// `setUserRole` (functions/src/index.ts). Le helper `hasRole()` ci-dessous
+// lit `request.auth.token.role` — infalsifiable côté client.
 // Déploiement : firebase deploy --only firestore:rules
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -24,6 +25,9 @@ service cloud.firestore {
     }
     function isOwner(uid) {
       return isSignedIn() && request.auth.uid == uid;
+    }
+    function hasRole(role) {
+      return isSignedIn() && request.auth.token.role == role;
     }
 
     match /users/{uid} {
