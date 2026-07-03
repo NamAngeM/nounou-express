@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -7,6 +10,14 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Signature release : lue depuis android/key.properties (hors git — voir
+// docs/KEYSTORE.md). En CI, le fichier est généré depuis les secrets.
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -35,17 +46,13 @@ android {
         versionName = flutter.versionName
     }
 
-    val keystorePropertiesFile = rootProject.file("key.properties")
-    val keystoreProperties = java.util.Properties()
-    if (keystorePropertiesFile.exists()) {
-        keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
-    }
-
     signingConfigs {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String? ?: ""
             keyPassword = keystoreProperties["keyPassword"] as String? ?: ""
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+            storeFile = (keystoreProperties["storeFile"] as String?)?.let {
+                file(it)
+            }
             storePassword = keystoreProperties["storePassword"] as String? ?: ""
         }
     }
