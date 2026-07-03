@@ -91,8 +91,8 @@ final bookingByIdProvider = FutureProvider.family<BookingModel, String>(
 
 // ── Chat ──────────────────────────────────────────────────────────────────────
 
-final conversationsProvider = FutureProvider<List<ConversationModel>>(
-  (ref) => ref.watch(chatRepositoryProvider).getConversations(),
+final conversationsProvider = StreamProvider<List<ConversationModel>>(
+  (ref) => ref.watch(chatRepositoryProvider).watchConversations(),
 );
 
 final conversationWithProvider =
@@ -101,9 +101,9 @@ final conversationWithProvider =
           ref.watch(chatRepositoryProvider).getConversationWith(otherUserId),
     );
 
-final messagesProvider = FutureProvider.family<List<MessageModel>, String>(
+final messagesProvider = StreamProvider.family<List<MessageModel>, String>(
   (ref, otherUserId) =>
-      ref.watch(chatRepositoryProvider).getMessages(otherUserId),
+      ref.watch(chatRepositoryProvider).watchMessages(otherUserId),
 );
 
 // ── Missions ──────────────────────────────────────────────────────────────────

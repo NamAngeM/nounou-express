@@ -6,6 +6,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/constants/backend_config.dart';
 import 'core/router/app_router.dart';
+import 'core/services/push_notifications_service.dart';
 import 'core/theme/app_theme.dart';
 import 'data/repositories/auth_repository.dart';
 import 'features/auth/providers/auth_provider.dart';
@@ -26,6 +27,7 @@ Future<void> main() async {
 
   await initializeDateFormatting('fr_FR');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await PushNotificationsService.initialize();
 
   // Session chargée avant le premier frame pour que le redirect du routeur
   // soit synchrone (pas d'écran de transition « auth inconnue »).

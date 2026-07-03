@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/backend_config.dart';
+import '../../../core/services/push_notifications_service.dart';
 import '../../../data/repositories/auth_repository.dart';
 
 /// Session chargée avant `runApp` (voir `main.dart`) et injectée via
@@ -42,12 +45,21 @@ class AuthNotifier extends Notifier<AuthSession> {
         .confirmOtp(smsCode, role: role);
     if (result.session.isAuthenticated) {
       state = result.session;
+      // Synchronise le token FCM sans bloquer la navigation (no-op en mock).
+      unawaited(PushNotificationsService.syncTokenForUser());
     }
     return result;
   }
 
-  Future<void> signIn({required String role}) async {
-    state = await ref.read(authRepositoryProvider).signIn(role: role);
+  Future<void> signIn({
+    required String role,
+    Map<String, dynamic>? profile,
+  }) async {
+    state = await ref
+        .read(authRepositoryProvider)
+        .signIn(role: role, profile: profile);
+    // Synchronise le token FCM sans bloquer la navigation (no-op en mock).
+    unawaited(PushNotificationsService.syncTokenForUser());
   }
 
   Future<void> signOut() async {

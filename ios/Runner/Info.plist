@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Nounou Express a besoin d'accéder à vos photos pour vous permettre de fournir vos documents d'identité (CNI, selfie) lors de l'inscription.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Nounou Express a besoin d'accéder à l'appareil photo pour photographier vos documents d'identité et prendre votre selfie de vérification.</string>
 </dict>
 </plist>

@@ -2,17 +2,29 @@ rules_version = '2';
 
 // Règles Cloud Storage — Nounou Express
 //
-// VERROUILLAGE PAR DÉFAUT : aucun upload n'est encore implémenté dans l'app.
-// À l'implémentation (photos de profil, CNI — voir AUDIT.md, Phase 3) :
-//  - photos de profil : écriture limitée au propriétaire authentifié,
-//    lecture publique acceptable ;
-//  - CNI recto/verso : bucket ou préfixe dédié, lecture/écriture refusées aux
-//    clients (accès uniquement via backend/admin), durée de conservation
-//    limitée (RGPD / loi gabonaise n°001/2011).
+// Préfixe kyc/{uid}/ : documents d'identité (CNI recto/verso, selfie,
+// casier judiciaire) uploadés à l'inscription nounou.
+//  - écriture : uniquement le propriétaire authentifié, images < 5 Mo ;
+//  - lecture : REFUSÉE aux clients. Les pièces d'identité sont des données
+//    personnelles sensibles (RGPD / loi gabonaise n°001/2011, contrôle APDP) :
+//    seuls le backend (Admin SDK) et la console y accèdent, pour la
+//    vérification manuelle. Prévoir une durée de conservation limitée.
+// Tout le reste du bucket demeure verrouillé (photos de profil : à ouvrir
+// lors de leur implémentation — écriture propriétaire, lecture publique).
 //
 // Déploiement : firebase deploy --only storage
 service firebase.storage {
   match /b/{bucket}/o {
+    match /kyc/{uid}/{fichier} {
+      allow write: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      // Lecture client interdite : CNI = données sensibles (RGPD / APDP),
+      // accès backend/console uniquement.
+      allow read: if false;
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

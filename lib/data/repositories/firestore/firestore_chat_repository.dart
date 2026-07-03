@@ -59,6 +59,35 @@ class FirestoreChatRepository implements ChatRepository {
   }
 
   @override
+  Stream<List<ConversationModel>> watchConversations() =>
+      _conversationsOf(currentUid())
+          .orderBy('lastMessageTime', descending: true)
+          .snapshots()
+          .map(
+            (snapshot) => List.unmodifiable(
+              snapshot.docs.map(
+                (d) => ConversationModel.fromJson(normalizeDoc(d.data())),
+              ),
+            ),
+          );
+
+  @override
+  Stream<List<MessageModel>> watchMessages(String otherUserId) {
+    final threadId = chatThreadId(currentUid(), otherUserId);
+    return _messagesOf(threadId)
+        .orderBy('timestamp')
+        .limit(100)
+        .snapshots()
+        .map(
+          (snapshot) => List.unmodifiable(
+            snapshot.docs.map(
+              (d) => MessageModel.fromJson(normalizeDoc(d.data())),
+            ),
+          ),
+        );
+  }
+
+  @override
   Future<MessageModel> sendMessage(MessageModel message) async {
     final uid = currentUid();
     final otherUserId = message.receiverId;

@@ -66,7 +66,9 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
                 ),
               ),
               data: (_) => RefreshIndicator(
-                onRefresh: () => ref.refresh(conversationsProvider.future),
+                // Temps réel : le stream pousse les mises à jour tout seul,
+                // le geste de rafraîchissement est conservé pour l'UX.
+                onRefresh: () async {},
                 color: AppColors.accent,
                 child: conversations.isEmpty
                     ? SingleChildScrollView(

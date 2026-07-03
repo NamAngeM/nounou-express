@@ -163,6 +163,10 @@ class DocUploadTile extends StatelessWidget {
   final String? subtitle;
   final bool required;
 
+  /// Vrai pendant la sélection/l'upload du document : la tuile affiche un
+  /// indicateur de chargement discret et ignore les taps.
+  final bool uploading;
+
   const DocUploadTile({
     super.key,
     required this.label,
@@ -171,12 +175,13 @@ class DocUploadTile extends StatelessWidget {
     required this.onTap,
     this.subtitle,
     this.required = true,
+    this.uploading = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: uploading ? null : onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -228,10 +233,20 @@ class DocUploadTile extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              uploaded ? Icons.check_rounded : Icons.upload_rounded,
-              color: uploaded ? AppColors.success : AppColors.textSecondary,
-            ),
+            if (uploading)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primary,
+                ),
+              )
+            else
+              Icon(
+                uploaded ? Icons.check_rounded : Icons.upload_rounded,
+                color: uploaded ? AppColors.success : AppColors.textSecondary,
+              ),
           ],
         ),
       ),

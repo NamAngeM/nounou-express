@@ -111,8 +111,56 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Future<void> _onSubmit() async {
-    await ref.read(authProvider.notifier).signIn(role: role);
+    await ref
+        .read(authProvider.notifier)
+        .signIn(role: role, profile: _buildProfile());
     if (mounted) context.go('/home');
+  }
+
+  /// Profil persisté à l'inscription — données non sensibles uniquement
+  /// (minimisation RGPD/APDP : pas de CNI, pas de contacts d'urgence,
+  /// pas de données médicales des enfants).
+  Map<String, dynamic> _buildProfile() {
+    final d = _formData;
+    final fullName = '${d.firstName.text.trim()} ${d.lastName.text.trim()}'
+        .trim();
+    final profile = <String, dynamic>{
+      'firstName': d.firstName.text.trim(),
+      'lastName': d.lastName.text.trim(),
+      'name': fullName,
+      'gender': d.gender,
+      'nationality': d.nationality.text.trim(),
+      'email': d.email.text.trim(),
+      'quartier': d.neighborhood,
+      'address': d.address.text.trim(),
+    };
+    if (role == 'nanny') {
+      profile.addAll({
+        'experience': d.experience,
+        'skills': d.nannySkills.toList(),
+        'languages': d.nannyLangs.toList(),
+        'diploma': d.diploma,
+        'bio': d.shortBio.text.trim(),
+        'longBio': d.longBio.text.trim(),
+        'hourlyRate': d.hourlyRate,
+        'urgentAvailable': d.urgentAvailable,
+        'maxChildren': d.maxChildren,
+        'availability': d.availability.map(
+          (day, slots) => MapEntry(day, slots.toList()),
+        ),
+        'paymentMethods': d.paymentMethods.toList(),
+      });
+    } else {
+      profile.addAll({
+        'careType': d.careType,
+        'timeSlots': d.timeSlots.toList(),
+        'maxBudgetPerHour': d.maxBudget,
+        'homeLangs': d.homeLangs.toList(),
+        'careCriteria': d.careCriteria.toList(),
+        'childrenCount': d.children.length,
+      });
+    }
+    return profile;
   }
 
   @override

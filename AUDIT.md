@@ -107,7 +107,13 @@ L'app est conçue pour traiter : CNI recto/verso, photos, téléphone, **donnée
 - ✅ Implémentations Firestore des 6 repositories (`lib/data/repositories/firestore/`) + index composite (`firestore.indexes.json`) + règles de sécurité par rôle/propriétaire (`firestore.rules` — catch-all deny conservé).
 - ✅ **Feature flag `USE_FIREBASE`** (`lib/core/constants/backend_config.dart`, `--dart-define=USE_FIREBASE=true`) : mock par défaut, bascule Firebase sans toucher aux écrans. Prérequis console avant activation : Phone Auth + empreintes SHA, `firebase deploy --only firestore:rules,firestore:indexes`, App Check, doc `config/quartiers`.
 - ✅ Gestion d'erreurs globale (`FlutterError.onError`, `PlatformDispatcher.onError`) — Crashlytics en Phase 4.
-- ⏳ Restant Phase 3 : chat temps réel en streams (actuellement fetch + invalidate), notifications FCM (handlers + tokens), vraie carte (google_maps_flutter + permissions manifest/Info.plist), flux CNI (Storage restreint ou KYC), wallet/paiements mobile money (côté serveur uniquement — le param `rate` de l'URL ne doit jamais faire foi), profil complet écrit dans `users/{uid}` à l'inscription.
+- ✅ Chat **temps réel** : streams (`watchConversations`/`watchMessages`) sur mock et Firestore (`snapshots()`), providers passés en `StreamProvider`, scroll auto à la réception.
+- ✅ **FCM** : `PushNotificationsService` (permission, handler background `@pragma('vm:entry-point')`, onMessage, onTokenRefresh), token synchronisé dans `users/{uid}.fcmToken` à la connexion. Manifest Android corrigé (INTERNET — bug release de l'audit — + POST_NOTIFICATIONS). ⏳ Console : clé APNs (iOS/Xcode), clé VAPID + service worker (web), affichage local en foreground (flutter_local_notifications, Phase 4).
+- ✅ **Upload CNI réel** : `DocumentUploadService` (image_picker → Storage `kyc/{uid}/{slot}.jpg`, 5 Mo max, images uniquement), règles Storage lecture-interdite (données sensibles RGPD/APDP), usage descriptions iOS ajoutées (corrige le crash picker relevé en audit).
+- ✅ **Profil écrit à l'inscription** : `users/{uid}` (minimisation RGPD : pas de CNI, contacts d'urgence ni données médicales) + profil public `nannies/{uid}` pour les nounous.
+- ⏳ Reporté (prérequis externes) : **carte réelle** (nécessite une clé Google Maps + config native — la carte décorative reste en place) ; **wallet mobile money** (nécessite contrats/API Airtel & Moov, à traiter exclusivement côté serveur — le param `rate` de l'URL ne doit jamais faire foi).
+
+**Phase 3 (périmètre code) : terminée le 2026-07-03.**
 
 ### Phase 4 — Production-ready (en parallèle)
 - Tests : unitaires (modèles, providers, redirects), widget tests par écran, 1-2 flux d'intégration ; viser > 60 % sur la logique.

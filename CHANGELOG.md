@@ -9,6 +9,13 @@
 - **Règles Firestore réelles** (`firestore.rules`) : accès par propriétaire/participant, missions lisibles par les connectés, notifications/dashboard en écriture backend uniquement, catch-all deny. Storage reste deny-all (aucun upload implémenté).
 - **Gestion d'erreurs globale** dans `main.dart` (`FlutterError.onError` + `PlatformDispatcher.onError`) — Crashlytics prévu en Phase 4.
 
+### Fin de phase (même jour)
+- **Chat temps réel** : streams mock + Firestore (`snapshots()`), `conversationsProvider`/`messagesProvider` en StreamProvider, scroll auto à la réception ; plus d'invalidation manuelle après envoi.
+- **FCM** : `PushNotificationsService` (permission, handler background, onTokenRefresh), token dans `users/{uid}.fcmToken` synchronisé à la connexion ; manifest Android corrigé (INTERNET + POST_NOTIFICATIONS).
+- **Upload CNI réel** : `DocumentUploadService` → Storage `kyc/{uid}/` (write propriétaire < 5 Mo images, read interdit — RGPD/APDP), spinner sur les tuiles KYC, usage descriptions iOS.
+- **Profil écrit à l'inscription** : `users/{uid}` (minimisation RGPD) + profil public `nannies/{uid}` pour les nounous.
+- Reporté (prérequis externes) : carte Google Maps (clé API), wallet mobile money (contrats Airtel/Moov, côté serveur).
+
 ### Qualité
 - `flutter analyze` : « No issues found! » ; `dart format` ; `flutter test` OK.
 

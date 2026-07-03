@@ -57,12 +57,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     _messageController.clear();
 
+    // Le stream de `messagesProvider` pousse la nouvelle liste tout seul ;
+    // le scroll est déclenché par le `ref.listen` dans `build`.
     await ref.read(chatRepositoryProvider).sendMessage(newMessage);
-    ref.invalidate(messagesProvider(_otherUserId));
-    await ref.read(messagesProvider(_otherUserId).future);
-    if (!mounted) return;
+  }
 
-    // Scroll to bottom
+  void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollController.hasClients) return;
       _scrollController.animateTo(
@@ -75,6 +75,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Scroll en bas à l'arrivée de nouveaux messages (envoyés ou reçus).
+    ref.listen(messagesProvider(_otherUserId), (previous, next) {
+      final previousCount = previous?.valueOrNull?.length;
+      final nextCount = next.valueOrNull?.length;
+      if (previousCount != null &&
+          nextCount != null &&
+          nextCount > previousCount) {
+        _scrollToBottom();
+      }
+    });
+
     // En-tête : conversation avec l'interlocuteur, sinon repli sur la
     // première conversation disponible (comportement historique du mock).
     final conversation =

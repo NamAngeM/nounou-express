@@ -36,6 +36,11 @@ dependencies:
   firebase_core: ^3.15.2
   firebase_auth: ^5.5.4             # Auth téléphone OTP (backend réel, Phase 3)
   cloud_firestore: ^5.6.9           # Implémentations Firestore des repositories
+  firebase_messaging: ^15.2.5      # Notifications push (tokens + handlers)
+  firebase_storage: ^12.4.5        # Upload CNI (bucket à accès restreint)
+
+  # ── Médias ───────────────────────────────────────────────────────────────────
+  image_picker: ^1.1.2             # Sélection photo CNI
 
   # ── Stockage local ───────────────────────────────────────────────────────────
   shared_preferences: ^2.5.3       # Préférences utilisateur (état d'auth mock)

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../../../../core/services/document_upload_service.dart';
 import '../../../../core/utils/validators.dart';
 import 'register_fields.dart';
 import 'register_form_data.dart';
@@ -38,14 +39,55 @@ const _diplomaOptions = [
 ];
 
 // ── SECTION 2 Nanny — KYC ─────────────────────────────────────────────────────
-class NannyKycStep extends StatelessWidget {
+class NannyKycStep extends StatefulWidget {
   final RegisterFormData data;
   final VoidCallback onChanged;
 
   const NannyKycStep({super.key, required this.data, required this.onChanged});
 
   @override
+  State<NannyKycStep> createState() => _NannyKycStepState();
+}
+
+class _NannyKycStepState extends State<NannyKycStep> {
+  /// Slots dont la sélection/l'upload est en cours (spinner sur la tuile).
+  final Set<String> _uploading = {};
+
+  /// Ouvre le sélecteur pour [slot] puis mémorise le chemin via [onPicked].
+  ///
+  /// Annulation du picker : aucun changement. Échec d'upload : SnackBar.
+  Future<void> _pickDocument(
+    String slot,
+    void Function(String path) onPicked,
+  ) async {
+    if (_uploading.contains(slot)) return;
+    setState(() => _uploading.add(slot));
+    try {
+      final String? path = await DocumentUploadService.pickAndUploadDocument(
+        slot: slot,
+      );
+      if (path != null) {
+        onPicked(path);
+        widget.onChanged();
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Échec de l\'envoi du document. Veuillez réessayer.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _uploading.remove(slot));
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final data = widget.data;
     return StepContent(
       title: 'Documents & Vérification KYC',
       subtitle: 'Ces documents garantissent la sécurité des familles.',
@@ -65,10 +107,9 @@ class NannyKycStep extends StatelessWidget {
               label: 'Photo CNI recto *',
               icon: Icons.credit_card_rounded,
               uploaded: data.hasCNIRecto,
-              onTap: () {
-                data.hasCNIRecto = true;
-                onChanged();
-              },
+              uploading: _uploading.contains('cni_recto'),
+              onTap: () =>
+                  _pickDocument('cni_recto', (p) => data.cniRectoPath = p),
             )
             .animate()
             .fadeIn(duration: 400.ms, delay: 100.ms)
@@ -77,10 +118,9 @@ class NannyKycStep extends StatelessWidget {
               label: 'Photo CNI verso *',
               icon: Icons.credit_card_rounded,
               uploaded: data.hasCNIVerso,
-              onTap: () {
-                data.hasCNIVerso = true;
-                onChanged();
-              },
+              uploading: _uploading.contains('cni_verso'),
+              onTap: () =>
+                  _pickDocument('cni_verso', (p) => data.cniVersoPath = p),
             )
             .animate()
             .fadeIn(duration: 400.ms, delay: 160.ms)
@@ -89,10 +129,8 @@ class NannyKycStep extends StatelessWidget {
               label: 'Selfie de vérification *',
               icon: Icons.face_rounded,
               uploaded: data.hasSelfie,
-              onTap: () {
-                data.hasSelfie = true;
-                onChanged();
-              },
+              uploading: _uploading.contains('selfie'),
+              onTap: () => _pickDocument('selfie', (p) => data.selfiePath = p),
               subtitle: 'Visage visible, bonne luminosité',
             )
             .animate()
@@ -102,10 +140,11 @@ class NannyKycStep extends StatelessWidget {
               label: 'Casier judiciaire vierge',
               icon: Icons.description_rounded,
               uploaded: data.hasCriminalRecord,
-              onTap: () {
-                data.hasCriminalRecord = true;
-                onChanged();
-              },
+              uploading: _uploading.contains('casier_judiciaire'),
+              onTap: () => _pickDocument(
+                'casier_judiciaire',
+                (p) => data.criminalRecordPath = p,
+              ),
               subtitle: 'Optionnel à l\'inscription — requis sous 7 jours',
               required: false,
             )

@@ -83,11 +83,20 @@ class RegisterFormData {
   bool certifyAccurate = false;
 
   // Section 2 Nanny — KYC
+  //
+  // Chemins des documents uploadés (chemin Storage `kyc/{uid}/{slot}.jpg`
+  // quand Firebase est actif, chemin local du fichier choisi en mode démo).
+  // `null` tant que le document n'a pas été fourni.
   final cniNumber = TextEditingController();
-  bool hasCNIRecto = false;
-  bool hasCNIVerso = false;
-  bool hasSelfie = false;
-  bool hasCriminalRecord = false;
+  String? cniRectoPath;
+  String? cniVersoPath;
+  String? selfiePath;
+  String? criminalRecordPath;
+
+  bool get hasCNIRecto => cniRectoPath != null;
+  bool get hasCNIVerso => cniVersoPath != null;
+  bool get hasSelfie => selfiePath != null;
+  bool get hasCriminalRecord => criminalRecordPath != null;
 
   // Section 3 Nanny — Compétences
   String experience = 'Débutant (< 1 an)';

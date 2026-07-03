@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Réseau : indispensable en release (le mode debug l'injecte, pas le
+         build final) — sans elle l'app n'a aucun accès réseau. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Notifications push (obligatoire depuis Android 13 / API 33). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:label="nounou_express"
         android:name="${applicationName}"

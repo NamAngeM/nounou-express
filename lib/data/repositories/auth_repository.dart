@@ -53,8 +53,15 @@ abstract class AuthRepository {
   /// Lève [OtpException] si le code est invalide ou expiré.
   Future<OtpResult> confirmOtp(String smsCode, {required String role});
 
-  /// Finalise l'inscription : persiste le rôle (et le profil à terme).
-  Future<AuthSession> signIn({required String role});
+  /// Finalise l'inscription : persiste le rôle et, si fourni, le profil.
+  ///
+  /// [profile] ne doit contenir que des données non sensibles (minimisation
+  /// RGPD/APDP : pas de CNI, pas de contacts d'urgence, pas de données
+  /// médicales — le KYC passe par un bucket Storage à accès restreint).
+  Future<AuthSession> signIn({
+    required String role,
+    Map<String, dynamic>? profile,
+  });
 
   Future<void> signOut();
 }
@@ -97,7 +104,11 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<AuthSession> signIn({required String role}) async {
+  Future<AuthSession> signIn({
+    required String role,
+    Map<String, dynamic>? profile,
+  }) async {
+    // Mode démo : le profil n'est pas persisté.
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kAuthenticated, true);
     await prefs.setString(_kRole, role);
@@ -198,7 +209,10 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<AuthSession> signIn({required String role}) async {
+  Future<AuthSession> signIn({
+    required String role,
+    Map<String, dynamic>? profile,
+  }) async {
     final user = _auth.currentUser;
     if (user == null) {
       throw const OtpException('Vérifiez votre numéro avant de continuer.');
@@ -207,7 +221,27 @@ class FirebaseAuthRepository implements AuthRepository {
       'role': role,
       'phone': user.phoneNumber,
       'createdAt': DateTime.now().toIso8601String(),
+      ...?profile,
     }, SetOptions(merge: true));
+
+    if (role == 'nanny') {
+      // Profil public minimal de la nounou (lisible par les parents
+      // connectés). Complété/mis à jour ensuite via l'édition de profil.
+      await _db.collection('nannies').doc(user.uid).set({
+        'id': user.uid,
+        'role': 'nanny',
+        'name': profile?['name'] ?? '',
+        'phone': user.phoneNumber,
+        'quartier': profile?['quartier'] ?? '',
+        'bio': profile?['bio'] ?? '',
+        'skills': profile?['skills'] ?? const <String>[],
+        'hourlyRate': profile?['hourlyRate'] ?? 0,
+        'rating': 0.0,
+        'totalMissions': 0,
+        'isVerified': false,
+        'createdAt': DateTime.now().toIso8601String(),
+      }, SetOptions(merge: true));
+    }
     return AuthSession(isAuthenticated: true, role: role);
   }
 
