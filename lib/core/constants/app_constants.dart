@@ -7,14 +7,18 @@ abstract final class AppConstants {
   static const String currency = 'FCFA';
 
   // --- Tarification ---
+  // Source unique des taux : toute l'app (profil nounou, réservation,
+  // récapitulatif) doit passer par PricingService, jamais par des valeurs
+  // locales.
   static const double defaultHourlyRate = 2500;
-  static const double emergencySurcharge = 1.5;
-  static const double weekendSurcharge = 1.25;
+  static const double nightSurchargeRate = 0.20;
+  static const double weekendSurchargeRate = 0.10;
   static const double commissionRate = 0.15;
 
   // --- Règles métier ---
   static const int maxChildrenPerNanny = 3;
 
-  // --- Contacts urgence ---
-  static const String sosPhoneNumber = '+241XXXXXXX';
+  // --- Contacts urgence (Gabon) ---
+  static const String emergencyFireNumber = '112'; // Pompiers
+  static const String emergencySamuNumber = '1488'; // SAMU social
 }

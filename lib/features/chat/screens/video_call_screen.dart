@@ -109,7 +109,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       width: 100,
                       height: 150,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade800,
+                        color: AppColors.darkSurfaceVariant,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: Colors.white24, width: 2),
                         boxShadow: const [

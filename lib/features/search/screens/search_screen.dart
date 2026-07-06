@@ -6,13 +6,12 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/nanny_card.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
 import '../widgets/filter_bottom_sheet.dart';
-
-const _mockDistances = [1.2, 0.8, 2.5, 1.9, 3.1, 0.5, 4.2, 2.1, 1.7, 3.8];
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -35,11 +34,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   String _quartierOf(NannyModel n) =>
       n.quartier.isNotEmpty ? n.quartier : 'Libreville';
-
-  double _distanceOf(List<NannyModel> all, NannyModel n) {
-    final i = all.indexOf(n).clamp(0, _mockDistances.length - 1);
-    return _mockDistances[i];
-  }
 
   List<NannyModel> _results(List<NannyModel> all) {
     final q = _query.toLowerCase().trim();
@@ -82,9 +76,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       }
 
       // Availability
-      if (_filters.onlyAvailable &&
-          !n.isVerified &&
-          !n.badges.contains('Disponible')) {
+      if (_filters.onlyAvailable && !n.badges.contains('Disponible')) {
         return false;
       }
 
@@ -98,8 +90,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     // Sort
     switch (_sortBy) {
-      case SortOption.distance:
-        list.sort((a, b) => _distanceOf(all, a).compareTo(_distanceOf(all, b)));
       case SortOption.prixCroissant:
         list.sort((a, b) => a.hourlyRate.compareTo(b.hourlyRate));
       case SortOption.prixDecroissant:
@@ -127,7 +117,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       appBar: _buildAppBar(),
       body: nanniesAsync.when(
         data: _buildResults,
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const AppLoader(),
         error: (e, _) => EmptyState(
           icon: Icons.error_outline_rounded,
           title: 'Erreur de chargement',
@@ -203,7 +193,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             quartier: _quartierOf(n),
                             rating: n.rating,
                             hourlyRate: n.hourlyRate,
-                            distanceKm: _distanceOf(nannies, n),
                             isVerified: n.isVerified,
                           )
                           .animate()

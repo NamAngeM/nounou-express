@@ -3,6 +3,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/pricing.dart';
 import '../../../data/models/nanny_model.dart';
 
 class PriceSummary extends StatelessWidget {
@@ -26,30 +27,50 @@ class PriceSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double baseRate = nanny.hourlyRate;
-    final double baseTotal = baseRate * hours;
-    final double nightSurcharge = isNight ? baseTotal * 0.2 : 0;
-    final double weekendSurcharge = isWeekend ? baseTotal * 0.1 : 0;
-    final double subtotal = baseTotal + nightSurcharge + weekendSurcharge;
-    final double commission = subtotal * 0.15;
-    final double total = subtotal + commission;
+    final price = PricingService.compute(
+      hourlyRate: baseRate,
+      hours: hours,
+      isNight: isNight,
+      isWeekend: isWeekend,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildPriceRow(
           "Tarif de base ($hours h × ${baseRate.toInt()} ${AppConstants.currency})",
-          baseTotal,
+          price.baseTotal,
         ),
-        if (isNight) _buildPriceRow("Majoration nuit (+20%)", nightSurcharge),
+        if (isNight)
+          _buildPriceRow(
+            "Majoration nuit (${PricingService.nightLabel})",
+            price.nightSurcharge,
+          ),
         if (isWeekend)
-          _buildPriceRow("Majoration week-end (+10%)", weekendSurcharge),
+          _buildPriceRow(
+            "Majoration week-end (${PricingService.weekendLabel})",
+            price.weekendSurcharge,
+          ),
         const Divider(height: AppSpacing.xl),
-        _buildPriceRow("Sous-total", subtotal, isBold: true),
-        _buildPriceRow("Commission Nounou Express (15%)", commission),
+        _buildPriceRow("Sous-total", price.subtotal, isBold: true),
+        _buildPriceRow(
+          "Frais de service (${PricingService.commissionLabel})",
+          price.commission,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.xs),
+          child: Text(
+            "Ces frais couvrent le fonctionnement de la plateforme, "
+            "la vérification des profils et le support.",
+            style: AppTypography.small.copyWith(
+              color: AppColors.textTertiary,
+            ),
+          ),
+        ),
         const SizedBox(height: AppSpacing.md),
         _buildPriceRow(
           "TOTAL",
-          total,
+          price.total,
           isBold: true,
           isLarge: true,
           color: AppColors.primary,

@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/avatar_widget.dart';
+import '../../../data/models/review_model.dart';
+import '../../../data/providers/data_providers.dart';
 
-class LeaveReviewScreen extends StatefulWidget {
+class LeaveReviewScreen extends ConsumerStatefulWidget {
   final String bookingId;
   const LeaveReviewScreen({super.key, required this.bookingId});
 
   @override
-  State<LeaveReviewScreen> createState() => _LeaveReviewScreenState();
+  ConsumerState<LeaveReviewScreen> createState() => _LeaveReviewScreenState();
 }
 
-class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
+class _LeaveReviewScreenState extends ConsumerState<LeaveReviewScreen> {
   double _rating = 0;
+  bool _isSubmitting = false;
   final TextEditingController _commentController = TextEditingController();
   final List<String> _selectedQualities = [];
 
@@ -49,6 +53,16 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
     }
   }
 
+  /// Nounou de la réservation (nom réel pour l'en-tête, id pour l'avis).
+  ({String? id, String name}) get _nanny {
+    final booking = ref
+        .watch(bookingByIdProvider(widget.bookingId))
+        .valueOrNull;
+    if (booking == null) return (id: null, name: 'votre nounou');
+    final nanny = ref.watch(nannyByIdProvider(booking.nannyId)).valueOrNull;
+    return (id: booking.nannyId, name: nanny?.name ?? 'votre nounou');
+  }
+
   @override
   Widget build(BuildContext context) {
     final ratingInfo = _ratingLabel;
@@ -75,7 +89,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
       body: Column(
         children: [
           // ── Hero gradient header card ────────────────────────────────────
-          _HeroHeader(),
+          _HeroHeader(nannyName: _nanny.name),
 
           // ── Scrollable content ───────────────────────────────────────────
           Expanded(
@@ -149,7 +163,10 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                   // Submit button
                   AppButton(
                     label: 'Soumettre mon avis',
-                    onPressed: _rating == 0 ? null : _submitReview,
+                    isLoading: _isSubmitting,
+                    onPressed: _rating == 0 || _isSubmitting
+                        ? null
+                        : _submitReview,
                   ),
                   const SizedBox(height: AppSpacing.md),
 
@@ -234,20 +251,48 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
     );
   }
 
-  void _submitReview() {
-    // Show success snackbar
+  Future<void> _submitReview() async {
+    final nannyId = _nanny.id;
+    if (nannyId == null) return;
+    setState(() => _isSubmitting = true);
+
+    // Le commentaire agrège les qualités cochées et le texte libre.
+    final comment = [
+      if (_selectedQualities.isNotEmpty) _selectedQualities.join(' · '),
+      _commentController.text.trim(),
+    ].where((part) => part.isNotEmpty).join('\n');
+
+    await ref
+        .read(reviewRepositoryProvider)
+        .addReview(
+          ReviewModel(
+            id: 'rev-${widget.bookingId}',
+            bookingId: widget.bookingId,
+            fromUserId: ref.read(currentUserIdProvider),
+            toUserId: nannyId,
+            rating: _rating,
+            comment: comment,
+            createdAt: DateTime.now(),
+          ),
+        );
+    ref.invalidate(reviewsForUserProvider(nannyId));
+
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white),
-            const SizedBox(width: 12),
-            const Text('Merci ! Votre avis a été enregistré.'),
+            Icon(Icons.check_circle_rounded, color: Colors.white),
+            SizedBox(width: 12),
+            Text('Merci ! Votre avis a été enregistré.'),
           ],
         ),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.buttonBorderRadius,
+        ),
       ),
     );
     context.go('/home');
@@ -258,7 +303,8 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
 
 /// Gradient hero header with avatar, name and subtitle.
 class _HeroHeader extends StatelessWidget {
-  const _HeroHeader();
+  final String nannyName;
+  const _HeroHeader({required this.nannyName});
 
   @override
   Widget build(BuildContext context) {
@@ -283,10 +329,11 @@ class _HeroHeader extends StatelessWidget {
           ),
           child: Column(
             children: [
-              const AppAvatar(name: 'Julie M.', size: 90),
+              AppAvatar(name: nannyName, size: 90),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                'Comment s\'est passée votre mission avec Julie ?',
+                'Comment s\'est passée votre garde avec '
+                '${nannyName.split(' ').first} ?',
                 textAlign: TextAlign.center,
                 style: AppTypography.h3.copyWith(
                   fontWeight: FontWeight.w900,

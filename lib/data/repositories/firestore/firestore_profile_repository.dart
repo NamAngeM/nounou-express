@@ -15,6 +15,16 @@ class FirestoreProfileRepository implements ProfileRepository {
 
   final FirebaseFirestore _db;
 
+  @override
+  String currentUserId() => currentUid();
+
+  @override
+  Future<Map<String, dynamic>?> getCurrentUserProfile() async {
+    final snapshot = await _db.collection('users').doc(currentUid()).get();
+    final data = snapshot.data();
+    return data == null ? null : normalizeDoc(data);
+  }
+
   Future<Map<String, dynamic>> _statsDoc() async {
     final snapshot = await _db
         .collection('users')

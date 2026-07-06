@@ -53,3 +53,9 @@ lib/features/auth/screens/*.bak
 # ── Release signing (Phase 4) ────────────────────────────────────────────────
 keystore/
 android/key.properties
+
+# Claude Code (sessions locales, worktrees)
+.claude/
+
+# Cloud Functions
+functions/node_modules/

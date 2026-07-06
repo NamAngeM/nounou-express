@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/constants/backend_config.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../data/models/application_model.dart';
 import '../../../data/models/mission_model.dart';
+import '../../../data/models/notification_model.dart';
 import '../../../data/providers/data_providers.dart';
 
 // ── Sort options ──────────────────────────────────────────────────────────────
@@ -24,19 +27,36 @@ class CandidaturesScreen extends ConsumerStatefulWidget {
 class _CandidaturesScreenState extends ConsumerState<CandidaturesScreen> {
   _SortOption _sortOption = _SortOption.rating;
 
-  // État UI transitoire : surcouche locale sur les données des providers
-  // (le repository n'expose pas encore de mutation sur les candidatures).
-  String? _acceptedApplicationId;
-  final Set<String> _rejectedApplicationIds = {};
+  /// Prévient la nounou de la décision. En mode Firebase, c'est la
+  /// Cloud Function `onApplicationDecided` qui notifie (+ push FCM) —
+  /// le client ne peut pas écrire dans le fil d'un autre utilisateur.
+  Future<void> _notifyDecision(ApplicationModel app, bool accepted) async {
+    if (BackendConfig.useFirebase) return;
+    final now = DateTime.now();
+    await ref
+        .read(notificationRepositoryProvider)
+        .addNotification(
+          NotificationModel(
+            id: 'decision-${app.id}-${now.millisecondsSinceEpoch}',
+            userId: app.nannyId,
+            title: accepted ? 'Candidature acceptée 🎉' : 'Candidature refusée',
+            body: accepted
+                ? 'Votre candidature a été acceptée. Retrouvez la mission '
+                      'dans « Mes candidatures ».'
+                : 'Votre candidature n\'a pas été retenue cette fois-ci.',
+            type: 'application_decision',
+            isRead: false,
+            createdAt: now,
+          ),
+        );
+    ref.invalidate(notificationsProvider);
+  }
 
   List<ApplicationModel> _visibleApplications(List<ApplicationModel> all) {
+    // Les refus sont persistés côté repository : on masque simplement
+    // les candidatures refusées.
     final applications = all
-        .where((a) => !_rejectedApplicationIds.contains(a.id))
-        .map(
-          (a) => a.id == _acceptedApplicationId
-              ? a.copyWith(status: ApplicationStatus.accepted)
-              : a,
-        )
+        .where((a) => a.status != ApplicationStatus.rejected)
         .toList();
     switch (_sortOption) {
       case _SortOption.rating:
@@ -92,6 +112,7 @@ class _CandidaturesScreenState extends ConsumerState<CandidaturesScreen> {
     );
 
     if (confirmed == true && mounted) {
+      final repository = ref.read(missionRepositoryProvider);
       final mission = await ref.read(
         missionByIdProvider(widget.missionId).future,
       );
@@ -99,11 +120,17 @@ class _CandidaturesScreenState extends ConsumerState<CandidaturesScreen> {
         status: MissionStatus.confirmed,
         selectedNannyId: app.nannyId,
       );
-      await ref.read(missionRepositoryProvider).updateMission(updated);
+      await repository.updateMission(updated);
+      await repository.updateApplicationStatus(
+        app.id,
+        ApplicationStatus.accepted,
+      );
+      await _notifyDecision(app, true);
       ref.invalidate(missionByIdProvider(widget.missionId));
       ref.invalidate(missionsProvider);
+      ref.invalidate(missionApplicationsProvider(widget.missionId));
+      ref.invalidate(myApplicationsProvider);
       if (!mounted) return;
-      setState(() => _acceptedApplicationId = app.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -136,13 +163,14 @@ class _CandidaturesScreenState extends ConsumerState<CandidaturesScreen> {
     }
   }
 
-  void _rejectApplication(ApplicationModel app) {
-    setState(() {
-      _rejectedApplicationIds.add(app.id);
-      if (_acceptedApplicationId == app.id) {
-        _acceptedApplicationId = null;
-      }
-    });
+  Future<void> _rejectApplication(ApplicationModel app) async {
+    await ref
+        .read(missionRepositoryProvider)
+        .updateApplicationStatus(app.id, ApplicationStatus.rejected);
+    await _notifyDecision(app, false);
+    ref.invalidate(missionApplicationsProvider(widget.missionId));
+    ref.invalidate(myApplicationsProvider);
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: AppColors.dangerSurface,
@@ -408,7 +436,7 @@ class _CandidaturesScreenState extends ConsumerState<CandidaturesScreen> {
         ),
       ),
       body: applicationsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const AppLoader(),
         error: (e, _) => Center(
           child: Text(
             'Erreur de chargement des candidatures',

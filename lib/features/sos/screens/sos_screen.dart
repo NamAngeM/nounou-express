@@ -3,20 +3,24 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../data/models/mission_model.dart';
+import '../../../data/providers/data_providers.dart';
 
-class SosScreen extends StatefulWidget {
+class SosScreen extends ConsumerStatefulWidget {
   const SosScreen({super.key});
 
   @override
-  State<SosScreen> createState() => _SosScreenState();
+  ConsumerState<SosScreen> createState() => _SosScreenState();
 }
 
-class _SosScreenState extends State<SosScreen>
+class _SosScreenState extends ConsumerState<SosScreen>
     with SingleTickerProviderStateMixin {
   bool _isSent = false;
   double _progress = 0;
@@ -55,10 +59,59 @@ class _SosScreenState extends State<SosScreen>
     }
   }
 
+  /// `true` si l'alerte a pu être rattachée à une mission (et donc
+  /// relayée à la contrepartie).
+  bool _hasMissionContext = false;
+
   void _onComplete() {
     _timer?.cancel();
     HapticFeedback.vibrate();
     setState(() => _isSent = true);
+    _sendAlert();
+  }
+
+  /// Statuts pendant lesquels une garde est effectivement active :
+  /// l'alerte doit prévenir l'autre partie de cette mission.
+  static const _activeStatuses = {
+    MissionStatus.confirmed,
+    MissionStatus.nannyEnRoute,
+    MissionStatus.nannyArrived,
+    MissionStatus.inProgress,
+    MissionStatus.delayed,
+  };
+
+  /// Mission active impliquant l'utilisateur courant (parent ou nounou),
+  /// ou `null` si aucune garde n'est en cours.
+  Future<MissionModel?> _currentMission(String userId) async {
+    final missions = await ref.read(missionsProvider.future);
+    for (final mission in missions) {
+      final involved =
+          mission.parentId == userId || mission.selectedNannyId == userId;
+      if (involved && _activeStatuses.contains(mission.status)) {
+        return mission;
+      }
+    }
+    return null;
+  }
+
+  /// Envoie l'alerte : trace horodatée côté émetteur, et — si une
+  /// mission est en cours — relais à la contrepartie (notification +
+  /// push FCM via la Cloud Function en mode Firebase).
+  Future<void> _sendAlert() async {
+    final userId = ref.read(currentUserIdProvider);
+    MissionModel? mission;
+    try {
+      mission = await _currentMission(userId);
+    } catch (_) {
+      mission = null; // L'alerte part même si la recherche échoue.
+    }
+    await ref
+        .read(sosRepositoryProvider)
+        .sendAlert(fromUserId: userId, missionId: mission?.id);
+    ref.invalidate(notificationsProvider);
+    if (mounted) {
+      setState(() => _hasMissionContext = mission != null);
+    }
   }
 
   Future<void> _callNumber(String number) async {
@@ -107,7 +160,7 @@ class _SosScreenState extends State<SosScreen>
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     _isSent
-                        ? "Alerte envoyée !"
+                        ? "Alerte enregistrée !"
                         : "Appuyez longuement pour envoyer une alerte",
                     style: AppTypography.bodyLarge.copyWith(
                       color: Colors.white.withValues(alpha: 0.9),
@@ -242,7 +295,13 @@ class _SosScreenState extends State<SosScreen>
     return Column(
       children: [
         Text(
-          "Les parents et les secours ont été prévenus",
+          _hasMissionContext
+              ? "Alerte transmise : l'autre partie de votre mission en "
+                    "cours est prévenue. Contactez les secours ci-dessous "
+                    "si la situation l'exige."
+              : "Alerte enregistrée et horodatée (aucune mission en "
+                    "cours). Contactez les secours ci-dessous si la "
+                    "situation l'exige.",
           style: AppTypography.caption.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -251,9 +310,11 @@ class _SosScreenState extends State<SosScreen>
         ),
         const SizedBox(height: AppSpacing.xl),
         ElevatedButton.icon(
-          onPressed: () => _callNumber('17'),
+          onPressed: () => _callNumber(AppConstants.emergencyFireNumber),
           icon: const Icon(Icons.phone),
-          label: const Text("Appeler les secours (17)"),
+          label: Text(
+            "Appeler les pompiers (${AppConstants.emergencyFireNumber})",
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: AppColors.danger,
@@ -269,7 +330,7 @@ class _SosScreenState extends State<SosScreen>
 
   Widget _buildEmergencyContactCard() {
     return GestureDetector(
-      onTap: () => _callNumber('15'),
+      onTap: () => _callNumber(AppConstants.emergencySamuNumber),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
@@ -298,7 +359,7 @@ class _SosScreenState extends State<SosScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "SAMU — 15",
+                    "SAMU social — ${AppConstants.emergencySamuNumber}",
                     style: AppTypography.h4.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
@@ -306,7 +367,7 @@ class _SosScreenState extends State<SosScreen>
                     ),
                   ),
                   Text(
-                    "Appel d'urgence médical",
+                    "Aide médicale et sociale d'urgence",
                     style: AppTypography.bodySmall.copyWith(
                       color: Colors.white.withValues(alpha: 0.8),
                     ),

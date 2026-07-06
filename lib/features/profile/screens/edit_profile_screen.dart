@@ -7,6 +7,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/validators.dart';
+import '../../../core/widgets/app_loader.dart';
+import '../../../core/widgets/avatar_widget.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -100,7 +102,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               _prefillFrom(user);
               return _buildForm(user);
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const AppLoader(),
             error: (e, _) => const EmptyState(
               icon: Icons.error_outline_rounded,
               title: "Erreur de chargement",
@@ -316,11 +318,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ],
                   border: Border.all(color: Colors.white, width: 3),
                 ),
-                child: const CircleAvatar(
-                  radius: 60,
-                  backgroundImage: NetworkImage(
-                    "https://i.pravatar.cc/150?u=n1",
-                  ),
+                child: AppAvatar(
+                  name: user.name,
+                  imageUrl: user.avatar,
+                  size: 120,
                 ),
               ),
               Positioned(

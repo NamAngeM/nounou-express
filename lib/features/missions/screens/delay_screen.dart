@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../data/models/mission_model.dart';
 import '../../../data/providers/data_providers.dart';
-
-// ── Mode enum ─────────────────────────────────────────────────────────────────
-enum _DelayMode { nannyMode, parentMode }
+import '../../auth/providers/auth_provider.dart';
 
 class DelayScreen extends ConsumerStatefulWidget {
   final String missionId;
@@ -26,10 +27,13 @@ class DelayScreen extends ConsumerStatefulWidget {
 }
 
 class _DelayScreenState extends ConsumerState<DelayScreen> {
-  _DelayMode _mode = _DelayMode.nannyMode;
   int? _selectedMinutes;
   String? _parentChoice; // 'en_route' | 'bloque'
   bool _showDurationSelector = false;
+
+  /// Le point de vue (nounou qui prolonge / parent en retard) est déduit
+  /// du rôle de la session — plus de toggle manuel.
+  bool get _isNanny => ref.watch(authProvider).isNanny;
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -80,13 +84,12 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
       body: missionAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const AppLoader(),
         error: (e, _) => Center(
           child: Text('Mission introuvable', style: AppTypography.bodyMedium),
         ),
         data: (mission) => Column(
           children: [
-            _buildModeToggle(),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
@@ -98,7 +101,7 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
                   children: [
                     _buildHeaderWarningCard(mission),
                     const SizedBox(height: AppSpacing.lg),
-                    _mode == _DelayMode.nannyMode
+                    _isNanny
                         ? _buildNannyBody(mission)
                         : _buildParentBody(mission),
                     const SizedBox(height: AppSpacing.lg),
@@ -145,63 +148,10 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
     );
   }
 
-  Widget _buildModeToggle() {
-    return Container(
-      color: AppColors.surface,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          Text('Mode :', style: AppTypography.labelMd),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: SegmentedButton<_DelayMode>(
-              segments: const [
-                ButtonSegment(
-                  value: _DelayMode.nannyMode,
-                  label: Text('Nounou'),
-                  icon: Icon(Icons.child_care_rounded, size: 16),
-                ),
-                ButtonSegment(
-                  value: _DelayMode.parentMode,
-                  label: Text('Parent'),
-                  icon: Icon(Icons.person_rounded, size: 16),
-                ),
-              ],
-              selected: {_mode},
-              onSelectionChanged: (s) => setState(() {
-                _mode = s.first;
-                _selectedMinutes = null;
-                _parentChoice = null;
-                _showDurationSelector = false;
-              }),
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return AppColors.warning;
-                  }
-                  return AppColors.surfaceVariant;
-                }),
-                foregroundColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return Colors.white;
-                  }
-                  return AppColors.textSecondary;
-                }),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   // ── Header warning card ──────────────────────────────────────────────────────
 
   Widget _buildHeaderWarningCard(MissionModel mission) {
-    final isNanny = _mode == _DelayMode.nannyMode;
+    final isNanny = _isNanny;
     final title = isNanny
         ? "L'heure de fin prévue est dépassée"
         : 'Vous êtes en retard !';
@@ -412,7 +362,7 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
         ],
         if (_parentChoice == 'bloque') ...[
           const SizedBox(height: AppSpacing.lg),
-          _buildContactOptions(),
+          _buildContactOptions(mission),
         ],
       ],
     );
@@ -572,7 +522,14 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
     );
   }
 
-  Widget _buildContactOptions() {
+  Future<void> _callNanny(String nannyId) async {
+    final nanny = await ref.read(nannyByIdProvider(nannyId).future);
+    final uri = Uri(scheme: 'tel', path: nanny.phone);
+    if (await canLaunchUrl(uri)) await launchUrl(uri);
+  }
+
+  Widget _buildContactOptions(MissionModel mission) {
+    final nannyId = mission.selectedNannyId;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
@@ -592,12 +549,16 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
             icon: Icons.phone_rounded,
             label: 'Appeler la nounou',
             color: AppColors.danger,
+            onPressed: nannyId == null ? null : () => _callNanny(nannyId),
           ),
           const SizedBox(height: AppSpacing.sm),
           _contactRow(
             icon: Icons.chat_rounded,
             label: 'Envoyer un message',
             color: AppColors.danger,
+            onPressed: nannyId == null
+                ? null
+                : () => context.push('/chat/$nannyId'),
           ),
         ],
       ),
@@ -608,9 +569,10 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
     required IconData icon,
     required String label,
     required Color color,
+    required VoidCallback? onPressed,
   }) {
     return OutlinedButton.icon(
-      onPressed: () {},
+      onPressed: onPressed,
       icon: Icon(icon, color: color, size: 20),
       label: Text(label, style: AppTypography.labelLg.copyWith(color: color)),
       style: OutlinedButton.styleFrom(
@@ -731,7 +693,7 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
   Widget _buildEmergencyOption() {
     return Center(
       child: TextButton.icon(
-        onPressed: () {},
+        onPressed: () => context.push('/sos'),
         icon: const Icon(Icons.sos_rounded, color: AppColors.danger, size: 20),
         label: Text(
           'Situation d\'urgence — Contacter le support',

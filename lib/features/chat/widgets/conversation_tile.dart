@@ -23,7 +23,7 @@ class ConversationTile extends StatelessWidget {
     return Dismissible(
       key: Key(conversation.id),
       background: _buildSwipeBackground(
-        color: Colors.blue,
+        color: AppColors.primary,
         icon: Icons.archive_outlined,
         alignment: Alignment.centerLeft,
       ),
@@ -104,7 +104,7 @@ class ConversationTile extends StatelessWidget {
                           const Icon(
                             Icons.done_all,
                             size: 16,
-                            color: Colors.blue,
+                            color: AppColors.primary,
                           ),
                       ],
                     ),
@@ -138,7 +138,7 @@ class ConversationTile extends StatelessWidget {
               width: 14,
               height: 14,
               decoration: BoxDecoration(
-                color: Colors.green,
+                color: AppColors.success,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
               ),

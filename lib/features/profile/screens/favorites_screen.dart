@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/nanny_card.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -36,7 +37,7 @@ class FavoritesScreen extends ConsumerWidget {
           .when(
             data: (favorites) =>
                 favorites.isEmpty ? _buildEmptyState() : _buildList(favorites),
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const AppLoader(),
             error: (e, _) => _buildEmptyState(),
           ),
     );

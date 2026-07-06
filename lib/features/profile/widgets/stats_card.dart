@@ -23,14 +23,8 @@ class StatsCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: AppSpacing.cardBorderRadius,
+        boxShadow: AppColors.cardShadow,
         border: Border.all(color: AppColors.border),
       ),
       child: Column(

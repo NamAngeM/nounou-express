@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/app_page_header.dart';
 import '../../../data/models/notification_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -19,17 +20,14 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
-  /// Suppressions locales (swipe) : le repository n'expose pas encore de
-  /// méthode de suppression, on filtre donc côté écran.
-  final Set<String> _deletedIds = {};
-
   Future<void> _markAllAsRead() async {
     await ref.read(notificationRepositoryProvider).markAllAsRead();
     ref.invalidate(notificationsProvider);
   }
 
-  void _deleteNotification(String id) {
-    setState(() => _deletedIds.add(id));
+  Future<void> _deleteNotification(String id) async {
+    await ref.read(notificationRepositoryProvider).deleteNotification(id);
+    ref.invalidate(notificationsProvider);
   }
 
   Map<String, List<NotificationModel>> _groupNotifications(
@@ -70,9 +68,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncNotifications = ref.watch(notificationsProvider);
-    final notifications = (asyncNotifications.valueOrNull ?? [])
-        .where((n) => !_deletedIds.contains(n.id))
-        .toList();
+    final notifications = asyncNotifications.valueOrNull ?? [];
     final unread = notifications.where((n) => !n.isRead).length;
 
     return Scaffold(
@@ -102,7 +98,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 data: (_) => notifications.isEmpty
                     ? _buildScrollableEmptyState()
                     : _buildList(_groupNotifications(notifications)),
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => const AppLoader(),
                 error: (e, _) => _buildScrollableEmptyState(),
               ),
             ),
@@ -182,7 +178,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       case 'booking_confirmed':
         context.go('/bookings');
       case 'new_message':
-        context.go('/chat/n1');
+        context.go('/chat');
       case 'sos_alert':
         context.push('/sos');
       default:

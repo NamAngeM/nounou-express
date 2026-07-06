@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -25,7 +26,7 @@ class BookingConfirmationScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: bookingAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const AppLoader(),
           error: (e, _) => Center(child: Text('Erreur : $e')),
           data: (booking) =>
               _BookingConfirmationBody(bookingId: bookingId, booking: booking),
@@ -49,7 +50,7 @@ class _BookingConfirmationBody extends ConsumerWidget {
     final nannyAsync = ref.watch(nannyByIdProvider(booking.nannyId));
 
     return nannyAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const AppLoader(),
       error: (e, _) => Center(child: Text('Erreur : $e')),
       data: (nanny) => _buildContent(context, nanny),
     );

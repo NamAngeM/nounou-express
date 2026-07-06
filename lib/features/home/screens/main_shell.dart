@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/demo_banner.dart';
+import '../../../data/providers/data_providers.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../sos/widgets/sos_button.dart';
 
 class MainShell extends StatelessWidget {
@@ -14,14 +18,21 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      body: Column(
         children: [
-          navigationShell,
-          // Global SOS button — top-right, always accessible
-          const SafeArea(
-            child: Padding(
-              padding: EdgeInsets.only(top: 8, right: 12),
-              child: SosButton(),
+          const SafeArea(bottom: false, child: DemoBanner()),
+          Expanded(
+            child: Stack(
+              children: [
+                navigationShell,
+                // Global SOS button — top-right, always accessible
+                const SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 8, right: 12),
+                    child: SosButton(),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -37,13 +48,13 @@ class MainShell extends StatelessWidget {
   }
 }
 
-class _BottomNavBar extends StatelessWidget {
+class _BottomNavBar extends ConsumerWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
   const _BottomNavBar({required this.currentIndex, required this.onTap});
 
-  static const _items = [
+  static const _parentItems = [
     _NavItem(Icons.home_outlined, Icons.home_rounded, 'Accueil'),
     _NavItem(Icons.search_outlined, Icons.search_rounded, 'Recherche'),
     _NavItem(
@@ -59,8 +70,30 @@ class _BottomNavBar extends StatelessWidget {
     _NavItem(Icons.person_outline_rounded, Icons.person_rounded, 'Profil'),
   ];
 
+  static const _nannyItems = [
+    _NavItem(Icons.dashboard_outlined, Icons.dashboard_rounded, 'Accueil'),
+    _NavItem(Icons.work_outline_rounded, Icons.work_rounded, 'Missions'),
+    _NavItem(
+      Icons.event_note_outlined,
+      Icons.event_note_rounded,
+      'Réservations',
+    ),
+    _NavItem(
+      Icons.chat_bubble_outline_rounded,
+      Icons.chat_bubble_rounded,
+      'Messages',
+    ),
+    _NavItem(Icons.person_outline_rounded, Icons.person_rounded, 'Profil'),
+  ];
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(authProvider).isNanny ? _nannyItems : _parentItems;
+    final unreadMessages =
+        (ref.watch(conversationsProvider).valueOrNull ?? const [])
+            .where((c) => c.unreadCount > 0)
+            .length;
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -80,12 +113,12 @@ class _BottomNavBar extends StatelessWidget {
         child: SizedBox(
           height: 64,
           child: Row(
-            children: _items.asMap().entries.map((e) {
+            children: items.asMap().entries.map((e) {
               final index = e.key;
               final item = e.value;
               final isSelected = index == currentIndex;
-              // Messages tab gets a badge
-              final hasBadge = index == 3;
+              // Messages tab gets a badge when conversations are unread
+              final hasBadge = index == 3 && unreadMessages > 0;
               return Expanded(
                 child: _NavTapWrapper(
                   onTap: () => onTap(index),
@@ -142,7 +175,9 @@ class _BottomNavBar extends StatelessWidget {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      '3',
+                                      unreadMessages > 9
+                                          ? '9+'
+                                          : '$unreadMessages',
                                       style: AppTypography.small.copyWith(
                                         color: Colors.white,
                                         fontSize: 9,

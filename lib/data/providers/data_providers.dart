@@ -8,6 +8,7 @@ import '../models/message_model.dart';
 import '../models/mission_model.dart';
 import '../models/nanny_model.dart';
 import '../models/notification_model.dart';
+import '../models/review_model.dart';
 import '../repositories/booking_repository.dart';
 import '../repositories/chat_repository.dart';
 import '../repositories/firestore/firestore_booking_repository.dart';
@@ -16,10 +17,14 @@ import '../repositories/firestore/firestore_mission_repository.dart';
 import '../repositories/firestore/firestore_nanny_repository.dart';
 import '../repositories/firestore/firestore_notification_repository.dart';
 import '../repositories/firestore/firestore_profile_repository.dart';
+import '../repositories/firestore/firestore_review_repository.dart';
+import '../repositories/firestore/firestore_sos_repository.dart';
 import '../repositories/mission_repository.dart';
 import '../repositories/nanny_repository.dart';
 import '../repositories/notification_repository.dart';
 import '../repositories/profile_repository.dart';
+import '../repositories/review_repository.dart';
+import '../repositories/sos_repository.dart';
 
 // ── Repositories ──────────────────────────────────────────────────────────────
 // Un seul point de bascule : remplacer les implémentations Mock* par les
@@ -59,6 +64,18 @@ final profileRepositoryProvider = Provider<ProfileRepository>(
   (ref) => BackendConfig.useFirebase
       ? FirestoreProfileRepository()
       : MockProfileRepository(),
+);
+
+final sosRepositoryProvider = Provider<SosRepository>(
+  (ref) => BackendConfig.useFirebase
+      ? FirestoreSosRepository()
+      : MockSosRepository(ref.watch(notificationRepositoryProvider)),
+);
+
+final reviewRepositoryProvider = Provider<ReviewRepository>(
+  (ref) => BackendConfig.useFirebase
+      ? FirestoreReviewRepository()
+      : MockReviewRepository(),
 );
 
 // ── Nounous ───────────────────────────────────────────────────────────────────
@@ -123,11 +140,44 @@ final missionApplicationsProvider =
           .getApplicationsForMission(missionId),
     );
 
+/// Candidatures déposées par la nounou connectée (plus récentes d'abord).
+final myApplicationsProvider = FutureProvider<List<ApplicationModel>>(
+  (ref) => ref
+      .watch(missionRepositoryProvider)
+      .getApplicationsForNanny(ref.watch(currentUserIdProvider)),
+);
+
+// ── Avis ──────────────────────────────────────────────────────────────────────
+
+/// Avis reçus par un utilisateur (nounou ou parent).
+final reviewsForUserProvider = FutureProvider.family<List<ReviewModel>, String>(
+  (ref, userId) => ref.watch(reviewRepositoryProvider).getReviewsFor(userId),
+);
+
 // ── Notifications ─────────────────────────────────────────────────────────────
 
 final notificationsProvider = FutureProvider<List<NotificationModel>>(
   (ref) => ref.watch(notificationRepositoryProvider).getNotifications(),
 );
+
+// ── Utilisateur courant ───────────────────────────────────────────────────────
+
+/// Id de l'utilisateur connecté (uid Firebase, ou 'p1' en mode démo).
+final currentUserIdProvider = Provider<String>(
+  (ref) => ref.watch(profileRepositoryProvider).currentUserId(),
+);
+
+/// Profil saisi à l'inscription (prénom, quartier...), `null` si absent.
+final currentUserProfileProvider = FutureProvider<Map<String, dynamic>?>(
+  (ref) => ref.watch(profileRepositoryProvider).getCurrentUserProfile(),
+);
+
+/// Nombre de notifications non lues (badge cloche / bottom nav).
+final unreadNotificationsCountProvider = Provider<int>((ref) {
+  final notifications = ref.watch(notificationsProvider).valueOrNull;
+  if (notifications == null) return 0;
+  return notifications.where((n) => !n.isRead).length;
+});
 
 // ── Profil / dashboard ────────────────────────────────────────────────────────
 

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/app_loader.dart';
+import '../../../data/models/application_model.dart';
 import '../../../data/models/mission_model.dart';
 import '../../../data/providers/data_providers.dart';
 
@@ -76,7 +79,7 @@ class _AvailableMissionsScreenState
           ),
           Expanded(
             child: missionsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const AppLoader(),
               error: (e, _) => Center(
                 child: Text(
                   'Erreur de chargement des annonces',
@@ -109,6 +112,10 @@ class _AvailableMissionsScreenState
   }
 
   PreferredSizeWidget _buildAppBar() {
+    final quartier =
+        (ref.watch(currentUserProfileProvider).valueOrNull?['quartier']
+                as String?)
+            ?.trim();
     return AppBar(
       backgroundColor: AppColors.surface,
       surfaceTintColor: Colors.transparent,
@@ -119,13 +126,25 @@ class _AvailableMissionsScreenState
         children: [
           Text('Annonces disponibles', style: AppTypography.h3),
           Text(
-            'Libreville · Angondjé',
+            quartier == null || quartier.isEmpty
+                ? 'Libreville'
+                : 'Libreville · $quartier',
             style: AppTypography.caption.copyWith(
               color: AppColors.textSecondary,
             ),
           ),
         ],
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.assignment_outlined,
+            color: AppColors.primary,
+          ),
+          tooltip: 'Mes candidatures',
+          onPressed: () => context.push('/missions/my-applications'),
+        ),
+      ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: AppColors.border),
@@ -495,12 +514,12 @@ class _InfoRow extends StatelessWidget {
 // Bottom row: applicants count + Postuler button
 // ---------------------------------------------------------------------------
 
-class _BottomRow extends StatelessWidget {
+class _BottomRow extends ConsumerWidget {
   const _BottomRow({required this.mission});
   final MissionModel mission;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final count = mission.applicantIds.length;
     return Row(
       children: [
@@ -531,7 +550,7 @@ class _BottomRow extends StatelessWidget {
         ),
         const Spacer(),
         ElevatedButton(
-          onPressed: () => _showApplySheet(context, mission),
+          onPressed: () => _showApplySheet(context, ref, mission),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
@@ -555,65 +574,76 @@ class _BottomRow extends StatelessWidget {
 // Apply bottom sheet
 // ---------------------------------------------------------------------------
 
-void _showApplySheet(BuildContext context, MissionModel mission) {
-  // Simulation blocage KYC pour la démo Investisseur (Point 3 : Onboarding progressif)
-  showDialog(
-    context: context,
-    builder: (c) => AlertDialog(
-      title: const Row(
-        children: [
-          Icon(Icons.security_rounded, color: AppColors.warning),
-          SizedBox(width: 8),
-          Text('Vérification requise'),
+void _showApplySheet(BuildContext context, WidgetRef ref, MissionModel mission) {
+  // Onboarding progressif : la candidature exige un profil complété à
+  // l'inscription (la CNI y est déjà collectée). Sans profil, on oriente
+  // vers la vérification d'identité au lieu de bloquer sans issue.
+  final profile = ref.read(currentUserProfileProvider).valueOrNull;
+  if (profile == null) {
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.security_rounded, color: AppColors.warning),
+            SizedBox(width: 8),
+            Text('Vérification requise'),
+          ],
+        ),
+        content: const Text(
+          'Pour postuler à cette mission, vous devez d\'abord vérifier votre identité (KYC). Veuillez compléter votre profil avec une pièce d\'identité valide.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c),
+            child: const Text(
+              'Plus tard',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(c);
+              context.push('/profile/verification');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Vérifier mon identité'),
+          ),
         ],
       ),
-      content: const Text(
-        'Pour postuler à cette mission, vous devez d\'abord vérifier votre identité (KYC). Veuillez compléter votre profil avec une pièce d\'identité valide.',
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(c),
-          child: const Text(
-            'Plus tard',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(c);
-            // Rediriger vers l'édition de profil ou une page KYC
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-          ),
-          child: const Text('Vérifier mon identité'),
-        ),
-      ],
-    ),
-  );
-  // Le code en dessous était pour le bottom sheet d'application classique,
-  // qui est maintenant bloqué par le KYC dans cette démo.
-  /*
+    );
+    return;
+  }
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (_) => _ApplySheet(mission: mission),
   );
-  */
 }
 
-class _ApplySheet extends StatefulWidget {
+class _ApplySheet extends ConsumerStatefulWidget {
   const _ApplySheet({required this.mission});
   final MissionModel mission;
 
   @override
-  State<_ApplySheet> createState() => _ApplySheetState();
+  ConsumerState<_ApplySheet> createState() => _ApplySheetState();
 }
 
-class _ApplySheetState extends State<_ApplySheet> {
+class _ApplySheetState extends ConsumerState<_ApplySheet> {
   final _controller = TextEditingController();
+  bool _isSubmitting = false;
+
+  /// Tarif horaire saisi à l'inscription, sinon tarif par défaut.
+  double _hourlyRate() {
+    final profile = ref.read(currentUserProfileProvider).valueOrNull;
+    return (profile?['hourlyRate'] as num?)?.toDouble() ??
+        AppConstants.defaultHourlyRate;
+  }
 
   @override
   void dispose() {
@@ -621,9 +651,42 @@ class _ApplySheetState extends State<_ApplySheet> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
+    // Crée une vraie candidature (visible côté parent dans l'écran
+    // candidatures, et côté nounou dans « Mes candidatures »).
+    final nannyId = ref.read(currentUserIdProvider);
+    if (!widget.mission.applicantIds.contains(nannyId)) {
+      final profile = ref.read(currentUserProfileProvider).valueOrNull;
+      final message = _controller.text.trim();
+      final application = ApplicationModel(
+        id: 'app-${DateTime.now().millisecondsSinceEpoch}',
+        missionId: widget.mission.id,
+        nannyId: nannyId,
+        nannyName: (profile?['name'] as String?)?.trim() ?? 'Nounou',
+        nannyPhotoUrl: '',
+        nannyRating: 0,
+        nannyReviewCount: 0,
+        hourlyRate: _hourlyRate(),
+        experienceYears: (profile?['experience'] as num?)?.toInt() ?? 0,
+        skills:
+            (profile?['skills'] as List?)?.cast<String>() ?? const <String>[],
+        message: message.isEmpty ? null : message,
+        appliedAt: DateTime.now(),
+      );
+      await ref.read(missionRepositoryProvider).applyToMission(application);
+      ref.invalidate(missionsProvider);
+      ref.invalidate(myApplicationsProvider);
+      ref.invalidate(missionApplicationsProvider(widget.mission.id));
+    }
+
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.showSnackBar(
       SnackBar(
         content: Row(
           children: [
@@ -638,6 +701,11 @@ class _ApplySheetState extends State<_ApplySheet> {
               style: AppTypography.bodyMedium.copyWith(color: Colors.white),
             ),
           ],
+        ),
+        action: SnackBarAction(
+          label: 'Suivre',
+          textColor: Colors.white,
+          onPressed: () => router.push('/missions/my-applications'),
         ),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
@@ -700,7 +768,7 @@ class _ApplySheetState extends State<_ApplySheet> {
                 const SizedBox(width: AppSpacing.sm),
                 Text('Votre tarif: ', style: AppTypography.bodyMedium),
                 Text(
-                  '2 500 ${AppConstants.currency}/h',
+                  '${_hourlyRate().toStringAsFixed(0)} ${AppConstants.currency}/h',
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w700,
@@ -742,7 +810,7 @@ class _ApplySheetState extends State<_ApplySheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           ElevatedButton(
-            onPressed: _submit,
+            onPressed: _isSubmitting ? null : _submit,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
@@ -752,10 +820,19 @@ class _ApplySheetState extends State<_ApplySheet> {
                 borderRadius: AppSpacing.buttonBorderRadius,
               ),
             ),
-            child: Text(
-              'Confirmer ma candidature',
-              style: AppTypography.buttonLabel,
-            ),
+            child: _isSubmitting
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(
+                    'Confirmer ma candidature',
+                    style: AppTypography.buttonLabel,
+                  ),
           ),
         ],
       ),

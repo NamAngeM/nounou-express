@@ -29,7 +29,7 @@ class MessageBubble extends StatelessWidget {
               vertical: AppSpacing.sm,
             ),
             decoration: BoxDecoration(
-              color: isMe ? const Color(0xFFFFF0E8) : const Color(0xFFF0F0F0),
+              color: isMe ? AppColors.primarySurface : AppColors.surfaceVariant,
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(16),
                 topRight: const Radius.circular(16),
@@ -59,7 +59,7 @@ class MessageBubble extends StatelessWidget {
                     message.isRead ? Icons.done_all : Icons.check,
                     size: 14,
                     color: message.isRead
-                        ? Colors.blue
+                        ? AppColors.primary
                         : AppColors.textSecondary,
                   ),
                 ],

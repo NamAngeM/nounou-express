@@ -22,14 +22,18 @@ import '../../features/missions/screens/available_missions_screen.dart';
 import '../../features/missions/screens/candidatures_screen.dart';
 import '../../features/missions/screens/delay_screen.dart';
 import '../../features/missions/screens/mission_tracking_screen.dart';
+import '../../features/missions/screens/my_applications_screen.dart';
 import '../../features/missions/screens/publish_announcement_screen.dart';
 import '../../features/nanny_profile/screens/nanny_profile_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/onboarding/screens/onboarding_screen.dart';
 import '../../features/profile/screens/edit_profile_screen.dart';
+import '../../features/profile/screens/favorites_screen.dart';
 import '../../features/profile/screens/nanny_dashboard_screen.dart';
+import '../../features/profile/screens/nanny_verification_screen.dart';
 import '../../features/profile/screens/parent_profile_screen.dart';
 import '../../features/profile/screens/wallet_screen.dart';
+import '../../features/review/screens/leave_review_screen.dart';
 import '../../features/search/screens/map_screen.dart';
 import '../../features/search/screens/search_screen.dart';
 import '../../features/sos/screens/sos_screen.dart';
@@ -103,11 +107,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state, navigationShell) =>
             MainShell(navigationShell: navigationShell),
         branches: [
+          // Chaque onglet s'adapte au rôle : le parent cherche une nounou,
+          // la nounou gère son activité.
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: '/home',
-                pageBuilder: (c, s) => _fadeTransition(const HomeScreen()),
+                pageBuilder: (c, s) => _fadeTransition(
+                  ref.read(authProvider).isNanny
+                      ? const NannyDashboardScreen()
+                      : const HomeScreen(),
+                ),
               ),
             ],
           ),
@@ -115,7 +125,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/search',
-                pageBuilder: (c, s) => _fadeTransition(const SearchScreen()),
+                pageBuilder: (c, s) => _fadeTransition(
+                  ref.read(authProvider).isNanny
+                      ? const AvailableMissionsScreen()
+                      : const SearchScreen(),
+                ),
               ),
             ],
           ),
@@ -141,14 +155,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/profile',
-                pageBuilder: (c, s) {
-                  final bool isNanny = ref.read(authProvider).isNanny;
-                  return _fadeTransition(
-                    isNanny
-                        ? const NannyDashboardScreen()
-                        : const ParentProfileScreen(),
-                  );
-                },
+                // Le dashboard nounou vit désormais dans l'onglet Accueil ;
+                // l'onglet Profil donne à tous accès au compte (édition,
+                // notifications, déconnexion...).
+                pageBuilder: (c, s) =>
+                    _fadeTransition(const ParentProfileScreen()),
               ),
             ],
           ),
@@ -171,6 +182,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             BookingDetailScreen(bookingId: s.pathParameters['id']!),
       ),
       GoRoute(
+        path: '/booking/:id/review',
+        builder: (c, s) =>
+            LeaveReviewScreen(bookingId: s.pathParameters['id']!),
+      ),
+      GoRoute(
         path: '/booking/confirmation/:id',
         builder: (c, s) =>
             BookingConfirmationScreen(bookingId: s.pathParameters['id']!),
@@ -182,6 +198,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile/edit',
         builder: (c, s) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '/favorites',
+        builder: (c, s) => const FavoritesScreen(),
+      ),
+      GoRoute(
+        path: '/profile/verification',
+        builder: (c, s) => const NannyVerificationScreen(),
       ),
       GoRoute(
         path: '/notifications',
@@ -197,6 +221,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/missions/available',
         builder: (c, s) => const AvailableMissionsScreen(),
+      ),
+      GoRoute(
+        path: '/missions/my-applications',
+        builder: (c, s) => const MyApplicationsScreen(),
       ),
       GoRoute(
         path: '/missions/:missionId/candidatures',

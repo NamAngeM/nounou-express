@@ -6,9 +6,12 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/app_page_header.dart';
+import '../../../core/widgets/avatar_widget.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/providers/data_providers.dart';
+import '../../auth/providers/auth_provider.dart';
 
 class BookingsListScreen extends ConsumerWidget {
   const BookingsListScreen({super.key});
@@ -17,6 +20,8 @@ class BookingsListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bookingsAsync = ref.watch(bookingsProvider);
     final total = bookingsAsync.valueOrNull?.length ?? 0;
+    // La nounou ne « réserve » pas : ce sont ses gardes confirmées.
+    final isNanny = ref.watch(authProvider).isNanny;
 
     return DefaultTabController(
       length: 4,
@@ -26,8 +31,10 @@ class BookingsListScreen extends ConsumerWidget {
           children: [
             // ── Styled header ──────────────────────────────────────────────
             AppPageHeader(
-              title: 'Mes Réservations',
-              subtitle: '$total réservation${total != 1 ? 's' : ''} au total',
+              title: isNanny ? 'Mes Gardes' : 'Mes Réservations',
+              subtitle: isNanny
+                  ? '$total garde${total != 1 ? 's' : ''} au total'
+                  : '$total réservation${total != 1 ? 's' : ''} au total',
               icon: Icons.calendar_month_rounded,
               gradientColors: const [
                 AppColors.secondary,
@@ -89,7 +96,7 @@ class _BookingsList extends ConsumerWidget {
     final bookingsAsync = ref.watch(bookingsProvider);
 
     return bookingsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const AppLoader(),
       error: (e, _) => Center(child: Text('Erreur : $e')),
       data: (allBookings) {
         final bookings = allBookings.where((b) => b.status == status).toList();
@@ -198,13 +205,7 @@ class _BookingCard extends ConsumerWidget {
                   // Top row: nanny info + badge
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 22,
-                        backgroundColor: AppColors.surfaceVariant,
-                        backgroundImage: NetworkImage(
-                          'https://i.pravatar.cc/150?u=${booking.nannyId}',
-                        ),
-                      ),
+                      AppAvatar(name: nanny?.name ?? '?', size: 44),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
@@ -301,6 +302,29 @@ class _BookingCard extends ConsumerWidget {
                       ),
                     ],
                   ),
+
+                  // Boucle d'avis : proposée au parent uniquement, quand
+                  // la garde est terminée (l'avis porte sur la nounou).
+                  if (booking.status == 'Terminée' &&
+                      !ref.watch(authProvider).isNanny) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            context.push('/booking/${booking.id}/review'),
+                        icon: const Icon(Icons.star_outline_rounded, size: 18),
+                        label: const Text('Laisser un avis'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(color: AppColors.primary),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: AppSpacing.buttonBorderRadius,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
@@ -10,10 +11,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/mission_model.dart';
 import '../../../data/providers/data_providers.dart';
-import 'delay_screen.dart';
-
-// ── View perspective toggle ───────────────────────────────────────────────────
-enum _ViewPerspective { parent, nanny }
+import '../../auth/providers/auth_provider.dart';
 
 class MissionTrackingScreen extends ConsumerStatefulWidget {
   final String missionId;
@@ -28,7 +26,9 @@ class MissionTrackingScreen extends ConsumerStatefulWidget {
 class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
   late MissionModel _mission;
   MissionStatus _status = MissionStatus.pending;
-  _ViewPerspective _perspective = _ViewPerspective.parent;
+
+  /// Le point de vue est déduit du rôle de la session — plus de toggle.
+  bool get _isNanny => ref.watch(authProvider).isNanny;
 
   Timer? _timer;
   Duration _elapsed = Duration.zero;
@@ -148,7 +148,7 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
         label: 'Nounou en route',
         icon: Icons.directions_car_rounded,
         activeStatus: MissionStatus.nannyEnRoute,
-        color: const Color(0xFF9C27B0),
+        color: AppColors.primaryLight,
       ),
       _TimelineStep(
         label: 'Nounou arrivée',
@@ -235,7 +235,6 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
       appBar: _buildAppBar(),
       body: Column(
         children: [
-          _buildPerspectiveToggle(),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(
@@ -290,54 +289,6 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: AppColors.border),
-      ),
-    );
-  }
-
-  Widget _buildPerspectiveToggle() {
-    return Container(
-      color: AppColors.surface,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          Text('Vue :', style: AppTypography.labelMd),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: SegmentedButton<_ViewPerspective>(
-              segments: const [
-                ButtonSegment(
-                  value: _ViewPerspective.parent,
-                  label: Text('Parent'),
-                  icon: Icon(Icons.person_rounded, size: 16),
-                ),
-                ButtonSegment(
-                  value: _ViewPerspective.nanny,
-                  label: Text('Nounou'),
-                  icon: Icon(Icons.child_care_rounded, size: 16),
-                ),
-              ],
-              selected: {_perspective},
-              onSelectionChanged: (s) => setState(() => _perspective = s.first),
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return AppColors.primary;
-                  }
-                  return AppColors.surfaceVariant;
-                }),
-                foregroundColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return Colors.white;
-                  }
-                  return AppColors.textSecondary;
-                }),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -476,9 +427,7 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
   // ── Action area ─────────────────────────────────────────────────────────────
 
   Widget _buildActionArea() {
-    return _perspective == _ViewPerspective.parent
-        ? _buildParentActions()
-        : _buildNannyActions();
+    return _isNanny ? _buildNannyActions() : _buildParentActions();
   }
 
   Widget _buildParentActions() {
@@ -499,7 +448,7 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
       case MissionStatus.nannyEnRoute:
         return _infoCard(
           icon: Icons.directions_car_rounded,
-          color: const Color(0xFF9C27B0),
+          color: AppColors.primaryLight,
           message: 'Votre nounou est en route !',
         );
 
@@ -580,7 +529,7 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
                 builder: (c) => const AlertDialog(
                   content: Row(
                     children: [
-                      CircularProgressIndicator(),
+                      CircularProgressIndicator(color: AppColors.primary),
                       SizedBox(width: 16),
                       Expanded(
                         child: Text("Vérification de la position GPS..."),
@@ -609,16 +558,10 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
           icon: Icons.warning_amber_rounded,
           label: 'Signaler un retard',
           color: AppColors.warning,
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => DelayScreen(
-                  missionId: _mission.id,
-                  hourlyRate: _mission.hourlyRateSnapshot ?? 3000,
-                ),
-              ),
-            );
-          },
+          onTap: () => context.push(
+            '/missions/${_mission.id}/delay'
+            '?rate=${_mission.hourlyRateSnapshot ?? AppConstants.defaultHourlyRate}',
+          ),
         );
 
       case MissionStatus.delayed:

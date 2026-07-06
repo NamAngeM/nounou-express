@@ -7,87 +7,43 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/formatters.dart';
+import '../../../core/utils/pricing.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
 import '../../../core/widgets/rating_stars.dart';
 import '../../../data/models/nanny_model.dart';
+import '../../../data/models/review_model.dart';
 import '../../../data/providers/data_providers.dart';
 
-// ─────────────────────────────────────── Mock helpers ──
-
-class _Review {
-  final String parentName;
-  final double rating;
-  final String comment;
-  final DateTime date;
-  const _Review({
-    required this.parentName,
-    required this.rating,
-    required this.comment,
-    required this.date,
-  });
-}
-
-List<_Review> _mockReviews(NannyModel nanny) {
-  const parents = [
-    'Aminata B.',
-    'Sylvie M.',
-    'Patricia N.',
-    'Rose O.',
-    'Claire E.',
-  ];
-  const comments = [
-    'Excellente, mes enfants l\'adorent ! Toujours ponctuelle et pleine d\'énergie.',
-    'Très professionnelle et attentionnée. Je la recommande vivement.',
-    'Parfaite avec les nourrissons. Sa patience est remarquable.',
-    'Bonne communication, très sérieuse. Nous faisons appel à elle régulièrement.',
-    'Disponible et réactive. Les enfants réclament leur nounou !',
-  ];
-  final hash = nanny.id.codeUnits.fold(0, (a, b) => a + b);
-  return List.generate(
-    3,
-    (i) => _Review(
-      parentName: parents[(hash + i) % parents.length],
-      rating: [5.0, 4.0, 5.0, 4.0, 5.0][(hash + i) % 5],
-      comment: comments[(hash + i * 2) % comments.length],
-      date: DateTime.now().subtract(Duration(days: 10 + i * 20)),
-    ),
-  );
-}
-
-Map<int, double> _ratingDistribution(double r) {
-  if (r >= 4.8) return {5: 0.80, 4: 0.15, 3: 0.04, 2: 0.01, 1: 0.00};
-  if (r >= 4.5) return {5: 0.65, 4: 0.25, 3: 0.08, 2: 0.02, 1: 0.00};
-  if (r >= 4.0) return {5: 0.45, 4: 0.35, 3: 0.15, 2: 0.05, 1: 0.00};
-  return {5: 0.30, 4: 0.40, 3: 0.20, 2: 0.08, 1: 0.02};
-}
-
+/// Couleurs des chips de compétences, limitées à la palette de la charte.
 _SkillStyle _skillStyle(String skill) {
   final s = skill.toLowerCase();
   if (s.contains('secours') || s.contains('secourisme')) {
-    return _SkillStyle(Colors.red.shade50, Colors.red.shade700);
+    return const _SkillStyle(AppColors.dangerSurface, AppColors.danger);
   }
   if (s.contains('cuisine')) {
-    return _SkillStyle(Colors.orange.shade50, Colors.orange.shade700);
+    return const _SkillStyle(AppColors.goldSurface, AppColors.gold);
   }
   if (s.contains('devoir') || s.contains('scolaire')) {
-    return _SkillStyle(Colors.blue.shade50, Colors.blue.shade700);
+    return const _SkillStyle(AppColors.primarySurface, AppColors.primary);
   }
   if (s.contains('éveil') ||
       s.contains('musical') ||
       s.contains('créati') ||
       s.contains('animation')) {
-    return _SkillStyle(Colors.purple.shade50, Colors.purple.shade700);
+    return const _SkillStyle(AppColors.accentSurface, AppColors.accentDark);
   }
   if (s.contains('langue') || s.contains('bilingue')) {
-    return _SkillStyle(Colors.green.shade50, Colors.green.shade700);
+    return const _SkillStyle(AppColors.surfaceVariant, AppColors.secondary);
   }
   if (s.contains('hygiène') || s.contains('bébé') || s.contains('nourri')) {
-    return _SkillStyle(Colors.teal.shade50, Colors.teal.shade700);
+    return const _SkillStyle(AppColors.accentSurface, AppColors.accentDark);
   }
   if (s.contains('nuit') || s.contains('garde')) {
-    return _SkillStyle(Colors.indigo.shade50, Colors.indigo.shade700);
+    return const _SkillStyle(AppColors.primarySurface, AppColors.primaryDark);
   }
-  return _SkillStyle(Colors.grey.shade100, Colors.grey.shade700);
+  return const _SkillStyle(AppColors.surfaceVariant, AppColors.textSecondary);
 }
 
 class _SkillStyle {
@@ -115,8 +71,7 @@ class _NannyProfileScreenState extends ConsumerState<NannyProfileScreen> {
         .watch(nannyByIdProvider(widget.nannyId))
         .when(
           data: _buildProfile,
-          loading: () =>
-              const Scaffold(body: Center(child: CircularProgressIndicator())),
+          loading: () => const Scaffold(body: AppLoader()),
           // L'état error couvre aussi le cas « nounou introuvable ».
           error: (e, _) => Scaffold(
             appBar: AppBar(),
@@ -127,7 +82,6 @@ class _NannyProfileScreenState extends ConsumerState<NannyProfileScreen> {
 
   Widget _buildProfile(NannyModel nanny) {
     final quartier = nanny.quartier.isNotEmpty ? nanny.quartier : 'Libreville';
-    final reviews = _mockReviews(nanny);
     final memberSince = DateTime.now().subtract(
       Duration(days: (nanny.experience * 365).round()),
     );
@@ -158,13 +112,12 @@ class _NannyProfileScreenState extends ConsumerState<NannyProfileScreen> {
                 _SkillsSection(
                   skills: nanny.skills,
                 ).animate().fadeIn(delay: 250.ms, duration: 400.ms),
-                _AvailabilitySection().animate().fadeIn(
-                  delay: 300.ms,
-                  duration: 400.ms,
-                ),
+                if (nanny.availability.isNotEmpty)
+                  _AvailabilitySection(
+                    availability: nanny.availability,
+                  ).animate().fadeIn(delay: 300.ms, duration: 400.ms),
                 _ReviewsSection(
                   nanny: nanny,
-                  reviews: reviews,
                 ).animate().fadeIn(delay: 350.ms, duration: 400.ms),
                 const SizedBox(height: 100),
               ],
@@ -216,13 +169,7 @@ class _HeaderBackground extends StatelessWidget {
       children: [
         // Gradient background
         Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFFFF6B35), Color(0xFFFF9A6C)],
-            ),
-          ),
+          decoration: const BoxDecoration(gradient: AppColors.heroGradient),
         ),
         // Avatar centered
         // Avatar centered
@@ -409,7 +356,7 @@ class _BadgeChip extends StatelessWidget {
 
   Color get _fg {
     if (label.contains('Vérifié')) return AppColors.accent;
-    if (label.contains('Super')) return const Color(0xFFB8860B);
+    if (label.contains('Super')) return AppColors.gold;
     if (label.contains('Disponible')) return AppColors.success;
     return AppColors.primary;
   }
@@ -478,15 +425,13 @@ class _TarifCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nightRate = (hourlyRate * 1.4).toStringAsFixed(0);
+    final nightRate = PricingService.nightRate(hourlyRate).toStringAsFixed(0);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.xl),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.primary, Color(0xFFFF9A6C)],
-          ),
+        decoration: const BoxDecoration(
+          gradient: AppColors.primaryGradientH,
           borderRadius: AppSpacing.cardBorderRadius,
         ),
         child: Row(
@@ -539,7 +484,7 @@ class _TarifCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppSpacing.sm),
               ),
               child: Text(
-                'Week-end\n+25%',
+                'Week-end\n${PricingService.weekendLabel}',
                 style: AppTypography.small.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -644,7 +589,9 @@ class _SkillsSection extends StatelessWidget {
 // ─────────────────────────────────────── Availability section ──
 
 class _AvailabilitySection extends StatefulWidget {
-  const _AvailabilitySection();
+  /// Disponibilités déclarées par la nounou : jour → créneaux.
+  final Map<String, List<String>> availability;
+  const _AvailabilitySection({required this.availability});
 
   @override
   State<_AvailabilitySection> createState() => _AvailabilitySectionState();
@@ -653,13 +600,23 @@ class _AvailabilitySection extends StatefulWidget {
 class _AvailabilitySectionState extends State<_AvailabilitySection> {
   int? _selectedDay;
 
+  static const _dayKeys = [
+    'Lundi',
+    'Mardi',
+    'Mercredi',
+    'Jeudi',
+    'Vendredi',
+    'Samedi',
+    'Dimanche',
+  ];
   static const _dayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-  // Mock: Mon-Fri available, Sat-Sun not
-  static const _available = [true, true, true, true, true, false, false];
-  static const _slots = ['08:00–12:00', '14:00–18:00', '18:00–22:00'];
+
+  List<String> _slotsOf(int dayIndex) =>
+      widget.availability[_dayKeys[dayIndex]] ?? const [];
 
   @override
   Widget build(BuildContext context) {
+    final available = List.generate(7, (i) => _slotsOf(i).isNotEmpty);
     final now = DateTime.now();
     final monday = now.subtract(Duration(days: now.weekday - 1));
 
@@ -674,7 +631,7 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
             children: List.generate(7, (i) {
               final day = monday.add(Duration(days: i));
               final isSelected = _selectedDay == i;
-              final isAvail = _available[i];
+              final isAvail = available[i];
               return GestureDetector(
                 onTap: isAvail
                     ? () => setState(
@@ -741,7 +698,7 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
             }),
           ),
           // Slots when a day is selected
-          if (_selectedDay != null && _available[_selectedDay!]) ...[
+          if (_selectedDay != null && available[_selectedDay!]) ...[
             const SizedBox(height: AppSpacing.lg),
             Text(
               'Créneaux disponibles — ${_dayLabels[_selectedDay!]}',
@@ -754,7 +711,7 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
             Wrap(
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
-              children: _slots
+              children: _slotsOf(_selectedDay!)
                   .map(
                     (slot) => Container(
                       padding: const EdgeInsets.symmetric(
@@ -788,195 +745,117 @@ class _AvailabilitySectionState extends State<_AvailabilitySection> {
 
 // ─────────────────────────────────────── Reviews section ──
 
-class _ReviewsSection extends StatelessWidget {
+class _ReviewsSection extends ConsumerWidget {
   final NannyModel nanny;
-  final List<_Review> reviews;
 
-  const _ReviewsSection({required this.nanny, required this.reviews});
+  const _ReviewsSection({required this.nanny});
 
   @override
-  Widget build(BuildContext context) {
-    final dist = _ratingDistribution(nanny.rating);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasRating = nanny.rating > 0 && nanny.totalMissions > 0;
+    final reviews =
+        ref.watch(reviewsForUserProvider(nanny.id)).valueOrNull ??
+        const <ReviewModel>[];
 
     return _Section(
-      title: 'Avis des parents (${nanny.totalMissions})',
+      title: 'Avis des parents',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Summary row
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Big rating
-              Column(
-                children: [
-                  Text(
-                    nanny.rating.toStringAsFixed(1),
-                    style: AppTypography.h1.copyWith(
-                      fontSize: 48,
-                      color: AppColors.primary,
+          if (hasRating)
+            Row(
+              children: [
+                Text(
+                  nanny.rating.toStringAsFixed(1),
+                  style: AppTypography.h1.copyWith(
+                    fontSize: 48,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.lg),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RatingStars(rating: nanny.rating, size: 18),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Note moyenne sur ${nanny.totalMissions} '
+                      'mission${nanny.totalMissions > 1 ? 's' : ''}',
+                      style: AppTypography.small,
                     ),
-                  ),
-                  RatingStars(rating: nanny.rating, size: 18),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${nanny.totalMissions} avis',
-                    style: AppTypography.small,
-                  ),
-                ],
-              ),
-              const SizedBox(width: AppSpacing.xl),
-              // Bars
-              Expanded(
-                child: Column(
-                  children: List.generate(5, (i) {
-                    final stars = 5 - i;
-                    final pct = dist[stars] ?? 0;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Row(
-                        children: [
-                          Text('$stars', style: AppTypography.small),
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.star_rounded,
-                            size: 11,
-                            color: AppColors.warning,
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: pct,
-                                backgroundColor: AppColors.border,
-                                valueColor: const AlwaysStoppedAnimation(
-                                  AppColors.warning,
-                                ),
-                                minHeight: 8,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          SizedBox(
-                            width: 30,
-                            child: Text(
-                              '${(pct * 100).round()}%',
-                              style: AppTypography.small,
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
+                  ],
                 ),
-              ),
+              ],
+            ),
+          if (reviews.isNotEmpty) ...[
+            if (hasRating) ...[
+              const SizedBox(height: AppSpacing.lg),
+              const Divider(),
+              const SizedBox(height: AppSpacing.md),
             ],
-          ),
-          const SizedBox(height: AppSpacing.xxl),
-          const Divider(),
-          const SizedBox(height: AppSpacing.md),
-          // Review cards
-          ...reviews.map((r) => _ReviewCard(review: r)),
-          const SizedBox(height: AppSpacing.md),
-          // See all
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.primary),
-                shape: RoundedRectangleBorder(
-                  borderRadius: AppSpacing.buttonBorderRadius,
-                ),
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-              ),
-              child: Text(
-                'Voir tous les avis',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
+            ...reviews.map((r) => _ReviewTile(review: r)),
+          ] else if (hasRating) ...[
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              'Les commentaires détaillés des parents seront '
+              'affichés ici dès leur publication.',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textTertiary,
               ),
             ),
-          ),
+          ] else
+            Text(
+              'Pas encore d\'avis — cette nounou démarre sur '
+              'Nounou Express.',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
         ],
       ),
     );
   }
 }
 
-class _ReviewCard extends StatelessWidget {
-  final _Review review;
-  const _ReviewCard({required this.review});
+class _ReviewTile extends ConsumerWidget {
+  final ReviewModel review;
+  const _ReviewTile({required this.review});
 
   @override
-  Widget build(BuildContext context) {
-    final months = [
-      'janv.',
-      'févr.',
-      'mars',
-      'avr.',
-      'mai',
-      'juin',
-      'juil.',
-      'août',
-      'sept.',
-      'oct.',
-      'nov.',
-      'déc.',
-    ];
-    final dateLabel =
-        '${review.date.day} ${months[review.date.month - 1]} ${review.date.year}';
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isMine = review.fromUserId == ref.watch(currentUserIdProvider);
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Parent initial avatar
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: AppColors.secondary.withValues(alpha: 0.15),
-                child: Text(
-                  review.parentName[0],
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.secondary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      review.parentName,
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(dateLabel, style: AppTypography.small),
-                  ],
+              Text(
+                isMine ? 'Vous' : 'Un parent',
+                style: AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               RatingStars(rating: review.rating, size: 13),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 2),
           Text(
-            review.comment,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-              height: 1.5,
-            ),
+            AppFormatters.formatShortDate(review.createdAt),
+            style: AppTypography.small,
           ),
-          const SizedBox(height: AppSpacing.md),
-          const Divider(),
+          if (review.comment.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              review.comment,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+          ],
         ],
       ),
     );

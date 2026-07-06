@@ -12,7 +12,6 @@ import '../../../data/providers/data_providers.dart';
 
 enum SortOption {
   pertinence('Pertinence'),
-  distance('Distance'),
   prixCroissant('Prix croissant'),
   prixDecroissant('Prix décroissant'),
   meilleuresNotes('Meilleures notes');
@@ -96,19 +95,6 @@ class _FilterSheetContent extends ConsumerStatefulWidget {
 class _FilterSheetContentState extends ConsumerState<_FilterSheetContent> {
   late SearchFilters _f;
 
-  static const _quartierOptions = [
-    'Akanda',
-    'Angondjé',
-    'Nzeng-Ayong',
-    'Owendo',
-    'Glass',
-    'Nombakélé',
-    'Alibandeng',
-    'PK8',
-    'Louis',
-    'Batterie IV',
-  ];
-
   static const _expOptions = ['Toute', '1-2 ans', '3-5 ans', '5+ ans'];
 
   static const _badgeOptions = [
@@ -126,6 +112,9 @@ class _FilterSheetContentState extends ConsumerState<_FilterSheetContent> {
 
   int _resultCount(List<NannyModel> nannies) {
     return nannies.where((n) {
+      if (_f.quartiers.isNotEmpty && !_f.quartiers.contains(n.quartier)) {
+        return false;
+      }
       if (n.hourlyRate < _f.priceRange.start ||
           n.hourlyRate > _f.priceRange.end) {
         return false;
@@ -143,9 +132,7 @@ class _FilterSheetContentState extends ConsumerState<_FilterSheetContent> {
       if (_f.experienceFilter == '5+ ans' && exp < 5) {
         return false;
       }
-      if (_f.onlyAvailable &&
-          !n.isVerified &&
-          !n.badges.contains('Disponible')) {
+      if (_f.onlyAvailable && !n.badges.contains('Disponible')) {
         return false;
       }
       for (final badge in _f.badges) {
@@ -214,7 +201,7 @@ class _FilterSheetContentState extends ConsumerState<_FilterSheetContent> {
           width: 40,
           height: 4,
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
+            color: AppColors.border,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -272,10 +259,14 @@ class _FilterSheetContentState extends ConsumerState<_FilterSheetContent> {
 
   // ── Quartier chips ──
   Widget _buildQuartierChips() {
+    // Source unique : même liste que la recherche et la publication
+    // d'annonce (repository nounous).
+    final quartiers =
+        ref.watch(quartiersProvider).valueOrNull ?? const <String>[];
     return Wrap(
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.sm,
-      children: _quartierOptions.map((q) {
+      children: quartiers.map((q) {
         final selected = _f.quartiers.contains(q);
         return FilterChip(
           label: Text(

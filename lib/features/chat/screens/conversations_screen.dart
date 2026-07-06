@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/app_page_header.dart';
 import '../../../data/models/conversation_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -48,14 +49,13 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
                 ? '$unread non lu${unread > 1 ? 's' : ''}'
                 : 'Toutes vos conversations',
             icon: Icons.chat_bubble_rounded,
-            gradientColors: const [Color(0xFF006D62), AppColors.accent],
-            actions: [_HeaderAction(icon: Icons.edit_rounded, onTap: () {})],
+            gradientColors: const [AppColors.accentDark, AppColors.accent],
           ),
 
           // ── Content ──────────────────────────────────────────────────────
           Expanded(
             child: conversationsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const AppLoader(),
               error: (e, _) => Center(
                 child: Text(
                   'Impossible de charger les conversations.',
@@ -161,23 +161,3 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
   }
 }
 
-class _HeaderAction extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _HeaderAction({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(9),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.18),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, size: 18, color: Colors.white),
-      ),
-    );
-  }
-}

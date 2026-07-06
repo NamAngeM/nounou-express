@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../data/models/conversation_model.dart';
 import '../../../data/models/message_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -47,8 +49,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     final newMessage = MessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      // TODO Phase 3: id utilisateur réel
-      senderId: "p1", // Assuming current user is parent
+      senderId: ref.read(currentUserIdProvider),
       receiverId: _otherUserId,
       content: _messageController.text.trim(),
       timestamp: DateTime.now(),
@@ -103,6 +104,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
+  void _startCall(ConversationModel? conversation) {
+    final name = conversation?.otherUserName;
+    context.push(
+      '/video-call${name == null ? '' : '?name=${Uri.encodeQueryComponent(name)}'}',
+    );
+  }
+
   PreferredSizeWidget _buildAppBar(ConversationModel? conversation) {
     return AppBar(
       titleSpacing: 0,
@@ -137,7 +145,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                               : "Hors ligne"),
                     style: AppTypography.caption.copyWith(
                       color: conversation.isOnline
-                          ? Colors.green
+                          ? AppColors.success
                           : AppColors.textSecondary,
                       fontSize: 11,
                     ),
@@ -148,17 +156,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ],
       ),
       actions: [
-        IconButton(icon: const Icon(Icons.phone_outlined), onPressed: () {}),
-        IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+        IconButton(
+          icon: const Icon(Icons.videocam_outlined),
+          tooltip: 'Appel vidéo',
+          onPressed: () => _startCall(conversation),
+        ),
       ],
     );
   }
 
   Widget _buildMessagesList() {
+    final currentUserId = ref.watch(currentUserIdProvider);
     return ref
         .watch(messagesProvider(_otherUserId))
         .when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const AppLoader(),
           error: (e, _) => Center(
             child: Text(
               'Impossible de charger les messages.',
@@ -174,7 +186,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             itemCount: messages.length,
             itemBuilder: (context, index) {
               final message = messages[index];
-              final bool isMe = message.senderId == "p1";
+              final bool isMe = message.senderId == currentUserId;
 
               // Show date separator if the date changed
               bool showDateSeparator = false;
@@ -251,13 +263,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(
-              Icons.add_circle_outline,
-              color: AppColors.textSecondary,
-            ),
-            onPressed: () {},
-          ),
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -278,18 +283,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          GestureDetector(
-            onTap: _sendMessage,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                _isTyping ? Icons.send : Icons.mic_none,
-                color: Colors.white,
-                size: 20,
+          Semantics(
+            button: true,
+            label: 'Envoyer le message',
+            child: GestureDetector(
+              onTap: _sendMessage,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  _isTyping ? Icons.send : Icons.mic_none,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
           ),

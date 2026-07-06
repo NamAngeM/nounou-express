@@ -5,6 +5,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_button.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -15,6 +16,11 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
+  /// Solde de démonstration — sera remplacé par le repository wallet
+  /// (chantier 4). Centralisé ici pour que l'affichage et la validation
+  /// de retrait utilisent la même valeur.
+  static const double _balance = 45250;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,14 +78,8 @@ class _WalletScreenState extends State<WalletScreen> {
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        borderRadius: AppSpacing.largeBorderRadius,
+        boxShadow: AppColors.primaryShadow,
       ),
       child: Column(
         children: [
@@ -92,10 +92,9 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            "45 250 ${AppConstants.currency}",
+            AppFormatters.formatFCFA(_balance),
             style: AppTypography.h1.copyWith(
               color: Colors.white,
-              fontSize: 40,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -136,17 +135,17 @@ class _WalletScreenState extends State<WalletScreen> {
       {
         "name": "Airtel Money",
         "icon": Icons.phone_android_rounded,
-        "color": Colors.red,
+        "color": AppColors.danger,
       },
       {
         "name": "Moov Money",
         "icon": Icons.account_balance_wallet_rounded,
-        "color": Colors.blue,
+        "color": AppColors.primary,
       },
       {
         "name": "Virement Bancaire",
         "icon": Icons.account_balance_rounded,
-        "color": Colors.green,
+        "color": AppColors.success,
       },
     ];
 
@@ -201,13 +200,12 @@ class _WalletScreenState extends State<WalletScreen> {
             horizontal: AppSpacing.lg,
             vertical: 8,
           ),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.05),
-            ),
+            color: AppColors.surface,
+            borderRadius: AppSpacing.cardBorderRadius,
+            boxShadow: AppColors.cardShadow,
+            border: Border.all(color: AppColors.border),
           ),
           child: Row(
             children: [
@@ -264,7 +262,8 @@ class _WalletScreenState extends State<WalletScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _WithdrawBottomSheet(method: method),
+      builder: (context) =>
+          _WithdrawBottomSheet(method: method, balance: _balance),
     );
   }
 }
@@ -323,12 +322,13 @@ class _WithdrawMethodTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.05)),
+          color: AppColors.surface,
+          borderRadius: AppSpacing.cardBorderRadius,
+          boxShadow: AppColors.cardShadow,
+          border: Border.all(color: AppColors.border),
         ),
         child: Row(
           children: [
@@ -363,30 +363,73 @@ class _WithdrawMethodTile extends StatelessWidget {
 
 class _WithdrawBottomSheet extends StatefulWidget {
   final String method;
-  const _WithdrawBottomSheet({required this.method});
+  final double balance;
+  const _WithdrawBottomSheet({required this.method, required this.balance});
 
   @override
   State<_WithdrawBottomSheet> createState() => _WithdrawBottomSheetState();
 }
 
 class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
+  static const double _minWithdrawal = 1000;
+
   final _amountController = TextEditingController();
+  String? _errorText;
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  void _confirm() {
+    final amount = double.tryParse(
+      _amountController.text.replaceAll(' ', ''),
+    );
+    final String? error;
+    if (amount == null || amount <= 0) {
+      error = 'Saisissez un montant valide.';
+    } else if (amount < _minWithdrawal) {
+      error =
+          'Retrait minimum : ${AppFormatters.formatFCFA(_minWithdrawal)}.';
+    } else if (amount > widget.balance) {
+      error =
+          'Montant supérieur au solde disponible '
+          '(${AppFormatters.formatFCFA(widget.balance)}).';
+    } else {
+      error = null;
+    }
+
+    if (error != null) {
+      setState(() => _errorText = error);
+      return;
+    }
+
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Demande de retrait envoyée !"),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.buttonBorderRadius,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        MediaQuery.of(context).viewInsets.bottom + 40,
+        AppSpacing.xxl,
+        AppSpacing.xxl,
+        AppSpacing.xxl,
+        MediaQuery.of(context).viewInsets.bottom + AppSpacing.huge,
       ),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(40),
-          topRight: Radius.circular(40),
-        ),
+        color: AppColors.surface,
+        borderRadius: AppSpacing.sheetBorderRadius,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -399,23 +442,26 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xxl),
           Text(
             "Retrait via ${widget.method}",
             style: AppTypography.h3.copyWith(fontWeight: FontWeight.w900),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
-            "Solde disponible : 45 250 ${AppConstants.currency}",
+            "Solde disponible : ${AppFormatters.formatFCFA(widget.balance)}",
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.textTertiary,
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xxxl),
           TextField(
             controller: _amountController,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
+            onChanged: (_) {
+              if (_errorText != null) setState(() => _errorText = null);
+            },
             style: AppTypography.h1.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.w900,
@@ -434,23 +480,16 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 40),
-          AppButton(
-            label: "Confirmer le retrait",
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text("Demande de retrait envoyée !"),
-                  backgroundColor: AppColors.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-              );
-            },
-          ),
+          if (_errorText != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              _errorText!,
+              style: AppTypography.caption.copyWith(color: AppColors.danger),
+              textAlign: TextAlign.center,
+            ),
+          ],
+          const SizedBox(height: AppSpacing.huge),
+          AppButton(label: "Confirmer le retrait", onPressed: _confirm),
         ],
       ),
     );

@@ -44,4 +44,11 @@ class FirestoreNotificationRepository implements NotificationRepository {
     }
     await batch.commit();
   }
+
+  @override
+  Future<void> deleteNotification(String id) => _notifications.doc(id).delete();
+
+  @override
+  Future<void> addNotification(NotificationModel notification) =>
+      _notifications.doc(notification.id).set(notification.toJson());
 }

@@ -6,13 +6,13 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
 import '../../../core/widgets/nanny_card.dart';
 import '../../../core/widgets/rating_stars.dart';
+import '../../../data/models/mission_model.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
-
-const _mockDistances = [1.2, 0.8, 2.5, 1.9, 3.1, 0.5, 4.2, 2.1, 1.7, 3.8];
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -41,11 +41,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       case 2:
         return all.where((n) => n.badges.contains('Super Nounou')).toList();
       case 3:
-        final indexed = List.generate(all.length, (i) => (i, all[i]));
-        indexed.sort(
-          (a, b) => _mockDistances[a.$1].compareTo(_mockDistances[b.$1]),
-        );
-        return indexed.map((e) => e.$2).toList();
+        // "Proches" : les nounous du quartier de l'utilisateur d'abord.
+        // (Tri par distance GPS réelle prévu avec la géolocalisation.)
+        final userQuartier =
+            ref.watch(currentUserProfileProvider).valueOrNull?['quartier']
+                as String?;
+        if (userQuartier == null || userQuartier.isEmpty) return all;
+        return [
+          ...all.where((n) => n.quartier == userQuartier),
+          ...all.where((n) => n.quartier != userQuartier),
+        ];
       case 4:
         return [...all]..sort((a, b) => a.hourlyRate.compareTo(b.hourlyRate));
       default:
@@ -145,6 +150,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ).animate().fadeIn(delay: 60.ms).slideY(begin: 0.08, end: 0),
               ),
 
+              // ── Mes annonces (suivi des candidatures) ──────────────────────
+              const SliverToBoxAdapter(child: _MyAnnouncementsSection()),
+
               // ── Search ─────────────────────────────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
@@ -170,7 +178,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 loading: () => const [
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(child: CircularProgressIndicator()),
+                    child: AppLoader(),
                   ),
                 ],
                 error: (e, _) => [
@@ -216,7 +224,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: AppSpacing.md),
             _NearbyScroll(
               nannies: _filteredNannies(nannies),
-              allNannies: nannies,
             ).animate().fadeIn(delay: 250.ms).slideX(begin: 0.05, end: 0),
             const SizedBox(height: AppSpacing.xxl),
           ],
@@ -244,7 +251,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: AppSpacing.md),
             _TopRatedList(
               nannies: _topRated(nannies).take(4).toList(),
-              allNannies: nannies,
             ).animate().fadeIn(delay: 400.ms),
             const SizedBox(height: 100),
           ],
@@ -255,9 +261,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 }
 
 // ─────────────────────────────────────────────────────── Header ──
-class _HomeHeader extends StatelessWidget {
+class _HomeHeader extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(currentUserProfileProvider).valueOrNull;
+    final firstName = (profile?['firstName'] as String?)?.trim();
+    final fullName = (profile?['name'] as String?)?.trim();
+    final quartier = (profile?['quartier'] as String?)?.trim();
+
+    final greeting = firstName == null || firstName.isEmpty
+        ? 'Bonjour 👋'
+        : 'Bonjour, $firstName';
+    final location = quartier == null || quartier.isEmpty
+        ? 'Libreville · Gabon'
+        : '$quartier · Libreville';
+
     return Container(
       padding: AppSpacing.screenPadding.copyWith(
         top: AppSpacing.lg,
@@ -270,7 +288,7 @@ class _HomeHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Bonjour, Aminata', style: AppTypography.h2),
+                Text(greeting, style: AppTypography.h2),
                 const SizedBox(height: 3),
                 Row(
                   children: [
@@ -281,7 +299,7 @@ class _HomeHeader extends StatelessWidget {
                     ),
                     const SizedBox(width: 3),
                     Text(
-                      'Libreville · Gabon',
+                      location,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -298,8 +316,8 @@ class _HomeHeader extends StatelessWidget {
           // Profile avatar
           GestureDetector(
             onTap: () => context.go('/profile'),
-            child: const AppAvatar(
-              name: 'Aminata B.',
+            child: AppAvatar(
+              name: fullName == null || fullName.isEmpty ? '?' : fullName,
               size: 40,
               showRing: true,
             ),
@@ -310,56 +328,181 @@ class _HomeHeader extends StatelessWidget {
   }
 }
 
-class _NotifButton extends StatelessWidget {
+class _NotifButton extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.push('/notifications'),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(AppSpacing.md),
-              boxShadow: AppColors.cardShadow,
-            ),
-            child: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.textPrimary,
-              size: 22,
-            ),
-          ),
-          Positioned(
-            top: -1,
-            right: -1,
-            child: Container(
-              width: 15,
-              height: 15,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadNotificationsCountProvider);
+
+    return Semantics(
+      button: true,
+      label: unreadCount > 0
+          ? 'Notifications, $unreadCount non lue${unreadCount > 1 ? 's' : ''}'
+          : 'Notifications',
+      child: GestureDetector(
+        onTap: () => context.push('/notifications'),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.danger, Color(0xFFEF5350)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1.5),
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppSpacing.md),
+                boxShadow: AppColors.cardShadow,
               ),
-              child: Center(
-                child: Text(
-                  '3',
-                  style: AppTypography.small.copyWith(
-                    color: Colors.white,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w800,
+              child: const Icon(
+                Icons.notifications_outlined,
+                color: AppColors.textPrimary,
+                size: 22,
+              ),
+            ),
+            if (unreadCount > 0)
+              Positioned(
+                top: -1,
+                right: -1,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    color: AppColors.danger,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: Center(
+                    child: Text(
+                      unreadCount > 9 ? '9+' : '$unreadCount',
+                      style: AppTypography.small.copyWith(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────── Mes annonces ──
+/// Annonces publiées par le parent, avec compteur de candidatures :
+/// c'est le point d'entrée vers l'écran de sélection des candidates.
+class _MyAnnouncementsSection extends ConsumerWidget {
+  const _MyAnnouncementsSection();
+
+  static const _openStatuses = {
+    MissionStatus.pending,
+    MissionStatus.confirmed,
+  };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userId = ref.watch(currentUserIdProvider);
+    final missions = (ref.watch(missionsProvider).valueOrNull ?? const [])
+        .where(
+          (m) => m.parentId == userId && _openStatuses.contains(m.status),
+        )
+        .toList();
+    if (missions.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: AppSpacing.screenPadding.copyWith(bottom: AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Mes annonces', style: AppTypography.h3),
+          const SizedBox(height: AppSpacing.md),
+          ...missions.map(
+            (mission) => _AnnouncementTile(mission: mission),
           ),
         ],
+      ),
+    ).animate().fadeIn(delay: 70.ms).slideY(begin: 0.08, end: 0);
+  }
+}
+
+class _AnnouncementTile extends StatelessWidget {
+  final MissionModel mission;
+  const _AnnouncementTile({required this.mission});
+
+  @override
+  Widget build(BuildContext context) {
+    final count = mission.applicantIds.length;
+    final isConfirmed = mission.status == MissionStatus.confirmed;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppSpacing.cardBorderRadius,
+        boxShadow: AppColors.cardShadow,
+        border: Border.all(color: AppColors.border),
+      ),
+      child: InkWell(
+        onTap: () => context.push('/missions/${mission.id}/candidatures'),
+        borderRadius: AppSpacing.cardBorderRadius,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: const BoxDecoration(
+                  color: AppColors.primarySurface,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.campaign_rounded,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      mission.address,
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isConfirmed
+                          ? 'Nounou sélectionnée'
+                          : count == 0
+                          ? 'En attente de candidatures'
+                          : '$count candidature${count > 1 ? 's' : ''} reçue'
+                                '${count > 1 ? 's' : ''}',
+                      style: AppTypography.caption.copyWith(
+                        color: isConfirmed
+                            ? AppColors.success
+                            : count > 0
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                        fontWeight: count > 0 || isConfirmed
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textSecondary,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -555,8 +698,7 @@ class _SectionHeader extends StatelessWidget {
 // ─────────────────────────────────────────────────────── Nearby scroll ──
 class _NearbyScroll extends StatelessWidget {
   final List<NannyModel> nannies;
-  final List<NannyModel> allNannies;
-  const _NearbyScroll({required this.nannies, required this.allNannies});
+  const _NearbyScroll({required this.nannies});
 
   @override
   Widget build(BuildContext context) {
@@ -570,17 +712,10 @@ class _NearbyScroll extends StatelessWidget {
         separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
         itemBuilder: (context, index) {
           final nanny = nannies[index];
-          final originalIndex = allNannies.indexOf(nanny);
           final quartier = nanny.quartier.isNotEmpty
               ? nanny.quartier
               : 'Libreville';
-          final distance =
-              _mockDistances[originalIndex.clamp(0, _mockDistances.length - 1)];
-          return _NannyCompactCard(
-                nanny: nanny,
-                quartier: quartier,
-                distance: distance,
-              )
+          return _NannyCompactCard(nanny: nanny, quartier: quartier)
               .animate()
               .fadeIn(delay: (index * 70).ms, duration: 380.ms)
               .slideX(begin: 0.15, end: 0, curve: Curves.easeOutCubic);
@@ -593,13 +728,8 @@ class _NearbyScroll extends StatelessWidget {
 class _NannyCompactCard extends StatelessWidget {
   final NannyModel nanny;
   final String quartier;
-  final double distance;
 
-  const _NannyCompactCard({
-    required this.nanny,
-    required this.quartier,
-    required this.distance,
-  });
+  const _NannyCompactCard({required this.nanny, required this.quartier});
 
   @override
   Widget build(BuildContext context) {
@@ -664,7 +794,7 @@ class _NannyCompactCard extends StatelessWidget {
                       const SizedBox(width: 2),
                       Flexible(
                         child: Text(
-                          '$quartier · ${distance.toStringAsFixed(1)} km',
+                          quartier,
                           style: AppTypography.small.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -828,8 +958,7 @@ class _PromoBanner extends StatelessWidget {
 // ─────────────────────────────────────────────────────── Top rated list ──
 class _TopRatedList extends StatelessWidget {
   final List<NannyModel> nannies;
-  final List<NannyModel> allNannies;
-  const _TopRatedList({required this.nannies, required this.allNannies});
+  const _TopRatedList({required this.nannies});
 
   @override
   Widget build(BuildContext context) {
@@ -839,12 +968,9 @@ class _TopRatedList extends StatelessWidget {
         children: nannies.asMap().entries.map((entry) {
           final index = entry.key;
           final nanny = entry.value;
-          final originalIndex = allNannies.indexOf(nanny);
           final quartier = nanny.quartier.isNotEmpty
               ? nanny.quartier
               : 'Libreville';
-          final distance =
-              _mockDistances[originalIndex.clamp(0, _mockDistances.length - 1)];
           return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: NannyCard(
@@ -853,9 +979,7 @@ class _TopRatedList extends StatelessWidget {
                   quartier: quartier,
                   rating: nanny.rating,
                   hourlyRate: nanny.hourlyRate,
-                  distanceKm: distance,
                   isVerified: nanny.isVerified,
-                  reviewCount: 12 + index * 7,
                 ),
               )
               .animate()

@@ -8,6 +8,11 @@ abstract class NotificationRepository {
   Future<void> markAsRead(String id);
 
   Future<void> markAllAsRead();
+
+  Future<void> deleteNotification(String id);
+
+  /// Crée une notification (ex. trace d'une alerte SOS).
+  Future<void> addNotification(NotificationModel notification);
 }
 
 /// Implémentation mock : liste en mémoire initialisée depuis [MockData].
@@ -46,4 +51,15 @@ class MockNotificationRepository implements NotificationRepository {
       _notifications[i] = _asRead(_notifications[i]);
     }
   });
+
+  @override
+  Future<void> deleteNotification(String id) => Future.delayed(_latency, () {
+    _notifications.removeWhere((n) => n.id == id);
+  });
+
+  @override
+  Future<void> addNotification(NotificationModel notification) =>
+      Future.delayed(_latency, () {
+        _notifications.insert(0, notification);
+      });
 }

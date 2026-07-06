@@ -11,6 +11,11 @@ class NannyModel extends UserModel {
   final String bio;
   final String quartier;
 
+  /// Disponibilités déclarées à l'inscription :
+  /// jour ('Lundi'...'Dimanche') → créneaux ('Matin', 'Après-midi',
+  /// 'Soir', 'Nuit'). Vide si non renseignées.
+  final Map<String, List<String>> availability;
+
   NannyModel({
     required super.id,
     required super.name,
@@ -28,6 +33,7 @@ class NannyModel extends UserModel {
     required this.isVerified,
     required this.bio,
     this.quartier = '',
+    this.availability = const {},
   });
 
   @override
@@ -42,6 +48,7 @@ class NannyModel extends UserModel {
     'isVerified': isVerified,
     'bio': bio,
     'quartier': quartier,
+    'availability': availability,
   };
 
   /// Désérialisation robuste : champs manquants → valeurs par défaut.
@@ -63,5 +70,11 @@ class NannyModel extends UserModel {
     isVerified: json['isVerified'] as bool? ?? false,
     bio: json['bio'] as String? ?? '',
     quartier: json['quartier'] as String? ?? '',
+    availability:
+        (json['availability'] as Map?)?.map(
+          (day, slots) =>
+              MapEntry(day.toString(), (slots as List).cast<String>()),
+        ) ??
+        const {},
   );
 }

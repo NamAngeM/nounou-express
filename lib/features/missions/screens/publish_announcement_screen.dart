@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../data/models/mission_model.dart';
+import '../../../data/providers/data_providers.dart';
 
 // ── Mock children data ────────────────────────────────────────────────────────
 class _MockChild {
@@ -18,15 +22,16 @@ const List<_MockChild> _mockChildren = [
 ];
 
 // ── Screen ────────────────────────────────────────────────────────────────────
-class PublishAnnouncementScreen extends StatefulWidget {
+class PublishAnnouncementScreen extends ConsumerStatefulWidget {
   const PublishAnnouncementScreen({super.key});
 
   @override
-  State<PublishAnnouncementScreen> createState() =>
+  ConsumerState<PublishAnnouncementScreen> createState() =>
       _PublishAnnouncementScreenState();
 }
 
-class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
+class _PublishAnnouncementScreenState
+    extends ConsumerState<PublishAnnouncementScreen> {
   int _currentStep = 0;
   static const int _totalSteps = 5;
 
@@ -225,7 +230,51 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
     );
   }
 
-  void _publish() {
+  Future<void> _publish() async {
+    final userId = ref.read(currentUserIdProvider);
+    final profile = ref.read(currentUserProfileProvider).valueOrNull;
+    final allChildren = [..._mockChildren, ..._extraChildren];
+    final selectedChildren = allChildren
+        .where((c) => _selectedChildIds.contains(c.id))
+        .toList();
+    final parentName = (profile?['name'] as String?)?.trim();
+    final access = _accessController.text.trim();
+    final notes = _notesController.text.trim();
+    final pets = _petsController.text.trim();
+
+    final mission = MissionModel(
+      id: 'm-${DateTime.now().millisecondsSinceEpoch}',
+      parentId: userId,
+      parentName: parentName == null || parentName.isEmpty
+          ? 'Parent'
+          : parentName,
+      parentPhotoUrl: '',
+      address: _addressController.text.trim(),
+      locationType: LocationType.values[_selectedLocationIndex],
+      accessInstructions: access.isEmpty ? null : access,
+      date: _selectedDate ?? DateTime.now(),
+      startTime: _startTime == null ? '08:00' : _timeOfDayLabel(_startTime!),
+      endTime: _endTime == null ? '12:00' : _timeOfDayLabel(_endTime!),
+      isUrgent: _isUrgent,
+      childrenIds: selectedChildren.map((c) => c.id).toList(),
+      childrenSummary: selectedChildren
+          .map((c) => '${c.name}, ${c.age} ans')
+          .toList(),
+      notes: notes.isEmpty ? null : notes,
+      needs: _selectedNeeds.toList(),
+      hasPets: _hasPets,
+      petsDescription: _hasPets && pets.isNotEmpty ? pets : null,
+      paymentMethod: PaymentMethod.values[_selectedPaymentIndex],
+      maxBudgetPerHour: _budgetPerHour,
+      status: MissionStatus.pending,
+      applicantIds: const [],
+      publishedAt: DateTime.now(),
+    );
+
+    await ref.read(missionRepositoryProvider).publishMission(mission);
+    ref.invalidate(missionsProvider);
+
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: AppColors.success,
@@ -239,7 +288,7 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
-                'Annonce publiée avec succès !',
+                'Annonce publiée ! Suivez les candidatures ici.',
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.surface,
                 ),
@@ -249,7 +298,8 @@ class _PublishAnnouncementScreenState extends State<PublishAnnouncementScreen> {
         ),
       ),
     );
-    Navigator.of(context).pop();
+    // L'écran candidatures remplace le formulaire : retour → accueil.
+    context.pushReplacement('/missions/${mission.id}/candidatures');
   }
 
   // ── Build helpers ─────────────────────────────────────────────────────────

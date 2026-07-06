@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/utils/validators.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../core/utils/validators.dart';
 
 class PhoneInput extends StatefulWidget {
   final TextEditingController controller;
@@ -33,8 +34,8 @@ class _PhoneInputState extends State<PhoneInput> {
           duration: const Duration(milliseconds: 200),
           height: 60,
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
-            borderRadius: BorderRadius.circular(14),
+            color: AppColors.surface,
+            borderRadius: AppSpacing.inputBorderRadius,
             border: Border.all(
               color: hasError ? AppColors.danger : AppColors.border,
               width: hasError ? 2 : 1,
@@ -46,9 +47,9 @@ class _PhoneInputState extends State<PhoneInput> {
               // Country prefix
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
-                    right: BorderSide(color: Colors.grey.shade200, width: 1.5),
+                    right: BorderSide(color: AppColors.border, width: 1.5),
                   ),
                 ),
                 child: Row(
@@ -93,8 +94,8 @@ class _PhoneInputState extends State<PhoneInput> {
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     hintText: '066 85 18 18',
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade400,
+                    hintStyle: const TextStyle(
+                      color: AppColors.textTertiary,
                       fontSize: 18,
                       fontWeight: FontWeight.w400,
                       letterSpacing: 1.5,

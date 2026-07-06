@@ -6,25 +6,11 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
 import '../../../core/widgets/rating_stars.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
-
-const _mockQuartiers = [
-  'Akanda',
-  'Angondjé',
-  'Nzeng-Ayong',
-  'Owendo',
-  'Glass',
-  'Nombakélé',
-  'Alibandeng',
-  'PK8',
-  'Louis',
-  'Batterie IV',
-];
-
-const _mockDistances = [1.2, 0.8, 2.5, 1.9, 3.1, 0.5, 4.2, 2.1, 1.7, 3.8];
 
 class MapScreen extends ConsumerWidget {
   const MapScreen({super.key});
@@ -37,7 +23,7 @@ class MapScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       body: nanniesAsync.when(
         data: (nannies) => _MapBody(nannies: nannies),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const AppLoader(),
         error: (e, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.xl),
@@ -146,16 +132,10 @@ class _MapBody extends StatelessWidget {
           snapSizes: const [0.18, 0.38, 0.82],
           builder: (context, scrollController) {
             return Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x18000000),
-                    blurRadius: 20,
-                    offset: Offset(0, -4),
-                  ),
-                ],
+                borderRadius: AppSpacing.sheetBorderRadius,
+                boxShadow: AppColors.elevatedShadow,
               ),
               child: Column(
                 children: [
@@ -170,7 +150,7 @@ class _MapBody extends StatelessWidget {
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
+                          color: AppColors.border,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -208,21 +188,10 @@ class _MapBody extends StatelessWidget {
                           const SizedBox(height: AppSpacing.sm),
                       itemBuilder: (context, index) {
                         final n = nannies[index];
-                        final quartier =
-                            _mockQuartiers[index.clamp(
-                              0,
-                              _mockQuartiers.length - 1,
-                            )];
-                        final distance =
-                            _mockDistances[index.clamp(
-                              0,
-                              _mockDistances.length - 1,
-                            )];
-                        return _NannyMapCard(
-                          nanny: n,
-                          quartier: quartier,
-                          distance: distance,
-                        );
+                        final quartier = n.quartier.isNotEmpty
+                            ? n.quartier
+                            : 'Libreville';
+                        return _NannyMapCard(nanny: n, quartier: quartier);
                       },
                     ),
                   ),
@@ -243,7 +212,7 @@ class _MapPlaceholder extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: const Color(0xFFE8EAF0),
+      color: AppColors.surfaceVariant,
       child: Stack(
         children: [
           // Grid lines to suggest a map
@@ -399,13 +368,8 @@ class _GridPainter extends CustomPainter {
 class _NannyMapCard extends StatelessWidget {
   final NannyModel nanny;
   final String quartier;
-  final double distance;
 
-  const _NannyMapCard({
-    required this.nanny,
-    required this.quartier,
-    required this.distance,
-  });
+  const _NannyMapCard({required this.nanny, required this.quartier});
 
   @override
   Widget build(BuildContext context) {
@@ -443,10 +407,7 @@ class _NannyMapCard extends StatelessWidget {
                         color: AppColors.textSecondary,
                       ),
                       const SizedBox(width: 2),
-                      Text(
-                        '$quartier · ${distance.toStringAsFixed(1)} km',
-                        style: AppTypography.small,
-                      ),
+                      Text(quartier, style: AppTypography.small),
                     ],
                   ),
                   const SizedBox(height: 4),

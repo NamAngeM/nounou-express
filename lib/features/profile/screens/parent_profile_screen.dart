@@ -4,8 +4,11 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/app_page_header.dart';
+import '../../../core/widgets/avatar_widget.dart';
 import '../../../data/providers/data_providers.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../widgets/stats_card.dart';
 
 class ParentProfileScreen extends ConsumerStatefulWidget {
@@ -17,7 +20,13 @@ class ParentProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
-  bool _isDarkMode = false;
+  Map<String, dynamic>? get _profile =>
+      ref.watch(currentUserProfileProvider).valueOrNull;
+
+  String get _displayName {
+    final name = (_profile?['name'] as String?)?.trim();
+    return name == null || name.isEmpty ? 'Mon compte' : name;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,22 +37,26 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
           // ── Styled header ──────────────────────────────────────────────
           AppPageHeader(
             title: 'Mon Profil',
-            subtitle: 'Alice Mengome',
+            subtitle: _displayName,
             icon: Icons.person_rounded,
-            gradientColors: const [Color(0xFFC04420), AppColors.primary],
+            gradientColors: const [AppColors.secondary, AppColors.primary],
             actions: [
-              GestureDetector(
-                onTap: () => context.push('/profile/edit'),
-                child: Container(
-                  padding: const EdgeInsets.all(9),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.edit_rounded,
-                    size: 18,
-                    color: Colors.white,
+              Semantics(
+                button: true,
+                label: 'Modifier mon profil',
+                child: GestureDetector(
+                  onTap: () => context.push('/profile/edit'),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.edit_rounded,
+                      size: 18,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -58,8 +71,12 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
                 children: [
                   _buildProfileHeader(),
                   const SizedBox(height: AppSpacing.xl),
-                  _buildStatsRow(),
-                  const SizedBox(height: AppSpacing.xl),
+                  // Les stats nounou vivent sur son dashboard (onglet
+                  // Accueil) ; cette rangée est parent uniquement.
+                  if (!ref.watch(authProvider).isNanny) ...[
+                    _buildStatsRow(),
+                    const SizedBox(height: AppSpacing.xl),
+                  ],
                   _buildMenuSection(),
                   const SizedBox(height: AppSpacing.xl),
                   _buildFooter(),
@@ -74,43 +91,19 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
   }
 
   Widget _buildProfileHeader() {
+    final email = (_profile?['email'] as String?)?.trim();
     return Column(
       children: [
-        Stack(
-          children: [
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage("https://i.pravatar.cc/150?u=p1"),
-            ),
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: GestureDetector(
-                onTap: () {},
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        AppAvatar(name: _displayName, size: 100, showRing: true),
         const SizedBox(height: AppSpacing.md),
-        Text("Alice Mengome", style: AppTypography.h2),
-        Text(
-          "alice.mengome@gmail.com",
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
+        Text(_displayName, style: AppTypography.h2),
+        if (email != null && email.isNotEmpty)
+          Text(
+            email,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -140,7 +133,7 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
               ),
             ],
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const AppLoader(),
           error: (e, _) => Text(
             "Impossible de charger les statistiques",
             style: AppTypography.caption.copyWith(
@@ -150,49 +143,58 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
         );
   }
 
+  Future<void> _signOut() async {
+    await ref.read(authProvider.notifier).signOut();
+    if (mounted) context.go('/auth/login');
+  }
+
   Widget _buildMenuSection() {
+    final isNanny = ref.watch(authProvider).isNanny;
     return Column(
       children: [
         _buildMenuItem(
           Icons.person_outline,
           "Modifier mon profil",
-          Colors.blue,
+          AppColors.primary,
           onTap: () => context.push('/profile/edit'),
         ),
-        _buildMenuItem(Icons.child_care, "Mes enfants", Colors.orange),
+        if (isNanny)
+          _buildMenuItem(
+            Icons.verified_user_outlined,
+            "Vérification du profil",
+            AppColors.primary,
+            onTap: () => context.push('/profile/verification'),
+          ),
         _buildMenuItem(
           Icons.calendar_today,
           "Mes réservations",
-          Colors.green,
+          AppColors.primary,
           onTap: () => context.go('/bookings'),
         ),
-        _buildMenuItem(Icons.favorite_border, "Mes favorites", Colors.red),
-        _buildMenuItem(Icons.credit_card, "Paiements", Colors.teal),
+        if (!isNanny)
+          _buildMenuItem(
+            Icons.favorite_border,
+            "Mes favorites",
+            AppColors.primary,
+            onTap: () => context.push('/favorites'),
+          ),
         _buildMenuItem(
           Icons.notifications_none,
           "Notifications",
-          Colors.purple,
+          AppColors.primary,
+          onTap: () => context.push('/notifications'),
         ),
-        _buildMenuSwitch(
-          Icons.dark_mode_outlined,
-          "Mode sombre",
-          Colors.indigo,
-          _isDarkMode,
-          (val) {
-            setState(() => _isDarkMode = val);
-          },
-        ),
-        _buildMenuItem(
-          Icons.language,
-          "Langue",
-          Colors.blueGrey,
-          trailingText: "Français",
-        ),
-        _buildMenuItem(Icons.help_outline, "Aide & FAQ", Colors.amber),
         _buildMenuItem(
           Icons.description_outlined,
           "Conditions d'utilisation",
-          Colors.grey,
+          AppColors.primary,
+          onTap: () => context.push('/legal/terms'),
+        ),
+        _buildMenuItem(
+          Icons.privacy_tip_outlined,
+          "Politique de confidentialité",
+          AppColors.primary,
+          onTap: () => context.push('/legal/privacy'),
         ),
         const SizedBox(height: AppSpacing.md),
         _buildMenuItem(
@@ -200,7 +202,7 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
           "Déconnexion",
           AppColors.danger,
           isDestructive: true,
-          onTap: () => context.go('/auth/login'),
+          onTap: _signOut,
         ),
       ],
     );
@@ -255,42 +257,6 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
                 size: 20,
                 color: AppColors.textSecondary,
               ),
-      ),
-    );
-  }
-
-  Widget _buildMenuSwitch(
-    IconData icon,
-    String label,
-    Color color,
-    bool value,
-    ValueChanged<bool> onChanged,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        title: Text(
-          label,
-          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w500),
-        ),
-        trailing: Switch.adaptive(
-          value: value,
-          onChanged: onChanged,
-          activeTrackColor: AppColors.primary,
-        ),
       ),
     );
   }

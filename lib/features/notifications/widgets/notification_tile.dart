@@ -77,19 +77,19 @@ class NotificationTile extends StatelessWidget {
     switch (notification.type) {
       case 'booking_confirmed':
         iconData = Icons.check_circle;
-        iconColor = Colors.green;
+        iconColor = AppColors.success;
         break;
       case 'new_message':
         iconData = Icons.chat_bubble;
-        iconColor = Colors.blue;
+        iconColor = AppColors.primary;
         break;
       case 'reminder':
         iconData = Icons.notifications;
-        iconColor = Colors.orange;
+        iconColor = AppColors.warning;
         break;
       case 'review_received':
         iconData = Icons.star;
-        iconColor = Colors.amber;
+        iconColor = AppColors.gold;
         break;
       case 'sos_alert':
         iconData = Icons.warning;
@@ -97,7 +97,7 @@ class NotificationTile extends StatelessWidget {
         break;
       case 'system_info':
         iconData = Icons.info;
-        iconColor = Colors.blue;
+        iconColor = AppColors.primary;
         break;
       default:
         iconData = Icons.notifications;

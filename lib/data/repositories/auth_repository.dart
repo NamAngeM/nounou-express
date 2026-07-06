@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'profile_repository.dart';
 
 /// Session utilisateur.
 class AuthSession {
@@ -112,10 +116,17 @@ class MockAuthRepository implements AuthRepository {
     required String role,
     Map<String, dynamic>? profile,
   }) async {
-    // Mode démo : le profil n'est pas persisté.
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kAuthenticated, true);
     await prefs.setString(_kRole, role);
+    if (profile != null) {
+      // Persisté pour que l'app (accueil, dashboard) affiche les vraies
+      // données de l'utilisateur, même en mode démo.
+      await prefs.setString(
+        MockProfileRepository.profilePrefsKey,
+        jsonEncode(profile),
+      );
+    }
     return AuthSession(isAuthenticated: true, role: role);
   }
 

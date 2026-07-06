@@ -7,7 +7,10 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/formatters.dart';
+import '../../../core/utils/pricing.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/models/nanny_model.dart';
@@ -66,14 +69,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       '${time.hour.toString().padLeft(2, '0')}:'
       '${time.minute.toString().padLeft(2, '0')}';
 
-  double _calculateTotal(NannyModel nanny) {
-    final baseTotal = nanny.hourlyRate * _totalHours;
-    final nightSurcharge = _isNight ? baseTotal * 0.2 : 0.0;
-    final weekendSurcharge = _isWeekend ? baseTotal * 0.1 : 0.0;
-    final subtotal = baseTotal + nightSurcharge + weekendSurcharge;
-    final commission = subtotal * 0.15;
-    return subtotal + commission;
-  }
+  PriceBreakdown _price(NannyModel nanny) => PricingService.compute(
+    hourlyRate: nanny.hourlyRate,
+    hours: _totalHours,
+    isNight: _isNight,
+    isWeekend: _isWeekend,
+  );
 
   void _nextStep(NannyModel nanny) async {
     if (_currentStep == 0) {
@@ -84,7 +85,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         final success = await MockPaymentGateway.show(
           context,
           provider: _paymentMethod,
-          amount: _calculateTotal(nanny),
+          amount: _price(nanny).total,
         );
         if (success == true) {
           await _confirmBooking(nanny);
@@ -110,25 +111,19 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final bookingId =
         'NE-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
 
-    // Même barème que PriceSummary.
-    final baseTotal = nanny.hourlyRate * _totalHours;
-    final nightSurcharge = _isNight ? baseTotal * 0.2 : 0.0;
-    final weekendSurcharge = _isWeekend ? baseTotal * 0.1 : 0.0;
-    final subtotal = baseTotal + nightSurcharge + weekendSurcharge;
-    final commission = subtotal * 0.15;
-
+    final price = _price(nanny);
     final notes = _notesController.text.trim();
     final booking = BookingModel(
       id: bookingId,
-      parentId: 'p1',
+      parentId: ref.read(currentUserIdProvider),
       nannyId: nanny.id,
       date: _selectedDate,
       startTime: _formatTime(_startTime),
       endTime: _formatTime(_endTime),
       numberOfChildren: _childrenCount,
       childrenAges: _childrenAges,
-      totalPrice: subtotal + commission,
-      commission: commission,
+      totalPrice: price.total,
+      commission: price.commission,
       status: 'À venir',
       address:
           '${_addressController.text}'
@@ -153,7 +148,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     return nannyAsync.when(
       loading: () => const Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(child: CircularProgressIndicator()),
+        body: AppLoader(),
       ),
       error: (e, _) => Scaffold(
         backgroundColor: AppColors.background,
@@ -403,7 +398,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final quartiersAsync = ref.watch(quartiersProvider);
 
     return quartiersAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const AppLoader(),
       error: (e, _) => Text('Erreur : $e'),
       data: (quartiers) {
         _selectedNeighborhood ??= quartiers.isNotEmpty ? quartiers.first : null;
@@ -734,31 +729,54 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         ),
         boxShadow: AppColors.elevatedShadow,
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (_currentStep > 0) ...[
-            Expanded(
-              child: AppButton(
-                label: 'Retour',
-                icon: Icons.arrow_back_rounded,
-                onPressed: _previousStep,
-                type: AppButtonType.ghost,
-              ),
+          if (_currentStep == 0) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total estimé ($_totalHours h)',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                Text(
+                  AppFormatters.formatFCFA(_price(nanny).total),
+                  style: AppTypography.h4.copyWith(color: AppColors.primary),
+                ),
+              ],
             ),
-            const SizedBox(width: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
           ],
-          Expanded(
-            flex: 2,
-            child: AppButton(
-              label: _currentStep == 0
-                  ? 'Continuer'
-                  : 'Confirmer la réservation',
-              icon: _currentStep == 0
-                  ? Icons.arrow_forward_rounded
-                  : Icons.check_rounded,
-              onPressed: () => _nextStep(nanny),
-              isLoading: _isSubmitting,
-            ),
+          Row(
+            children: [
+              if (_currentStep > 0) ...[
+                Expanded(
+                  child: AppButton(
+                    label: 'Retour',
+                    icon: Icons.arrow_back_rounded,
+                    onPressed: _previousStep,
+                    type: AppButtonType.ghost,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+              ],
+              Expanded(
+                flex: 2,
+                child: AppButton(
+                  label: _currentStep == 0
+                      ? 'Continuer'
+                      : 'Confirmer la réservation',
+                  icon: _currentStep == 0
+                      ? Icons.arrow_forward_rounded
+                      : Icons.check_rounded,
+                  onPressed: () => _nextStep(nanny),
+                  isLoading: _isSubmitting,
+                ),
+              ),
+            ],
           ),
         ],
       ),

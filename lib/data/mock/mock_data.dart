@@ -25,6 +25,13 @@ class MockData {
       bio:
           "Nounou expérimentée avec 5 ans de pratique auprès d'enfants en bas âge.",
       quartier: "Akanda",
+      availability: {
+        "Lundi": ["Matin", "Après-midi"],
+        "Mardi": ["Matin", "Après-midi"],
+        "Mercredi": ["Matin", "Après-midi", "Soir"],
+        "Jeudi": ["Matin", "Après-midi"],
+        "Vendredi": ["Matin", "Après-midi", "Soir"],
+      },
     ),
     NannyModel(
       id: "n2",
@@ -42,6 +49,12 @@ class MockData {
       isVerified: true,
       bio: "Passionnée par le développement des enfants.",
       quartier: "Angondjé",
+      availability: {
+        "Lundi": ["Après-midi", "Soir"],
+        "Mercredi": ["Matin", "Après-midi"],
+        "Vendredi": ["Après-midi", "Soir"],
+        "Samedi": ["Matin", "Après-midi"],
+      },
     ),
     NannyModel(
       id: "n3",
@@ -60,6 +73,14 @@ class MockData {
       bio:
           "Ancienne puéricultrice, j'accompagne vos enfants avec bienveillance.",
       quartier: "Nzeng-Ayong",
+      availability: {
+        "Lundi": ["Matin", "Après-midi", "Soir", "Nuit"],
+        "Mardi": ["Soir", "Nuit"],
+        "Mercredi": ["Matin", "Après-midi"],
+        "Jeudi": ["Soir", "Nuit"],
+        "Vendredi": ["Soir", "Nuit"],
+        "Samedi": ["Nuit"],
+      },
     ),
     NannyModel(
       id: "n4",
@@ -78,6 +99,13 @@ class MockData {
       bio:
           "Jeune étudiante dynamique, je propose du soutien scolaire et de la garde d'enfants.",
       quartier: "Owendo",
+      availability: {
+        "Lundi": ["Soir"],
+        "Mardi": ["Soir"],
+        "Jeudi": ["Soir"],
+        "Samedi": ["Matin", "Après-midi", "Soir"],
+        "Dimanche": ["Après-midi"],
+      },
     ),
     NannyModel(
       id: "n5",
@@ -96,6 +124,12 @@ class MockData {
       bio:
           "J'organise des activités ludiques pour stimuler la créativité de vos enfants.",
       quartier: "Glass",
+      availability: {
+        "Mardi": ["Matin", "Après-midi"],
+        "Mercredi": ["Matin", "Après-midi", "Soir"],
+        "Jeudi": ["Matin", "Après-midi"],
+        "Samedi": ["Matin", "Après-midi"],
+      },
     ),
     NannyModel(
       id: "n6",
@@ -114,6 +148,13 @@ class MockData {
       bio:
           "Maman de 3 enfants, je sais gérer les situations imprévues avec calme.",
       quartier: "Nombakélé",
+      availability: {
+        "Lundi": ["Matin", "Après-midi"],
+        "Mardi": ["Matin", "Après-midi"],
+        "Mercredi": ["Matin"],
+        "Jeudi": ["Matin", "Après-midi"],
+        "Vendredi": ["Matin", "Après-midi"],
+      },
     ),
     NannyModel(
       id: "n7",
@@ -131,6 +172,10 @@ class MockData {
       isVerified: false,
       bio: "Douce et patiente, je suis disponible les week-ends.",
       quartier: "Alibandeng",
+      availability: {
+        "Samedi": ["Matin", "Après-midi", "Soir"],
+        "Dimanche": ["Matin", "Après-midi", "Soir"],
+      },
     ),
     NannyModel(
       id: "n8",
@@ -148,6 +193,14 @@ class MockData {
       isVerified: true,
       bio: "Spécialisée dans la garde de nourrissons et le suivi pédagogique.",
       quartier: "Akanda",
+      availability: {
+        "Lundi": ["Soir", "Nuit"],
+        "Mardi": ["Soir", "Nuit"],
+        "Mercredi": ["Soir", "Nuit"],
+        "Jeudi": ["Soir", "Nuit"],
+        "Vendredi": ["Soir", "Nuit"],
+        "Dimanche": ["Soir", "Nuit"],
+      },
     ),
     NannyModel(
       id: "n9",
@@ -165,6 +218,12 @@ class MockData {
       isVerified: true,
       bio: "Active et souriante, je veille à l'épanouissement des enfants.",
       quartier: "Angondjé",
+      availability: {
+        "Lundi": ["Matin", "Après-midi"],
+        "Mercredi": ["Après-midi", "Soir"],
+        "Vendredi": ["Matin", "Après-midi"],
+        "Samedi": ["Après-midi"],
+      },
     ),
     NannyModel(
       id: "n10",
@@ -183,6 +242,14 @@ class MockData {
       bio:
           "Rigoureuse et ponctuelle, je propose un accompagnement personnalisé.",
       quartier: "Nzeng-Ayong",
+      availability: {
+        "Lundi": ["Matin", "Après-midi", "Soir"],
+        "Mardi": ["Matin", "Après-midi"],
+        "Mercredi": ["Matin", "Après-midi", "Soir"],
+        "Jeudi": ["Matin", "Après-midi"],
+        "Vendredi": ["Matin", "Après-midi", "Soir"],
+        "Samedi": ["Matin"],
+      },
     ),
   ];
 
@@ -201,7 +268,6 @@ class MockData {
       id: "c1",
       otherUserId: "n1",
       otherUserName: "Marie Ndong",
-      otherUserAvatar: "https://i.pravatar.cc/150?u=n1",
       lastMessage: "Pas de problème, j'ai l'habitude des tout-petits",
       lastMessageTime: DateTime.now().subtract(const Duration(minutes: 5)),
       unreadCount: 0,
@@ -212,7 +278,6 @@ class MockData {
       id: "c2",
       otherUserId: "n2",
       otherUserName: "Christelle Obiang",
-      otherUserAvatar: "https://i.pravatar.cc/150?u=n2",
       lastMessage: "À quelle heure devrais-je arriver demain ?",
       lastMessageTime: DateTime.now().subtract(const Duration(hours: 2)),
       unreadCount: 2,
@@ -223,7 +288,6 @@ class MockData {
       id: "c3",
       otherUserId: "n3",
       otherUserName: "Francine Mba",
-      otherUserAvatar: "https://i.pravatar.cc/150?u=n3",
       lastMessage: "Merci pour votre confiance !",
       lastMessageTime: DateTime.now().subtract(
         const Duration(days: 1, hours: 3),

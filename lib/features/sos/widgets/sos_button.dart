@@ -11,7 +11,12 @@ class SosButton extends StatelessWidget {
     return FloatingActionButton(
           onPressed: () => context.push('/sos'),
           backgroundColor: AppColors.danger,
-          child: const Icon(Icons.security, color: Colors.white),
+          tooltip: 'Urgence SOS',
+          child: const Icon(
+            Icons.security,
+            color: Colors.white,
+            semanticLabel: 'Urgence SOS',
+          ),
         )
         .animate(onPlay: (controller) => controller.repeat())
         .scale(

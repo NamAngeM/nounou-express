@@ -71,4 +71,40 @@ class FirestoreMissionRepository implements MissionRepository {
     await _missions.doc(mission.id).set(mission.toJson());
     return mission;
   }
+
+  @override
+  Future<void> updateApplicationStatus(
+    String applicationId,
+    ApplicationStatus status,
+  ) => _db.collection('applications').doc(applicationId).update({
+    'status': status.name,
+  });
+
+  @override
+  Future<List<ApplicationModel>> getApplicationsForNanny(
+    String nannyId,
+  ) async {
+    final snapshot = await _db
+        .collection('applications')
+        .where('nannyId', isEqualTo: nannyId)
+        .get();
+    final applications = snapshot.docs
+        .map((d) => ApplicationModel.fromJson(normalizeDoc(d.data())))
+        .toList()
+      ..sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+    return List.unmodifiable(applications);
+  }
+
+  @override
+  Future<void> applyToMission(ApplicationModel application) async {
+    final batch = _db.batch()
+      ..set(
+        _db.collection('applications').doc(application.id),
+        application.toJson(),
+      )
+      ..update(_missions.doc(application.missionId), {
+        'applicantIds': FieldValue.arrayUnion([application.nannyId]),
+      });
+    await batch.commit();
+  }
 }

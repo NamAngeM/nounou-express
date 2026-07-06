@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_loader.dart';
+import '../../../core/widgets/avatar_widget.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/providers/data_providers.dart';
 
@@ -17,16 +19,16 @@ class BookingDetailScreen extends ConsumerWidget {
   Color _getStatusColor(String status) {
     switch (status) {
       case "En attente":
-        return Colors.orange;
+        return AppColors.warning;
       case "À venir":
       case "Confirmée":
-        return const Color(0xFF4ECDC4);
+        return AppColors.accent;
       case "En cours":
-        return Colors.blue;
+        return AppColors.primary;
       case "Terminée":
-        return Colors.green;
+        return AppColors.success;
       case "Annulée":
-        return Colors.red;
+        return AppColors.danger;
       default:
         return AppColors.textSecondary;
     }
@@ -48,7 +50,7 @@ class BookingDetailScreen extends ConsumerWidget {
         ],
       ),
       body: bookingAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const AppLoader(),
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (booking) => _buildBody(context, ref, booking),
       ),
@@ -79,7 +81,7 @@ class BookingDetailScreen extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (isEnCours)
-                  const Icon(Icons.circle, color: Colors.blue, size: 12)
+                  const Icon(Icons.circle, color: AppColors.primary, size: 12)
                       .animate(onPlay: (controller) => controller.repeat())
                       .scale(
                         duration: 1.seconds,
@@ -165,21 +167,14 @@ class BookingDetailScreen extends ConsumerWidget {
         border: Border.all(color: AppColors.border),
       ),
       child: nannyAsync.when(
-        loading: () => const Center(
-          child: Padding(
-            padding: EdgeInsets.all(AppSpacing.md),
-            child: CircularProgressIndicator(),
-          ),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(AppSpacing.md),
+          child: AppLoader(),
         ),
         error: (e, _) => Text('Erreur : $e'),
         data: (nanny) => Row(
           children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundImage: NetworkImage(
-                nanny.avatar ?? "https://i.pravatar.cc/150?u=${nanny.id}",
-              ),
-            ),
+            AppAvatar(name: nanny.name, imageUrl: nanny.avatar, size: 60),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
@@ -257,14 +252,14 @@ class BookingDetailScreen extends ConsumerWidget {
                   height: 12,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isDone ? Colors.green : AppColors.border,
+                    color: isDone ? AppColors.success : AppColors.border,
                   ),
                 ),
                 if (!isLast)
                   Container(
                     width: 2,
                     height: 40,
-                    color: isDone ? Colors.green : AppColors.border,
+                    color: isDone ? AppColors.success : AppColors.border,
                   ),
               ],
             ),
