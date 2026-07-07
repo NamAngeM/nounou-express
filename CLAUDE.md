@@ -111,15 +111,16 @@ référence.
 - Unification visuelle des headers (14 AppBar vs 5 AppPageHeader, sans
   logique de domaine) + consolidation des empty states/badges locaux
   sur les composants centraux — voir audit chantier 7.
-- Déploiement Firebase (tout est prêt localement — règles écrites,
-  functions compilées, firebase.json configuré) ; il ne manque que
-  l'authentification :
-  1. `npx firebase-tools login`
-  2. `npx firebase-tools deploy --only firestore:rules --project nounou-express-2112b`
-  3. `npx firebase-tools deploy --only functions --project nounou-express-2112b`
-  Prérequis console (voir backend_config.dart) : Phone Auth activée,
-  empreintes SHA Android, App Check. Ensuite :
+- Firebase : règles Firestore et les 5 Cloud Functions sont DÉPLOYÉES
+  (07/2026). Le projet a été assaini : 11 fonctions orphelines d'un
+  prototype antérieur (paiement Genius, KYC, OTP, push senders —
+  déployées le 25/04/2026 depuis un autre workspace, zéro trafic,
+  jamais référencées par ce code) ont été supprimées. Prérequis
+  console restants avant l'usage réel : Phone Auth activée,
+  empreintes SHA Android, App Check. Bascule :
   `flutter run --dart-define=USE_FIREBASE=true`.
+  Note : passer functions/package.json à Node 22 avant le 30/10/2026
+  (décommissionnement de Node 20 annoncé).
 - Onglet « Mes Gardes » nounou : le titre est adapté au rôle mais la
   liste affiche encore les bookings du parent (indistinguable en mode
   démo mono-utilisateur) ; filtrer par `nannyId` à la phase Firebase.
