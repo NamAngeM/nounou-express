@@ -9,7 +9,15 @@ class NotificationTile extends StatelessWidget {
   final NotificationModel notification;
   final VoidCallback? onTap;
 
-  const NotificationTile({super.key, required this.notification, this.onTap});
+  /// Alternative non gestuelle au swipe-delete (accessibilité).
+  final VoidCallback? onDelete;
+
+  const NotificationTile({
+    super.key,
+    required this.notification,
+    this.onTap,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +72,16 @@ class NotificationTile extends StatelessWidget {
                 ],
               ),
             ),
+            if (onDelete != null)
+              IconButton(
+                icon: const Icon(
+                  Icons.close_rounded,
+                  size: 18,
+                  color: AppColors.textTertiary,
+                ),
+                tooltip: 'Supprimer la notification',
+                onPressed: onDelete,
+              ),
           ],
         ),
       ),

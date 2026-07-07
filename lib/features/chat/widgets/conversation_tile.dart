@@ -41,6 +41,8 @@ class ConversationTile extends StatelessWidget {
       },
       child: InkWell(
         onTap: () => context.push('/chat/${conversation.otherUserId}'),
+        // Alternative non gestuelle au swipe (accessibilité).
+        onLongPress: () => _showActions(context),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.lg,
@@ -113,6 +115,52 @@ class ConversationTile extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showActions(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: AppSpacing.sheetBorderRadius,
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppSpacing.sm),
+            ListTile(
+              leading: const Icon(
+                Icons.archive_outlined,
+                color: AppColors.primary,
+              ),
+              title: Text('Archiver', style: AppTypography.bodyLarge),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                onArchive?.call();
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.delete_outline,
+                color: AppColors.danger,
+              ),
+              title: Text(
+                'Supprimer',
+                style: AppTypography.bodyLarge.copyWith(
+                  color: AppColors.danger,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                onDelete?.call();
+              },
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
         ),
       ),
     );

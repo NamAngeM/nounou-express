@@ -335,8 +335,44 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
+        if (mission.isRecurring) ...[
+          const _RecurringBadge(),
+          const SizedBox(width: AppSpacing.xs),
+        ],
         _UrgencyBadge(isUrgent: mission.isUrgent),
       ],
+    );
+  }
+}
+
+class _RecurringBadge extends StatelessWidget {
+  const _RecurringBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.primarySurface,
+        borderRadius: AppSpacing.badgeBorderRadius,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.repeat_rounded, size: 12, color: AppColors.primary),
+          const SizedBox(width: 4),
+          Text(
+            'Chaque semaine',
+            style: AppTypography.small.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

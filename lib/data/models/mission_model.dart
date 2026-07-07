@@ -71,6 +71,10 @@ class MissionModel {
   final String endTime; // "HH:mm"
   final bool isUrgent;
 
+  /// Besoin récurrent (même créneau chaque semaine). Informatif pour les
+  /// candidates ; la génération de série viendra avec le backend.
+  final bool isRecurring;
+
   // ── Enfants ──────────────────────────────────────────────────────────────────
   final List<String> childrenIds; // IDs depuis le profil
   final List<String> childrenSummary; // Ex: ["Léa, 3 ans", "Tom, 7 ans"]
@@ -111,6 +115,7 @@ class MissionModel {
     required this.startTime,
     required this.endTime,
     required this.isUrgent,
+    this.isRecurring = false,
     required this.childrenIds,
     required this.childrenSummary,
     this.notes,
@@ -176,6 +181,7 @@ class MissionModel {
       startTime: startTime,
       endTime: endTime,
       isUrgent: isUrgent,
+      isRecurring: isRecurring,
       childrenIds: childrenIds,
       childrenSummary: childrenSummary,
       notes: notes,
@@ -221,6 +227,7 @@ class MissionModel {
     'startTime': startTime,
     'endTime': endTime,
     'isUrgent': isUrgent,
+    'isRecurring': isRecurring,
     'childrenIds': childrenIds,
     'childrenSummary': childrenSummary,
     'notes': notes,
@@ -261,6 +268,7 @@ class MissionModel {
       startTime: json['startTime'] as String? ?? '',
       endTime: json['endTime'] as String? ?? '',
       isUrgent: json['isUrgent'] as bool? ?? false,
+      isRecurring: json['isRecurring'] as bool? ?? false,
       childrenIds: (json['childrenIds'] as List?)?.cast<String>() ?? const [],
       childrenSummary:
           (json['childrenSummary'] as List?)?.cast<String>() ?? const [],

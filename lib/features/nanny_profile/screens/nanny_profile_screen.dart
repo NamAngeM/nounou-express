@@ -529,10 +529,11 @@ class _BioSectionState extends State<_BioSection> {
             displayed,
             style: AppTypography.bodyMedium.copyWith(height: 1.6),
           ),
-          if (isLong) ...[
-            const SizedBox(height: AppSpacing.sm),
-            GestureDetector(
-              onTap: () => setState(() => _expanded = !_expanded),
+          if (isLong)
+            // TextButton : cible tactile 48dp garantie par Material.
+            TextButton(
+              onPressed: () => setState(() => _expanded = !_expanded),
+              style: TextButton.styleFrom(padding: EdgeInsets.zero),
               child: Text(
                 _expanded ? 'Voir moins' : 'Voir plus',
                 style: AppTypography.bodyMedium.copyWith(
@@ -541,7 +542,6 @@ class _BioSectionState extends State<_BioSection> {
                 ),
               ),
             ),
-          ],
         ],
       ),
     );

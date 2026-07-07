@@ -602,7 +602,8 @@ class _CategoryChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 42,
+      // 48dp : taille tactile minimale (WCAG / Material).
+      height: 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -614,12 +615,13 @@ class _CategoryChips extends StatelessWidget {
           final isActive = index == selectedIndex;
           return GestureDetector(
             onTap: () => onSelected(index),
+            behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutCubic,
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
+                vertical: AppSpacing.md,
               ),
               decoration: BoxDecoration(
                 gradient: isActive ? AppColors.primaryGradientH : null,

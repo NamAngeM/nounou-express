@@ -86,6 +86,20 @@ référence.
 
 ## Reste à faire (connu)
 
+- Mode sombre : les tokens dark existent dans `AppColors` mais les
+  écrans lisent les constantes claires directement (pas
+  `Theme.of(context)`). Brancher un `darkTheme` superficiellement
+  rendrait l'UI incohérente (widgets Material sombres, widgets custom
+  clairs). Prérequis : refactor vers un `ColorScheme`/extension de
+  thème consommé par les écrans — chantier dédié, ne pas brancher à
+  moitié.
+- Texte agrandi : la préférence système est respectée jusqu'à 130 %
+  (clamp dans main.dart) ; auditer les layouts à hauteur fixe avant de
+  relever le plafond.
+- Garde récurrente : le flag `isRecurring` est porté par l'annonce et
+  affiché aux candidates ; la génération de série de gardes viendra
+  avec le backend.
+
 - i18n : les strings sont en dur dans les écrans ; l'extraction doit se
   faire en un seul passage outillé (`flutter gen-l10n` + ARB), pas au
   fil de l'eau.

@@ -69,6 +69,21 @@ class NounouExpressApp extends ConsumerWidget {
       // Thème clair uniquement : le design system (AppColors) n'est pas encore
       // branché sur Theme.of(context), un darkTheme serait inopérant (audit M2).
       theme: AppTheme.light,
+      // Texte agrandi (accessibilité) : la préférence système est respectée
+      // jusqu'à 130 % — au-delà, les hauteurs fixes de certains écrans
+      // déborderaient. Plafond à relever après audit des layouts.
+      builder: (context, child) {
+        final media = MediaQuery.of(context);
+        return MediaQuery(
+          data: media.copyWith(
+            textScaler: media.textScaler.clamp(
+              minScaleFactor: 0.9,
+              maxScaleFactor: 1.3,
+            ),
+          ),
+          child: child!,
+        );
+      },
       routerConfig: ref.watch(appRouterProvider),
     );
   }

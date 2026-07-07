@@ -46,6 +46,7 @@ class _PublishAnnouncementScreenState
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
   bool _isUrgent = false;
+  bool _isRecurring = false;
 
   // ── Step 3: Enfants ───────────────────────────────────────────────────────
   final Set<String> _selectedChildIds = {};
@@ -100,6 +101,7 @@ class _PublishAnnouncementScreenState
     'startTime': _startTime == null ? null : _timeOfDayLabel(_startTime!),
     'endTime': _endTime == null ? null : _timeOfDayLabel(_endTime!),
     'isUrgent': _isUrgent,
+    'isRecurring': _isRecurring,
     'childIds': _selectedChildIds.toList(),
     'extraChildren': _extraChildren
         .map((c) => {'id': c.id, 'name': c.name, 'age': c.age})
@@ -139,6 +141,7 @@ class _PublishAnnouncementScreenState
       _startTime = _parseTime(draft['startTime'] as String?);
       _endTime = _parseTime(draft['endTime'] as String?);
       _isUrgent = draft['isUrgent'] as bool? ?? false;
+      _isRecurring = draft['isRecurring'] as bool? ?? false;
       _selectedChildIds
         ..clear()
         ..addAll((draft['childIds'] as List?)?.cast<String>() ?? const []);
@@ -360,6 +363,7 @@ class _PublishAnnouncementScreenState
       startTime: _startTime == null ? '08:00' : _timeOfDayLabel(_startTime!),
       endTime: _endTime == null ? '12:00' : _timeOfDayLabel(_endTime!),
       isUrgent: _isUrgent,
+      isRecurring: _isRecurring,
       childrenIds: selectedChildren.map((c) => c.id).toList(),
       childrenSummary: selectedChildren
           .map((c) => '${c.name}, ${c.age} ans')
@@ -802,6 +806,24 @@ class _PublishAnnouncementScreenState
           selectedIndex: _isUrgent ? 1 : 0,
           onChanged: (i) => setState(() => _isUrgent = i == 1),
         ),
+        const SizedBox(height: AppSpacing.lg),
+        Text('Fréquence', style: AppTypography.labelMd),
+        const SizedBox(height: AppSpacing.sm),
+        _buildSegmentSelector(
+          options: const ['Ponctuelle', 'Chaque semaine'],
+          selectedIndex: _isRecurring ? 1 : 0,
+          onChanged: (i) => setState(() => _isRecurring = i == 1),
+        ),
+        if (_isRecurring) ...[
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Les nounous verront que ce besoin se répète chaque semaine '
+            'au même créneau.',
+            style: AppTypography.small.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
       ],
     );
   }

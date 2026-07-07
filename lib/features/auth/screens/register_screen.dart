@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/form_draft_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -52,12 +53,55 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   List<String> get _stepTitles =>
       role == 'nanny' ? _nannyStepTitles : _parentStepTitles;
 
+  bool _draftChecked = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final uri = Uri.parse(GoRouterState.of(context).uri.toString());
     final newRole = uri.queryParameters['role'] ?? 'parent';
     if (newRole != role) setState(() => role = newRole);
+    // Le rôle est connu ici : on peut restaurer le bon brouillon.
+    if (!_draftChecked) {
+      _draftChecked = true;
+      _restoreDraft();
+    }
+  }
+
+  // ── Brouillon : quitter l'inscription (longue) ne perd pas la saisie ──────
+  String get _draftKey => 'register_$role';
+
+  void _saveDraft() {
+    FormDraftService.save(_draftKey, {
+      'step': _currentStep,
+      ..._formData.toDraftJson(),
+    });
+  }
+
+  Future<void> _restoreDraft() async {
+    final draft = await FormDraftService.load(_draftKey);
+    if (draft == null || !mounted) return;
+    setState(() {
+      _formData.restoreFromDraft(draft);
+      _currentStep = ((draft['step'] as num?)?.toInt() ?? 0).clamp(
+        0,
+        _totalSteps - 1,
+      );
+    });
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Brouillon restauré — reprenez où vous en étiez.',
+          style: AppTypography.bodyMedium.copyWith(color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppSpacing.buttonBorderRadius,
+        ),
+      ),
+    );
   }
 
   @override
@@ -75,6 +119,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     if (_currentStep < _totalSteps - 1) {
       setState(() => _currentStep++);
+      _saveDraft();
       _scrollController.animateTo(
         0,
         duration: const Duration(milliseconds: 300),
@@ -88,12 +133,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void _prevStep() {
     if (_currentStep > 0) {
       setState(() => _currentStep--);
+      _saveDraft();
       _scrollController.animateTo(
         0,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     } else {
+      _saveDraft();
       GoRouter.of(context).canPop()
           ? context.pop()
           : context.go('/auth/login?role=$role');
@@ -104,6 +151,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     await ref
         .read(authProvider.notifier)
         .signIn(role: role, profile: _buildProfile());
+    await FormDraftService.clear(_draftKey);
     if (mounted) context.go('/home');
   }
 
