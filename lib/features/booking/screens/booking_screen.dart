@@ -12,6 +12,7 @@ import '../../../core/widgets/app_back_button.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -153,7 +154,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       error: (e, _) => Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(backgroundColor: AppColors.background),
-        body: Center(child: Text('Erreur : $e')),
+        body: ErrorState(
+          onRetry: () => ref.invalidate(nannyByIdProvider(widget.nannyId)),
+        ),
       ),
       data: (nanny) => Scaffold(
         backgroundColor: AppColors.background,
@@ -167,6 +170,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 padding: AppSpacing.screenPaddingV,
                 child: Form(
                   key: _formKey,
+                  // Erreurs visibles dès la saisie, pas seulement au submit.
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: _currentStep == 0
                       ? _buildStepDetails()
                       : _buildStepSummary(nanny),
@@ -385,7 +390,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
     return quartiersAsync.when(
       loading: () => const AppLoader(),
-      error: (e, _) => Text('Erreur : $e'),
+      error: (e, _) => Text(
+        'Quartiers indisponibles. Réessayez plus tard.',
+        style: AppTypography.caption,
+      ),
       data: (quartiers) {
         _selectedNeighborhood ??= quartiers.isNotEmpty ? quartiers.first : null;
         return DropdownButtonFormField<String>(

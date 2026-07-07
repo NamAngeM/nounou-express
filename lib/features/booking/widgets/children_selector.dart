@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -30,8 +31,10 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
     _ages = List.from(widget.ages);
   }
 
+  static const int _maxChildren = AppConstants.maxChildrenPerNanny;
+
   void _updateCount(int newCount) {
-    if (newCount < 1 || newCount > 3) return;
+    if (newCount < 1 || newCount > _maxChildren) return;
     setState(() {
       _count = newCount;
       if (_count > _ages.length) {
@@ -78,12 +81,24 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
                 ),
                 _buildCounterButton(
                   icon: Icons.add,
-                  onPressed: _count < 3 ? () => _updateCount(_count + 1) : null,
+                  onPressed: _count < _maxChildren
+                      ? () => _updateCount(_count + 1)
+                      : null,
                 ),
               ],
             ),
           ],
         ),
+        if (_count >= _maxChildren) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Maximum $_maxChildren enfants par garde : au-delà, une '
+            'seule nounou ne peut plus assurer une surveillance sûre.',
+            style: AppTypography.small.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
         const SizedBox(height: AppSpacing.md),
         ...List.generate(_count, _buildAgeDropdown),
       ],
@@ -133,7 +148,7 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
               ),
-              items: List.generate(13, (i) => i).map((age) {
+              items: List.generate(16, (i) => i).map((age) {
                 return DropdownMenuItem<int>(
                   value: age,
                   child: Text("$age ans"),

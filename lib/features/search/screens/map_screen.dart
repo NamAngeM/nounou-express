@@ -8,6 +8,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/rating_stars.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -24,17 +25,11 @@ class MapScreen extends ConsumerWidget {
       body: nanniesAsync.when(
         data: (nannies) => _MapBody(nannies: nannies),
         loading: () => const AppLoader(),
-        error: (e, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Text(
-              'Impossible de charger les nounous.\n$e',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
+        error: (e, _) => ErrorState(
+          description:
+              'Impossible de charger les nounous. '
+              'Vérifiez votre connexion et réessayez.',
+          onRetry: () => ref.invalidate(nanniesProvider),
         ),
       ),
     );

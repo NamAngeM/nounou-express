@@ -10,6 +10,7 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/app_page_header.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../../data/models/application_model.dart';
 import '../../../data/models/mission_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -103,11 +104,11 @@ class _AvailableMissionsScreenState
           Expanded(
             child: missionsAsync.when(
               loading: () => const AppLoader(),
-              error: (e, _) => Center(
-                child: Text(
-                  'Erreur de chargement des annonces',
-                  style: AppTypography.bodyMedium,
-                ),
+              error: (e, _) => ErrorState(
+                description:
+                    'Impossible de charger les annonces. '
+                    'Vérifiez votre connexion et réessayez.',
+                onRetry: () => ref.invalidate(missionsProvider),
               ),
               data: (allMissions) {
                 final missions = _filteredMissions(allMissions);

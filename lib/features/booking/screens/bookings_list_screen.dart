@@ -11,6 +11,7 @@ import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/app_page_header.dart';
 import '../../../core/widgets/avatar_widget.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/providers/data_providers.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -99,7 +100,8 @@ class _BookingsList extends ConsumerWidget {
 
     return bookingsAsync.when(
       loading: () => const AppLoader(),
-      error: (e, _) => Center(child: Text('Erreur : $e')),
+      error: (e, _) =>
+          ErrorState(onRetry: () => ref.invalidate(bookingsProvider)),
       data: (allBookings) {
         final bookings = allBookings.where((b) => b.status == status).toList();
 

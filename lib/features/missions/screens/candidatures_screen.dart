@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_loader.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../../data/models/application_model.dart';
 import '../../../data/models/mission_model.dart';
 import '../../../data/models/notification_model.dart';
@@ -437,11 +438,12 @@ class _CandidaturesScreenState extends ConsumerState<CandidaturesScreen> {
       ),
       body: applicationsAsync.when(
         loading: () => const AppLoader(),
-        error: (e, _) => Center(
-          child: Text(
-            'Erreur de chargement des candidatures',
-            style: AppTypography.bodyMedium,
-          ),
+        error: (e, _) => ErrorState(
+          description:
+              'Impossible de charger les candidatures. '
+              'Vérifiez votre connexion et réessayez.',
+          onRetry: () =>
+              ref.invalidate(missionApplicationsProvider(widget.missionId)),
         ),
         data: (allApplications) {
           final applications = _visibleApplications(allApplications);

@@ -91,7 +91,14 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
     _timer = null;
   }
 
-  void _setStatus(MissionStatus next) {
+  static const _statusFeedback = {
+    MissionStatus.nannyEnRoute: 'Trajet confirmé — le parent est informé.',
+    MissionStatus.nannyArrived: 'Arrivée confirmée — le parent est informé.',
+    MissionStatus.inProgress: 'Garde démarrée, bon courage !',
+    MissionStatus.completed: 'Garde terminée.',
+  };
+
+  Future<void> _setStatus(MissionStatus next) async {
     setState(() {
       _status = next;
       _mission = _mission.copyWith(status: next);
@@ -104,6 +111,28 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
         _stopTimer();
       }
     });
+
+    // Persiste le changement (l'autre partie le voit) au lieu d'un
+    // simple état local perdu au refresh.
+    await ref.read(missionRepositoryProvider).updateMission(_mission);
+    ref.invalidate(missionByIdProvider(widget.missionId));
+    ref.invalidate(missionsProvider);
+
+    final feedback = _statusFeedback[next];
+    if (feedback == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          feedback,
+          style: AppTypography.bodyMedium.copyWith(color: Colors.white),
+        ),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppSpacing.buttonBorderRadius,
+        ),
+      ),
+    );
   }
 
   // ── Formatting helpers ──────────────────────────────────────────────────────
@@ -542,7 +571,7 @@ class _MissionTrackingScreenState extends ConsumerState<MissionTrackingScreen> {
             await Future.delayed(const Duration(seconds: 2));
             if (!mounted) return;
             Navigator.pop(context);
-            _setStatus(MissionStatus.nannyArrived);
+            await _setStatus(MissionStatus.nannyArrived);
           },
         );
 

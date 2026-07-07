@@ -9,6 +9,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/nanny_card.dart';
 import '../../../core/widgets/rating_stars.dart';
 import '../../../data/models/mission_model.dart';
@@ -185,17 +186,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 error: (e, _) => [
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(
-                      child: Padding(
-                        padding: AppSpacing.screenPadding,
-                        child: Text(
-                          'Impossible de charger les nounous.\n$e',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                    child: ErrorState(
+                      description:
+                          'Impossible de charger les nounous. '
+                          'Vérifiez votre connexion et réessayez.',
+                      onRetry: () => ref.invalidate(nanniesProvider),
                     ),
                   ),
                 ],

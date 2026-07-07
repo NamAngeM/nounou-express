@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_loader.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/models/nanny_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -27,7 +28,9 @@ class BookingConfirmationScreen extends ConsumerWidget {
       body: SafeArea(
         child: bookingAsync.when(
           loading: () => const AppLoader(),
-          error: (e, _) => Center(child: Text('Erreur : $e')),
+          error: (e, _) => ErrorState(
+            onRetry: () => ref.invalidate(bookingByIdProvider(bookingId)),
+          ),
           data: (booking) =>
               _BookingConfirmationBody(bookingId: bookingId, booking: booking),
         ),
@@ -51,7 +54,9 @@ class _BookingConfirmationBody extends ConsumerWidget {
 
     return nannyAsync.when(
       loading: () => const AppLoader(),
-      error: (e, _) => Center(child: Text('Erreur : $e')),
+      error: (e, _) => ErrorState(
+        onRetry: () => ref.invalidate(nannyByIdProvider(booking.nannyId)),
+      ),
       data: (nanny) => _buildContent(context, nanny),
     );
   }

@@ -9,6 +9,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_back_button.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/providers/data_providers.dart';
 
@@ -54,7 +55,9 @@ class BookingDetailScreen extends ConsumerWidget {
       ),
       body: bookingAsync.when(
         loading: () => const AppLoader(),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => ErrorState(
+          onRetry: () => ref.invalidate(bookingByIdProvider(bookingId)),
+        ),
         data: (booking) => _buildBody(context, ref, booking),
       ),
     );
@@ -174,7 +177,10 @@ class BookingDetailScreen extends ConsumerWidget {
           padding: EdgeInsets.all(AppSpacing.md),
           child: AppLoader(),
         ),
-        error: (e, _) => Text('Erreur : $e'),
+        error: (e, _) => Text(
+          'Nounou indisponible pour le moment.',
+          style: AppTypography.caption,
+        ),
         data: (nanny) => Row(
           children: [
             AppAvatar(name: nanny.name, imageUrl: nanny.avatar, size: 60),
