@@ -23,6 +23,22 @@ class BookingModel {
     this.notes,
   });
 
+  BookingModel copyWith({String? status}) => BookingModel(
+    id: id,
+    parentId: parentId,
+    nannyId: nannyId,
+    date: date,
+    startTime: startTime,
+    endTime: endTime,
+    numberOfChildren: numberOfChildren,
+    childrenAges: childrenAges,
+    totalPrice: totalPrice,
+    commission: commission,
+    status: status ?? this.status,
+    address: address,
+    notes: notes,
+  );
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'parentId': parentId,

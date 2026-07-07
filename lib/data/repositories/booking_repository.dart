@@ -8,6 +8,9 @@ abstract class BookingRepository {
   Future<BookingModel> getBookingById(String id);
 
   Future<BookingModel> createBooking(BookingModel booking);
+
+  /// Annule la réservation (statut → 'Annulée').
+  Future<void> cancelBooking(String id);
 }
 
 /// Implémentation mock : liste en mémoire initialisée depuis [MockData].
@@ -36,4 +39,13 @@ class MockBookingRepository implements BookingRepository {
         _bookings.insert(0, booking);
         return booking;
       });
+
+  @override
+  Future<void> cancelBooking(String id) => Future.delayed(_latency, () {
+    final index = _bookings.indexWhere((b) => b.id == id);
+    if (index == -1) {
+      throw StateError('Réservation introuvable : $id');
+    }
+    _bookings[index] = _bookings[index].copyWith(status: 'Annulée');
+  });
 }

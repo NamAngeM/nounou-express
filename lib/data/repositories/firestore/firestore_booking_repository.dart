@@ -43,4 +43,8 @@ class FirestoreBookingRepository implements BookingRepository {
     await _bookings.doc(booking.id).set(booking.toJson());
     return booking;
   }
+
+  @override
+  Future<void> cancelBooking(String id) =>
+      _bookings.doc(id).update({'status': 'Annulée'});
 }

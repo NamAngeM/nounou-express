@@ -87,83 +87,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     .slideY(begin: -0.05, end: 0),
               ),
 
-              // ── CTA Besoin d'une nounou ────────────────────────────────────
+              // ── Search — parcours primaire du parent ───────────────────────
               SliverToBoxAdapter(
                 child: Padding(
                   padding: AppSpacing.screenPadding.copyWith(
                     top: AppSpacing.lg,
+                    bottom: AppSpacing.lg,
                   ),
-                  child: GestureDetector(
-                    onTap: () => context.push('/missions/publish'),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xl,
-                        vertical: AppSpacing.lg,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: AppColors.primaryGradientH,
-                        borderRadius: AppSpacing.cardBorderRadius,
-                        boxShadow: AppColors.primaryShadow,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.20),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.add_circle_outline_rounded,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Besoin d\'une nounou ?',
-                                  style: AppTypography.h4.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                Text(
-                                  'Publiez une annonce en 2 minutes',
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.80),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  child: _SearchBar(),
                 ).animate().fadeIn(delay: 60.ms).slideY(begin: 0.08, end: 0),
               ),
 
               // ── Mes annonces (suivi des candidatures) ──────────────────────
               const SliverToBoxAdapter(child: _MyAnnouncementsSection()),
-
-              // ── Search ─────────────────────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: AppSpacing.screenPadding.copyWith(
-                    bottom: AppSpacing.lg,
-                  ),
-                  child: _SearchBar(),
-                ).animate().fadeIn(delay: 80.ms).slideY(begin: 0.08, end: 0),
-              ),
 
               // ── Category chips ─────────────────────────────────────────────
               SliverToBoxAdapter(
@@ -226,10 +162,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
 
-      // ── Promo banner ──────────────────────────────────────────────────────
+      // ── CTA annonce — parcours secondaire, contextualisé ──────────────────
       SliverToBoxAdapter(
         child: Padding(
           padding: AppSpacing.screenPadding,
+          child: const _PublishCta(),
+        ).animate().fadeIn(delay: 280.ms).slideY(begin: 0.08, end: 0),
+      ),
+
+      // ── Promo banner ──────────────────────────────────────────────────────
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: AppSpacing.screenPadding.copyWith(top: AppSpacing.xxl),
           child: const _PromoBanner(),
         ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.08, end: 0),
       ),
@@ -378,6 +322,73 @@ class _NotifButton extends ConsumerWidget {
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────── CTA annonce (secondaire) ──
+/// Parcours secondaire : publier une annonce et recevoir des candidatures.
+/// Volontairement moins saillant que la recherche (parcours primaire).
+class _PublishCta extends StatelessWidget {
+  const _PublishCta();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.primarySurface,
+        borderRadius: AppSpacing.cardBorderRadius,
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+      ),
+      child: InkWell(
+        onTap: () => context.push('/missions/publish'),
+        borderRadius: AppSpacing.cardBorderRadius,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: const BoxDecoration(
+                  color: AppColors.surface,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.campaign_rounded,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Vous ne trouvez pas ? Publiez une annonce',
+                      style: AppTypography.h4.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Décrivez votre besoin (récurrent, spécifique...) et '
+                      'recevez des candidatures de nounous.',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.primary,
+              ),
+            ],
+          ),
         ),
       ),
     );

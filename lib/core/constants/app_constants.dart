@@ -18,6 +18,10 @@ abstract final class AppConstants {
   // --- Règles métier ---
   static const int maxChildrenPerNanny = 3;
 
+  /// Annulation gratuite jusqu'à N heures avant le début de la garde ;
+  /// passé ce délai, les frais de service ne sont pas remboursés.
+  static const int freeCancellationHours = 24;
+
   // --- Contacts urgence (Gabon) ---
   static const String emergencyFireNumber = '112'; // Pompiers
   static const String emergencySamuNumber = '1488'; // SAMU social

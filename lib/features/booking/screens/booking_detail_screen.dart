@@ -3,9 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_back_button.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
@@ -298,6 +300,98 @@ class BookingDetailScreen extends ConsumerWidget {
     );
   }
 
+  /// Début effectif de la garde (date + heure de début "HH:mm").
+  DateTime _startDateTime(BookingModel booking) {
+    final parts = booking.startTime.split(':');
+    final hour = int.tryParse(parts.first) ?? 0;
+    final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    return DateTime(
+      booking.date.year,
+      booking.date.month,
+      booking.date.day,
+      hour,
+      minute,
+    );
+  }
+
+  Future<void> _confirmCancel(
+    BuildContext context,
+    WidgetRef ref,
+    BookingModel booking,
+  ) async {
+    final hoursLeft = _startDateTime(
+      booking,
+    ).difference(DateTime.now()).inHours;
+    final isFree = hoursLeft >= AppConstants.freeCancellationHours;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppSpacing.cardBorderRadius,
+        ),
+        title: Text('Annuler cette réservation ?', style: AppTypography.h3),
+        content: Text(
+          isFree
+              ? 'Annulation gratuite : la garde commence dans plus de '
+                    '${AppConstants.freeCancellationHours} h. '
+                    'Le montant payé vous sera intégralement remboursé.'
+              : 'La garde commence dans moins de '
+                    '${AppConstants.freeCancellationHours} h : les frais '
+                    'de service '
+                    '(${AppFormatters.formatFCFA(booking.commission)}) '
+                    'ne seront pas remboursés.',
+          style: AppTypography.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              'Garder ma réservation',
+              style: AppTypography.labelMd.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.danger,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: const RoundedRectangleBorder(
+                borderRadius: AppSpacing.buttonBorderRadius,
+              ),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Confirmer l\'annulation'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    await ref.read(bookingRepositoryProvider).cancelBooking(booking.id);
+    ref.invalidate(bookingByIdProvider(booking.id));
+    ref.invalidate(bookingsProvider);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          isFree
+              ? 'Réservation annulée. Remboursement intégral en cours.'
+              : 'Réservation annulée. Frais de service retenus.',
+          style: AppTypography.bodyMedium.copyWith(color: Colors.white),
+        ),
+        backgroundColor: AppColors.textSecondary,
+        behavior: SnackBarBehavior.floating,
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppSpacing.buttonBorderRadius,
+        ),
+      ),
+    );
+  }
+
   Widget _buildActionButtons(
     BuildContext context,
     BookingModel booking,
@@ -326,7 +420,7 @@ class BookingDetailScreen extends ConsumerWidget {
       buttons.add(const SizedBox(height: AppSpacing.sm));
       buttons.add(
         OutlinedButton(
-          onPressed: () {},
+          onPressed: () => _confirmCancel(context, ref, booking),
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.danger,
             side: const BorderSide(color: AppColors.danger),
@@ -348,7 +442,10 @@ class BookingDetailScreen extends ConsumerWidget {
       );
       buttons.add(const SizedBox(height: AppSpacing.sm));
       buttons.add(
-        OutlinedButton(onPressed: () {}, child: const Text("Noter la nounou")),
+        OutlinedButton(
+          onPressed: () => context.push('/booking/${booking.id}/review'),
+          child: const Text("Noter la nounou"),
+        ),
       );
     }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/services/form_draft_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -78,6 +79,107 @@ class _PublishAnnouncementScreenState
     'Moov Money',
   ];
 
+  // ── Brouillon ─────────────────────────────────────────────────────────────
+  // Quitter le formulaire (5 étapes) ne doit pas faire perdre la saisie :
+  // sauvegarde à chaque navigation d'étape et à la sortie de l'écran,
+  // restauration à l'ouverture, purge à la publication.
+  static const String _draftKey = 'publish_announcement';
+
+  @override
+  void initState() {
+    super.initState();
+    _restoreDraft();
+  }
+
+  Map<String, dynamic> _draftData() => {
+    'step': _currentStep,
+    'address': _addressController.text,
+    'locationIndex': _selectedLocationIndex,
+    'access': _accessController.text,
+    'date': _selectedDate?.toIso8601String(),
+    'startTime': _startTime == null ? null : _timeOfDayLabel(_startTime!),
+    'endTime': _endTime == null ? null : _timeOfDayLabel(_endTime!),
+    'isUrgent': _isUrgent,
+    'childIds': _selectedChildIds.toList(),
+    'extraChildren': _extraChildren
+        .map((c) => {'id': c.id, 'name': c.name, 'age': c.age})
+        .toList(),
+    'notes': _notesController.text,
+    'needs': _selectedNeeds.toList(),
+    'hasPets': _hasPets,
+    'pets': _petsController.text,
+    'paymentIndex': _selectedPaymentIndex,
+    'budget': _budgetPerHour,
+  };
+
+  void _saveDraft() {
+    // Fire-and-forget : la sauvegarde ne doit jamais bloquer la navigation.
+    FormDraftService.save(_draftKey, _draftData());
+  }
+
+  TimeOfDay? _parseTime(String? value) {
+    if (value == null) return null;
+    final parts = value.split(':');
+    if (parts.length != 2) return null;
+    final h = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    if (h == null || m == null) return null;
+    return TimeOfDay(hour: h, minute: m);
+  }
+
+  Future<void> _restoreDraft() async {
+    final draft = await FormDraftService.load(_draftKey);
+    if (draft == null || !mounted) return;
+    setState(() {
+      _currentStep = (draft['step'] as num?)?.toInt() ?? 0;
+      _addressController.text = draft['address'] as String? ?? '';
+      _selectedLocationIndex = (draft['locationIndex'] as num?)?.toInt() ?? 0;
+      _accessController.text = draft['access'] as String? ?? '';
+      _selectedDate = DateTime.tryParse(draft['date'] as String? ?? '');
+      _startTime = _parseTime(draft['startTime'] as String?);
+      _endTime = _parseTime(draft['endTime'] as String?);
+      _isUrgent = draft['isUrgent'] as bool? ?? false;
+      _selectedChildIds
+        ..clear()
+        ..addAll((draft['childIds'] as List?)?.cast<String>() ?? const []);
+      _extraChildren
+        ..clear()
+        ..addAll(
+          ((draft['extraChildren'] as List?) ?? const []).map((raw) {
+            final child = (raw as Map).cast<String, dynamic>();
+            return _MockChild(
+              id: child['id'] as String? ?? '',
+              name: child['name'] as String? ?? '',
+              age: (child['age'] as num?)?.toInt() ?? 0,
+            );
+          }),
+        );
+      _notesController.text = draft['notes'] as String? ?? '';
+      _selectedNeeds
+        ..clear()
+        ..addAll((draft['needs'] as List?)?.cast<String>() ?? const []);
+      _hasPets = draft['hasPets'] as bool? ?? false;
+      _petsController.text = draft['pets'] as String? ?? '';
+      _selectedPaymentIndex = (draft['paymentIndex'] as num?)?.toInt() ?? 0;
+      _budgetPerHour = (draft['budget'] as num?)?.toDouble() ?? 3000;
+    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Brouillon restauré — reprenez où vous en étiez.',
+            style: AppTypography.bodyMedium.copyWith(color: Colors.white),
+          ),
+          backgroundColor: AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppSpacing.buttonBorderRadius,
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _addressController.dispose();
@@ -111,12 +213,14 @@ class _PublishAnnouncementScreenState
   void _goNext() {
     if (_currentStep < _totalSteps - 1) {
       setState(() => _currentStep++);
+      _saveDraft();
     }
   }
 
   void _goPrev() {
     if (_currentStep > 0) {
       setState(() => _currentStep--);
+      _saveDraft();
     }
   }
 
@@ -272,6 +376,7 @@ class _PublishAnnouncementScreenState
     );
 
     await ref.read(missionRepositoryProvider).publishMission(mission);
+    await FormDraftService.clear(_draftKey);
     ref.invalidate(missionsProvider);
 
     if (!mounted) return;
@@ -1009,49 +1114,57 @@ class _PublishAnnouncementScreenState
       _buildStep5(),
     ];
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: AppColors.textPrimary,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Publier une annonce', style: AppTypography.h4),
-            Text(
-              'Étape ${_currentStep + 1}/$_totalSteps — ${_stepTitles[_currentStep]}',
-              style: AppTypography.caption,
+    return PopScope(
+      // Sortie de l'écran (retour, geste) : la saisie est mise en brouillon.
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _saveDraft();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.surface,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: AppColors.textPrimary,
             ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Publier une annonce', style: AppTypography.h4),
+              Text(
+                'Étape ${_currentStep + 1}/$_totalSteps — ${_stepTitles[_currentStep]}',
+                style: AppTypography.caption,
+              ),
+            ],
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(4),
+            child: LinearProgressIndicator(
+              value: (_currentStep + 1) / _totalSteps,
+              backgroundColor: AppColors.border,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primary,
+              ),
+              minHeight: 4,
+            ),
+          ),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: stepWidgets[_currentStep],
+              ),
+            ),
+            _buildBottomNavigation(),
           ],
         ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(4),
-          child: LinearProgressIndicator(
-            value: (_currentStep + 1) / _totalSteps,
-            backgroundColor: AppColors.border,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-            minHeight: 4,
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: stepWidgets[_currentStep],
-            ),
-          ),
-          _buildBottomNavigation(),
-        ],
       ),
     );
   }

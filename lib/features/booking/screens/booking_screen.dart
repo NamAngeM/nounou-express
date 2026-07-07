@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -664,6 +665,32 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           isNight: _isNight,
           paymentMethod: _paymentMethod,
           onPaymentMethodChanged: (val) => setState(() => _paymentMethod = val),
+        ),
+
+        const SizedBox(height: AppSpacing.md),
+
+        // Politique d'annulation, visible AVANT le paiement.
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(
+              Icons.info_outline_rounded,
+              size: 16,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                'Annulation gratuite jusqu\'à '
+                '${AppConstants.freeCancellationHours} h avant la garde. '
+                'Passé ce délai, les frais de service ne sont pas '
+                'remboursés.',
+                style: AppTypography.small.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ],
         ),
 
         const SizedBox(height: AppSpacing.lg),
