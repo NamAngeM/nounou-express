@@ -1,0 +1,61 @@
+name: Build APK de test
+
+# APK de test installable directement sur un téléphone, sans keystore ni
+# Java local : GitHub Actions fournit le JDK. À lancer depuis l'onglet
+# Actions → « Build APK de test » → Run workflow.
+#
+# L'APK est signé en debug (non publiable sur le Play Store — pour ça,
+# utiliser build_release.yml). Choisir le backend au lancement :
+#  - use_firebase = false → mode démo (données mock, bandeau démo)
+#  - use_firebase = true  → backend Firebase réel (nounou-express-2112b)
+
+on:
+  workflow_dispatch:
+    inputs:
+      use_firebase:
+        description: 'Backend Firebase réel (sinon mode démo mock)'
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: Build APK (debug)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.44.4'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build APK (mode démo)
+        if: ${{ !inputs.use_firebase }}
+        run: flutter build apk --debug
+
+      - name: Build APK (backend Firebase)
+        if: ${{ inputs.use_firebase }}
+        run: flutter build apk --debug --dart-define=USE_FIREBASE=true
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: nounou-express-test-apk-${{ inputs.use_firebase && 'firebase' || 'demo' }}
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
