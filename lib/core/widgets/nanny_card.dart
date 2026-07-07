@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../constants/app_constants.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
@@ -163,7 +164,7 @@ class NannyCard extends StatelessWidget {
                           style: AppTypography.buttonLabelSm,
                         ),
                         TextSpan(
-                          text: ' F',
+                          text: ' ${AppConstants.currency}',
                           style: AppTypography.small.copyWith(
                             color: Colors.white.withValues(alpha: 0.85),
                           ),

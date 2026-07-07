@@ -129,7 +129,7 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: StatsCard(value: stats["favorites"], label: "Favorites"),
+                child: StatsCard(value: stats["favorites"], label: "Favoris"),
               ),
             ],
           ),
@@ -174,7 +174,7 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
         if (!isNanny)
           _buildMenuItem(
             Icons.favorite_border,
-            "Mes favorites",
+            "Mes favoris",
             AppColors.primary,
             onTap: () => context.push('/favorites'),
           ),

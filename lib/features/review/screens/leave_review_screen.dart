@@ -79,10 +79,7 @@ class _LeaveReviewScreenState extends ConsumerState<LeaveReviewScreen> {
         ),
         title: Text(
           'Laisser un avis',
-          style: AppTypography.h4.copyWith(
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-          ),
+          style: AppTypography.h4.copyWith(color: Colors.white),
         ),
       ),
       extendBodyBehindAppBar: true,
@@ -335,10 +332,7 @@ class _HeroHeader extends StatelessWidget {
                 'Comment s\'est passée votre garde avec '
                 '${nannyName.split(' ').first} ?',
                 textAlign: TextAlign.center,
-                style: AppTypography.h3.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                ),
+                style: AppTypography.h3.copyWith(color: Colors.white),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
@@ -387,10 +381,7 @@ class _StarRatingCard extends StatelessWidget {
         children: [
           Text(
             'Votre note',
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
-            ),
+            style: AppTypography.h4,
           ),
           const SizedBox(height: AppSpacing.lg),
           Row(
@@ -466,10 +457,7 @@ class _QualityTagsSection extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Text(
               'Points forts',
-              style: AppTypography.bodyMedium.copyWith(
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
-              ),
+              style: AppTypography.h4,
             ),
           ],
         ),
@@ -545,10 +533,7 @@ class _CommentField extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Text(
               'Votre commentaire',
-              style: AppTypography.bodyMedium.copyWith(
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
-              ),
+              style: AppTypography.h4,
             ),
           ],
         ),

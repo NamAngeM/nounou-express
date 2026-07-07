@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_back_button.dart';
 import '../../../core/widgets/app_button.dart';
 
 class NannyVerificationScreen extends StatefulWidget {
@@ -27,19 +28,10 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(
-          "Vérification du Profil",
-          style: AppTypography.h4.copyWith(fontWeight: FontWeight.w900),
-        ),
+        title: Text("Vérification du profil", style: AppTypography.h3),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: AppColors.textPrimary,
-          ),
-          onPressed: () => context.pop(),
-        ),
+        leading: const AppBackButton(),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -50,7 +42,7 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
             const SizedBox(height: AppSpacing.xxxl),
             Text(
               "Documents requis",
-              style: AppTypography.h3.copyWith(fontWeight: FontWeight.w900),
+              style: AppTypography.h3,
             ),
             const SizedBox(height: 8),
             Text(
@@ -100,8 +92,7 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
               children: [
                 Text(
                   "Vérification en cours",
-                  style: AppTypography.bodySmall.copyWith(
-                    fontWeight: FontWeight.w900,
+                  style: AppTypography.labelMd.copyWith(
                     color: AppColors.warning,
                   ),
                 ),
@@ -182,8 +173,7 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
                   label,
                   style: AppTypography.small.copyWith(
                     color: color,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -211,12 +201,7 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
             color: AppColors.primary.withValues(alpha: 0.4),
           ),
           const SizedBox(height: 16),
-          Text(
-            "Prendre une photo ou parcourir",
-            style: AppTypography.bodySmall.copyWith(
-              fontWeight: FontWeight.w900,
-            ),
-          ),
+          Text("Prendre une photo ou parcourir", style: AppTypography.h4),
           const SizedBox(height: 4),
           Text(
             "PDF, JPG ou PNG (Max 5Mo)",

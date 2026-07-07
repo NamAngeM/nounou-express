@@ -7,6 +7,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/app_page_header.dart';
+import '../../../core/widgets/empty_state.dart';
 import '../../../data/models/notification_model.dart';
 import '../../../data/providers/data_providers.dart';
 import '../widgets/notification_tile.dart';
@@ -187,42 +188,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xxxl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: const BoxDecoration(
-                color: AppColors.primarySurface,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.notifications_none_rounded,
-                size: 48,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            Text(
-              'Aucune notification',
-              style: AppTypography.h2,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'C\'est ici que vous recevrez vos mises à jour importantes.',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return const EmptyState(
+      icon: Icons.notifications_none_rounded,
+      title: 'Aucune notification',
+      description:
+          'C\'est ici que vous recevrez vos mises à jour importantes.',
     );
   }
 }

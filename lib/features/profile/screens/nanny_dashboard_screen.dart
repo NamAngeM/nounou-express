@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_loader.dart';
+import '../../../core/widgets/app_page_header.dart';
 import '../../../core/widgets/rating_stars.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../data/providers/data_providers.dart';
@@ -28,63 +29,57 @@ class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text("Tableau de bord"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            tooltip: 'Notifications',
-            onPressed: () => context.push('/notifications'),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            const SizedBox(height: AppSpacing.xl),
-            _buildAvailabilityToggle(),
-            const SizedBox(height: AppSpacing.xl),
-            // Les missions d'abord : c'est l'action prioritaire de la nounou.
-            _buildSectionTitle("Prochaines missions"),
-            const SizedBox(height: AppSpacing.md),
-            _buildUpcomingMissions(),
-            const SizedBox(height: AppSpacing.xl),
-            _buildStatsGrid(),
-            const SizedBox(height: AppSpacing.xl),
-            _buildSectionTitle("Mes avis récents"),
-            const SizedBox(height: AppSpacing.md),
-            _buildRecentReviews(),
-            const SizedBox(height: AppSpacing.xl),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
     final firstName =
         (ref.watch(currentUserProfileProvider).valueOrNull?['firstName']
                 as String?)
             ?.trim();
-    final greeting = firstName == null || firstName.isEmpty
-        ? "Bonjour 👋"
-        : "Bonjour, $firstName 👋";
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(greeting, style: AppTypography.h1),
-        Text(
-          "Voici un résumé de votre activité ce mois-ci.",
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Column(
+        children: [
+          AppPageHeader(
+            title: firstName == null || firstName.isEmpty
+                ? 'Bonjour 👋'
+                : 'Bonjour, $firstName 👋',
+            subtitle: 'Voici un résumé de votre activité',
+            icon: Icons.dashboard_rounded,
+            gradientColors: const [AppColors.primaryDark, AppColors.primary],
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  Icons.notifications_none,
+                  color: Colors.white,
+                ),
+                tooltip: 'Notifications',
+                onPressed: () => context.push('/notifications'),
+              ),
+            ],
           ),
-        ),
-      ],
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildAvailabilityToggle(),
+                  const SizedBox(height: AppSpacing.xl),
+                  // Les missions d'abord : l'action prioritaire de la nounou.
+                  _buildSectionTitle("Prochaines missions"),
+                  const SizedBox(height: AppSpacing.md),
+                  _buildUpcomingMissions(),
+                  const SizedBox(height: AppSpacing.xl),
+                  _buildStatsGrid(),
+                  const SizedBox(height: AppSpacing.xl),
+                  _buildSectionTitle("Mes avis récents"),
+                  const SizedBox(height: AppSpacing.md),
+                  _buildRecentReviews(),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

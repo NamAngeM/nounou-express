@@ -7,6 +7,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/app_page_header.dart';
+import '../../../core/widgets/empty_state.dart';
 import '../../../data/models/conversation_model.dart';
 import '../../../data/providers/data_providers.dart';
 import '../widgets/conversation_tile.dart';
@@ -116,47 +117,12 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xxxl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: AppColors.accentSurface,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.chat_bubble_outline_rounded,
-                size: 48,
-                color: AppColors.accent,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            Text(
-              'Aucune conversation',
-              style: AppTypography.h2,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'Réservez une nounou pour commencer à discuter',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.xxxl),
-            ElevatedButton(
-              onPressed: () => context.go('/search'),
-              child: const Text('Trouver une nounou'),
-            ),
-          ],
-        ),
-      ),
+    return EmptyState(
+      icon: Icons.chat_bubble_outline_rounded,
+      title: 'Aucune conversation',
+      description: 'Réservez une nounou pour commencer à discuter.',
+      actionLabel: 'Trouver une nounou',
+      onAction: () => context.go('/search'),
     );
   }
 }

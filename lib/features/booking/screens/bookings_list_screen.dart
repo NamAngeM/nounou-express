@@ -6,9 +6,11 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/app_page_header.dart';
 import '../../../core/widgets/avatar_widget.dart';
+import '../../../core/widgets/empty_state.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/providers/data_providers.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -102,42 +104,10 @@ class _BookingsList extends ConsumerWidget {
         final bookings = allBookings.where((b) => b.status == status).toList();
 
         if (bookings.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.xxxl),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 90,
-                    height: 90,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.calendar_today_outlined,
-                      size: 40,
-                      color: AppColors.textSecondary.withValues(alpha: 0.4),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Aucune réservation',
-                    style: AppTypography.h3,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'dans la catégorie "$status"',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
+          return EmptyState(
+            icon: Icons.calendar_today_outlined,
+            title: 'Aucune réservation',
+            description: 'dans la catégorie « $status »',
           );
         }
 
@@ -294,7 +264,7 @@ class _BookingCard extends ConsumerWidget {
                           borderRadius: AppSpacing.chipBorderRadius,
                         ),
                         child: Text(
-                          '${booking.totalPrice.toInt()} F',
+                          AppFormatters.formatFCFA(booking.totalPrice),
                           style: AppTypography.labelMd.copyWith(
                             color: Colors.white,
                           ),

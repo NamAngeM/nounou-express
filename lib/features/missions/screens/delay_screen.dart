@@ -7,6 +7,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_back_button.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../data/models/mission_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -124,13 +125,7 @@ class _DelayScreenState extends ConsumerState<DelayScreen> {
       backgroundColor: AppColors.surface,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
-      leading: IconButton(
-        icon: const Icon(
-          Icons.arrow_back_rounded,
-          color: AppColors.textPrimary,
-        ),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
+      leading: const AppBackButton(),
       title: Row(
         children: [
           const Icon(Icons.alarm_rounded, color: AppColors.warning, size: 22),

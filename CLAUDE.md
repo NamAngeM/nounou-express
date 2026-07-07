@@ -53,6 +53,20 @@ référence.
 7. **Navigation** : GoRouter exclusivement (routes dans
    `lib/core/router/app_router.dart`). Jamais de `MaterialPageRoute`.
    Tout écran doit être atteignable par une route + un point d'entrée.
+8. **Headers** : écrans de premier niveau (onglets) = `AppPageHeader`
+   avec le gradient de son domaine ; écrans poussés = `AppBar` claire
+   avec `leading: AppBackButton()` (variante `close: true` pour les
+   formulaires). Gradients de domaine : Accueil/Dashboard et
+   Notifications = `[primaryDark, primary]` ; Missions nounou =
+   `[goldDark, gold]` ; Réservations/Gardes =
+   `[secondary, secondaryLight]` ; Messages = `[accentDark, accent]` ;
+   Profil = `[secondary, primary]`. Sémantique : primary = action et
+   navigation, accent/success = confirmations, gold = travail/notes,
+   warning/danger = urgences.
+9. **Wording** : vouvoiement partout ; « Mes favoris » (jamais
+   « Favorites ») ; « garde » côté nounou, « réservation » côté
+   parent ; prix via `AppFormatters.formatFCFA` /
+   `AppFormatters.pricePerHour` (jamais de « F » ou format local).
 
 ## Règles produit
 

@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/utils/pricing.dart';
+import '../../../core/widgets/app_back_button.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
@@ -184,21 +184,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   PreferredSizeWidget _buildAppBar(NannyModel nanny) {
     return AppBar(
       backgroundColor: AppColors.background,
-      leading: GestureDetector(
-        onTap: () => context.pop(),
-        child: Container(
-          margin: const EdgeInsets.all(AppSpacing.sm),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
-            borderRadius: BorderRadius.circular(AppSpacing.md),
-          ),
-          child: const Icon(
-            Icons.close_rounded,
-            size: 20,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ),
+      leading: const AppBackButton(close: true),
       title: Row(
         children: [
           AppAvatar(name: nanny.name, size: 32),
@@ -589,7 +575,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         children: [
                           Text(nanny.name, style: AppTypography.h4),
                           Text(
-                            '${nanny.hourlyRate.toStringAsFixed(0)} ${AppConstants.currency}/h · $_totalHours h',
+                            '${AppFormatters.pricePerHour(nanny.hourlyRate)} · $_totalHours h',
                             style: AppTypography.caption.copyWith(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,

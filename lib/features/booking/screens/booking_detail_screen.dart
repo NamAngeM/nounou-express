@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_back_button.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
 import '../../../data/models/booking_model.dart';
@@ -40,11 +41,13 @@ class BookingDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const AppBackButton(),
         title: Text("Détails de la réservation #$bookingId"),
         actions: [
           if (bookingAsync.valueOrNull?.status == "En cours")
             IconButton(
               icon: const Icon(Icons.sos, color: AppColors.danger),
+              tooltip: 'Urgence SOS',
               onPressed: () => context.push('/sos'),
             ),
         ],

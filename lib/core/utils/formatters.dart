@@ -11,6 +11,10 @@ class AppFormatters {
     ).format(amount);
   }
 
+  /// Format unique du tarif horaire dans toute l'app (ex: « 5 000 FCFA/h »).
+  static String pricePerHour(double hourlyRate) =>
+      '${formatFCFA(hourlyRate)}/h';
+
   static String formatDistance(double km) {
     if (km < 1) {
       return "${(km * 1000).toInt()} m";

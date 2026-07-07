@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/avatar_widget.dart';
 import '../../../core/widgets/nanny_card.dart';
@@ -818,7 +819,7 @@ class _NannyCompactCard extends StatelessWidget {
                       borderRadius: AppSpacing.chipBorderRadius,
                     ),
                     child: Text(
-                      '${nanny.hourlyRate.toStringAsFixed(0)} F/h',
+                      AppFormatters.pricePerHour(nanny.hourlyRate),
                       style: AppTypography.small.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,

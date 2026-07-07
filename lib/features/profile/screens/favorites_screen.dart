@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_back_button.dart';
 import '../../../core/widgets/app_loader.dart';
 import '../../../core/widgets/nanny_card.dart';
 import '../../../data/models/nanny_model.dart';
@@ -18,19 +18,10 @@ class FavoritesScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(
-          "Mes Favorites",
-          style: AppTypography.h4.copyWith(fontWeight: FontWeight.w900),
-        ),
+        title: Text("Mes favoris", style: AppTypography.h3),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: AppColors.textPrimary,
-          ),
-          onPressed: () => context.pop(),
-        ),
+        leading: const AppBackButton(),
       ),
       body: ref
           .watch(favoriteNanniesProvider)
@@ -86,7 +77,7 @@ class FavoritesScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.xl),
             Text(
               "Aucun favori pour le moment",
-              style: AppTypography.h3.copyWith(fontWeight: FontWeight.w900),
+              style: AppTypography.h3,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.md),

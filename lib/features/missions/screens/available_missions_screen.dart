@@ -8,6 +8,8 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_loader.dart';
+import '../../../core/widgets/app_page_header.dart';
+import '../../../core/widgets/empty_state.dart';
 import '../../../data/models/application_model.dart';
 import '../../../data/models/mission_model.dart';
 import '../../../data/providers/data_providers.dart';
@@ -67,11 +69,32 @@ class _AvailableMissionsScreenState
   @override
   Widget build(BuildContext context) {
     final missionsAsync = ref.watch(missionsProvider);
+    final quartier =
+        (ref.watch(currentUserProfileProvider).valueOrNull?['quartier']
+                as String?)
+            ?.trim();
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
       body: Column(
         children: [
+          AppPageHeader(
+            title: 'Annonces disponibles',
+            subtitle: quartier == null || quartier.isEmpty
+                ? 'Libreville'
+                : 'Libreville · $quartier',
+            icon: Icons.work_rounded,
+            gradientColors: const [AppColors.goldDark, AppColors.gold],
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  Icons.assignment_outlined,
+                  color: Colors.white,
+                ),
+                tooltip: 'Mes candidatures',
+                onPressed: () => context.push('/missions/my-applications'),
+              ),
+            ],
+          ),
           _FilterBar(
             filters: _filters,
             selected: _filter,
@@ -111,46 +134,6 @@ class _AvailableMissionsScreenState
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    final quartier =
-        (ref.watch(currentUserProfileProvider).valueOrNull?['quartier']
-                as String?)
-            ?.trim();
-    return AppBar(
-      backgroundColor: AppColors.surface,
-      surfaceTintColor: Colors.transparent,
-      elevation: 0,
-      centerTitle: false,
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Annonces disponibles', style: AppTypography.h3),
-          Text(
-            quartier == null || quartier.isEmpty
-                ? 'Libreville'
-                : 'Libreville · $quartier',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.assignment_outlined,
-            color: AppColors.primary,
-          ),
-          tooltip: 'Mes candidatures',
-          onPressed: () => context.push('/missions/my-applications'),
-        ),
-      ],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: AppColors.border),
-      ),
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -768,7 +751,7 @@ class _ApplySheetState extends ConsumerState<_ApplySheet> {
                 const SizedBox(width: AppSpacing.sm),
                 Text('Votre tarif: ', style: AppTypography.bodyMedium),
                 Text(
-                  '${_hourlyRate().toStringAsFixed(0)} ${AppConstants.currency}/h',
+                  AppFormatters.pricePerHour(_hourlyRate()),
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w700,
@@ -850,32 +833,12 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xxxl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 64,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              'Aucune annonce disponible',
-              style: AppTypography.h4,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Aucune mission ne correspond au filtre "$filter".\nEssayez un autre filtre.',
-              style: AppTypography.caption,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return EmptyState(
+      icon: Icons.search_off_rounded,
+      title: 'Aucune annonce disponible',
+      description:
+          'Aucune mission ne correspond au filtre « $filter ». '
+          'Essayez un autre filtre.',
     );
   }
 }

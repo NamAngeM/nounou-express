@@ -18,6 +18,7 @@ abstract final class AppColors {
 
   // ── Gold / Orange — cœur du logo ──────────────────────────────────────────
   static const Color gold = Color(0xFFF5871F);
+  static const Color goldDark = Color(0xFFE06A10);
   static const Color goldSurface = Color(0xFFFFF3E8);
 
   // ── Semantic ───────────────────────────────────────────────────────────────
@@ -78,7 +79,7 @@ abstract final class AppColors {
   );
 
   static const LinearGradient orangeGradient = LinearGradient(
-    colors: [Color(0xFFE06A10), gold],
+    colors: [goldDark, gold],
   );
 
   // ── Shadows ────────────────────────────────────────────────────────────────
