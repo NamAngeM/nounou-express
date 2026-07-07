@@ -15,7 +15,8 @@ class ErrorState extends StatelessWidget {
   const ErrorState({
     super.key,
     this.title = 'Une erreur est survenue',
-    this.description = 'Impossible de charger les données. '
+    this.description =
+        'Impossible de charger les données. '
         'Vérifiez votre connexion et réessayez.',
     this.onRetry,
   });

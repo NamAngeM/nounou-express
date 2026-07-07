@@ -4,7 +4,9 @@ import 'package:nounou_express/core/theme/app_colors.dart';
 import 'package:nounou_express/core/widgets/status_badge.dart';
 
 Future<void> _pump(WidgetTester tester, Widget child) => tester.pumpWidget(
-  MaterialApp(home: Scaffold(body: Center(child: child))),
+  MaterialApp(
+    home: Scaffold(body: Center(child: child)),
+  ),
 );
 
 void main() {

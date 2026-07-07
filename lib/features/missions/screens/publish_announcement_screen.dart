@@ -819,9 +819,7 @@ class _PublishAnnouncementScreenState
           Text(
             'Les nounous verront que ce besoin se répète chaque semaine '
             'au même créneau.',
-            style: AppTypography.small.copyWith(
-              color: AppColors.textSecondary,
-            ),
+            style: AppTypography.small.copyWith(color: AppColors.textSecondary),
           ),
         ],
       ],

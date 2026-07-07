@@ -379,10 +379,7 @@ class _StarRatingCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            'Votre note',
-            style: AppTypography.h4,
-          ),
+          Text('Votre note', style: AppTypography.h4),
           const SizedBox(height: AppSpacing.lg),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -455,10 +452,7 @@ class _QualityTagsSection extends StatelessWidget {
               color: AppColors.primary,
             ),
             const SizedBox(width: AppSpacing.sm),
-            Text(
-              'Points forts',
-              style: AppTypography.h4,
-            ),
+            Text('Points forts', style: AppTypography.h4),
           ],
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -531,10 +525,7 @@ class _CommentField extends StatelessWidget {
           children: [
             const Icon(Icons.edit_outlined, size: 18, color: AppColors.primary),
             const SizedBox(width: AppSpacing.sm),
-            Text(
-              'Votre commentaire',
-              style: AppTypography.h4,
-            ),
+            Text('Votre commentaire', style: AppTypography.h4),
           ],
         ),
         const SizedBox(height: AppSpacing.md),

@@ -114,10 +114,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ...nanniesAsync.when(
                 data: (nannies) => _buildNannySlivers(context, nannies),
                 loading: () => const [
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: AppLoader(),
-                  ),
+                  SliverFillRemaining(hasScrollBody: false, child: AppLoader()),
                 ],
                 error: (e, _) => [
                   SliverFillRemaining(
@@ -383,10 +380,7 @@ class _PublishCta extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.primary,
-              ),
+              const Icon(Icons.chevron_right_rounded, color: AppColors.primary),
             ],
           ),
         ),
@@ -401,18 +395,13 @@ class _PublishCta extends StatelessWidget {
 class _MyAnnouncementsSection extends ConsumerWidget {
   const _MyAnnouncementsSection();
 
-  static const _openStatuses = {
-    MissionStatus.pending,
-    MissionStatus.confirmed,
-  };
+  static const _openStatuses = {MissionStatus.pending, MissionStatus.confirmed};
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userId = ref.watch(currentUserIdProvider);
     final missions = (ref.watch(missionsProvider).valueOrNull ?? const [])
-        .where(
-          (m) => m.parentId == userId && _openStatuses.contains(m.status),
-        )
+        .where((m) => m.parentId == userId && _openStatuses.contains(m.status))
         .toList();
     if (missions.isEmpty) return const SizedBox.shrink();
 
@@ -423,9 +412,7 @@ class _MyAnnouncementsSection extends ConsumerWidget {
         children: [
           Text('Mes annonces', style: AppTypography.h3),
           const SizedBox(height: AppSpacing.md),
-          ...missions.map(
-            (mission) => _AnnouncementTile(mission: mission),
-          ),
+          ...missions.map((mission) => _AnnouncementTile(mission: mission)),
         ],
       ),
     ).animate().fadeIn(delay: 70.ms).slideY(begin: 0.08, end: 0);

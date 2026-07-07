@@ -128,4 +128,3 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
     );
   }
 }
-

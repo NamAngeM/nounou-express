@@ -43,10 +43,12 @@ abstract final class PricingService {
     required bool isWeekend,
   }) {
     final baseTotal = hourlyRate * hours;
-    final nightSurcharge =
-        isNight ? baseTotal * AppConstants.nightSurchargeRate : 0.0;
-    final weekendSurcharge =
-        isWeekend ? baseTotal * AppConstants.weekendSurchargeRate : 0.0;
+    final nightSurcharge = isNight
+        ? baseTotal * AppConstants.nightSurchargeRate
+        : 0.0;
+    final weekendSurcharge = isWeekend
+        ? baseTotal * AppConstants.weekendSurchargeRate
+        : 0.0;
     final subtotal = baseTotal + nightSurcharge + weekendSurcharge;
     final commission = subtotal * AppConstants.commissionRate;
     return PriceBreakdown(

@@ -40,9 +40,8 @@ class MyApplicationsScreen extends ConsumerWidget {
       ),
       body: applicationsAsync.when(
         loading: () => const AppLoader(),
-        error: (e, _) => ErrorState(
-          onRetry: () => ref.invalidate(myApplicationsProvider),
-        ),
+        error: (e, _) =>
+            ErrorState(onRetry: () => ref.invalidate(myApplicationsProvider)),
         data: (applications) => applications.isEmpty
             ? EmptyState(
                 icon: Icons.work_outline_rounded,
@@ -153,18 +152,15 @@ class _ApplicationCard extends ConsumerWidget {
           Text(
             'Envoyée le '
             '${AppFormatters.formatShortDate(application.appliedAt)}',
-            style: AppTypography.small.copyWith(
-              color: AppColors.textTertiary,
-            ),
+            style: AppTypography.small.copyWith(color: AppColors.textTertiary),
           ),
           if (isAccepted) ...[
             const SizedBox(height: AppSpacing.md),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () => context.push(
-                  '/missions/${application.missionId}/tracking',
-                ),
+                onPressed: () =>
+                    context.push('/missions/${application.missionId}/tracking'),
                 icon: const Icon(Icons.route_rounded, size: 18),
                 label: const Text('Suivre la mission'),
                 style: ElevatedButton.styleFrom(

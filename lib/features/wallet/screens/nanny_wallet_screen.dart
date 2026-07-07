@@ -383,15 +383,12 @@ class _WithdrawBottomSheetState extends State<_WithdrawBottomSheet> {
   }
 
   void _confirm() {
-    final amount = double.tryParse(
-      _amountController.text.replaceAll(' ', ''),
-    );
+    final amount = double.tryParse(_amountController.text.replaceAll(' ', ''));
     final String? error;
     if (amount == null || amount <= 0) {
       error = 'Saisissez un montant valide.';
     } else if (amount < _minWithdrawal) {
-      error =
-          'Retrait minimum : ${AppFormatters.formatFCFA(_minWithdrawal)}.';
+      error = 'Retrait minimum : ${AppFormatters.formatFCFA(_minWithdrawal)}.';
     } else if (amount > widget.balance) {
       error =
           'Montant supérieur au solde disponible '

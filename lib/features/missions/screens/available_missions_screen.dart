@@ -136,7 +136,6 @@ class _AvailableMissionsScreenState
       ),
     );
   }
-
 }
 
 // ---------------------------------------------------------------------------
@@ -596,7 +595,11 @@ class _BottomRow extends ConsumerWidget {
 // Apply bottom sheet
 // ---------------------------------------------------------------------------
 
-void _showApplySheet(BuildContext context, WidgetRef ref, MissionModel mission) {
+void _showApplySheet(
+  BuildContext context,
+  WidgetRef ref,
+  MissionModel mission,
+) {
   // Onboarding progressif : la candidature exige un profil complété à
   // l'inscription (la CNI y est déjà collectée). Sans profil, on oriente
   // vers la vérification d'identité au lieu de bloquer sans issue.

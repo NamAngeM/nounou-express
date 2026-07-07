@@ -46,10 +46,7 @@ class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
             gradientColors: const [AppColors.primaryDark, AppColors.primary],
             actions: [
               IconButton(
-                icon: const Icon(
-                  Icons.notifications_none,
-                  color: Colors.white,
-                ),
+                icon: const Icon(Icons.notifications_none, color: Colors.white),
                 tooltip: 'Notifications',
                 onPressed: () => context.push('/notifications'),
               ),
@@ -196,11 +193,12 @@ class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
           data: (missions) {
             // Les demandes en attente d'abord : c'est ce que la nounou
             // doit traiter en priorité.
-            final sorted = [...missions]..sort((a, b) {
-              final aPending = _statusOf(a) == "En attente" ? 0 : 1;
-              final bPending = _statusOf(b) == "En attente" ? 0 : 1;
-              return aPending.compareTo(bPending);
-            });
+            final sorted = [...missions]
+              ..sort((a, b) {
+                final aPending = _statusOf(a) == "En attente" ? 0 : 1;
+                final bPending = _statusOf(b) == "En attente" ? 0 : 1;
+                return aPending.compareTo(bPending);
+              });
             return Column(children: sorted.map(_buildMissionCard).toList());
           },
           loading: () => const AppLoader(),
@@ -259,18 +257,13 @@ class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
             children: [
               Text(
                 mission["date"],
-                style: AppTypography.labelMd.copyWith(
-                  color: AppColors.primary,
-                ),
+                style: AppTypography.labelMd.copyWith(color: AppColors.primary),
               ),
               StatusBadge.fromStatus(status),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
-            mission["parentName"],
-            style: AppTypography.h4,
-          ),
+          Text(mission["parentName"], style: AppTypography.h4),
           const SizedBox(height: AppSpacing.xs),
           Row(
             children: [

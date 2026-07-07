@@ -167,14 +167,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         child: const Icon(Icons.delete_outline, color: Colors.white),
       ),
       onDismissed: (_) => _deleteNotification(n.id),
-      child: NotificationTile(
-            notification: n,
-            onTap: () => _handleTap(n),
-            onDelete: () => _deleteNotification(n.id),
-          )
-          .animate()
-          .fadeIn(delay: (index * 80).ms, duration: 350.ms)
-          .slideX(begin: 0.08, end: 0),
+      child:
+          NotificationTile(
+                notification: n,
+                onTap: () => _handleTap(n),
+                onDelete: () => _deleteNotification(n.id),
+              )
+              .animate()
+              .fadeIn(delay: (index * 80).ms, duration: 350.ms)
+              .slideX(begin: 0.08, end: 0),
     );
   }
 
@@ -195,8 +196,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     return const EmptyState(
       icon: Icons.notifications_none_rounded,
       title: 'Aucune notification',
-      description:
-          'C\'est ici que vous recevrez vos mises à jour importantes.',
+      description: 'C\'est ici que vous recevrez vos mises à jour importantes.',
     );
   }
 }

@@ -62,9 +62,7 @@ class PriceSummary extends StatelessWidget {
           child: Text(
             "Ces frais couvrent le fonctionnement de la plateforme, "
             "la vérification des profils et le support.",
-            style: AppTypography.small.copyWith(
-              color: AppColors.textTertiary,
-            ),
+            style: AppTypography.small.copyWith(color: AppColors.textTertiary),
           ),
         ),
         const SizedBox(height: AppSpacing.md),

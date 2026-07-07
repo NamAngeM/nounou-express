@@ -94,9 +94,7 @@ class _ChildrenSelectorState extends State<ChildrenSelector> {
           Text(
             'Maximum $_maxChildren enfants par garde : au-delà, une '
             'seule nounou ne peut plus assurer une surveillance sûre.',
-            style: AppTypography.small.copyWith(
-              color: AppColors.textSecondary,
-            ),
+            style: AppTypography.small.copyWith(color: AppColors.textSecondary),
           ),
         ],
         const SizedBox(height: AppSpacing.md),

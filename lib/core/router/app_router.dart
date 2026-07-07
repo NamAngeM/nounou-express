@@ -199,10 +199,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/profile/edit',
         builder: (c, s) => const EditProfileScreen(),
       ),
-      GoRoute(
-        path: '/favorites',
-        builder: (c, s) => const FavoritesScreen(),
-      ),
+      GoRoute(path: '/favorites', builder: (c, s) => const FavoritesScreen()),
       GoRoute(
         path: '/profile/verification',
         builder: (c, s) => const NannyVerificationScreen(),
@@ -248,10 +245,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // Portefeuille parent : recharge du compte via mobile money.
       GoRoute(path: '/wallet', builder: (c, s) => const WalletScreen()),
       // Portefeuille nounou : solde des gains, retraits et historique.
-      GoRoute(
-        path: '/earnings',
-        builder: (c, s) => const NannyWalletScreen(),
-      ),
+      GoRoute(path: '/earnings', builder: (c, s) => const NannyWalletScreen()),
     ],
   );
 });

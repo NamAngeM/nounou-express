@@ -70,22 +70,19 @@ class MockMissionRepository implements MissionRepository {
       );
 
   @override
-  Future<void> applyToMission(ApplicationModel application) =>
-      Future.delayed(_latency, () {
-        _applications.insert(0, application);
-        final index = _missions.indexWhere(
-          (m) => m.id == application.missionId,
+  Future<void> applyToMission(ApplicationModel application) => Future.delayed(
+    _latency,
+    () {
+      _applications.insert(0, application);
+      final index = _missions.indexWhere((m) => m.id == application.missionId);
+      if (index != -1 &&
+          !_missions[index].applicantIds.contains(application.nannyId)) {
+        _missions[index] = _missions[index].copyWith(
+          applicantIds: [..._missions[index].applicantIds, application.nannyId],
         );
-        if (index != -1 &&
-            !_missions[index].applicantIds.contains(application.nannyId)) {
-          _missions[index] = _missions[index].copyWith(
-            applicantIds: [
-              ..._missions[index].applicantIds,
-              application.nannyId,
-            ],
-          );
-        }
-      });
+      }
+    },
+  );
 
   @override
   Future<MissionModel> publishMission(MissionModel mission) =>

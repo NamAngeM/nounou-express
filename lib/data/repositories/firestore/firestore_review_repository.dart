@@ -32,10 +32,11 @@ class FirestoreReviewRepository implements ReviewRepository {
         .where('toUserId', isEqualTo: userId)
         .limit(50)
         .get();
-    final reviews = snapshot.docs
-        .map((d) => ReviewModel.fromJson(normalizeDoc(d.data())))
-        .toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final reviews =
+        snapshot.docs
+            .map((d) => ReviewModel.fromJson(normalizeDoc(d.data())))
+            .toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return List.unmodifiable(reviews);
   }
 

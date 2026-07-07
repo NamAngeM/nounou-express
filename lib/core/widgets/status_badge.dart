@@ -21,11 +21,15 @@ class StatusBadge extends StatelessWidget {
   /// Variante déduite des libellés de statut utilisés dans l'app.
   factory StatusBadge.fromStatus(String status, {Key? key}) {
     final variant = switch (status.toLowerCase()) {
-      'confirmé' || 'confirmée' || 'terminé' || 'terminée' =>
-        StatusBadgeVariant.success,
+      'confirmé' ||
+      'confirmée' ||
+      'terminé' ||
+      'terminée' => StatusBadgeVariant.success,
       'en attente' || 'à venir' => StatusBadgeVariant.warning,
-      'annulé' || 'annulée' || 'refusé' || 'refusée' =>
-        StatusBadgeVariant.danger,
+      'annulé' ||
+      'annulée' ||
+      'refusé' ||
+      'refusée' => StatusBadgeVariant.danger,
       'en cours' => StatusBadgeVariant.primary,
       _ => StatusBadgeVariant.neutral,
     };

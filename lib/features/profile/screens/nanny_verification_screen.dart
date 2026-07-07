@@ -40,10 +40,7 @@ class _NannyVerificationScreenState extends State<NannyVerificationScreen> {
           children: [
             _buildStatusHeader(),
             const SizedBox(height: AppSpacing.xxxl),
-            Text(
-              "Documents requis",
-              style: AppTypography.h3,
-            ),
+            Text("Documents requis", style: AppTypography.h3),
             const SizedBox(height: 8),
             Text(
               "Téléchargez les documents suivants pour obtenir le badge 'Vérifié' et accéder à plus de missions.",

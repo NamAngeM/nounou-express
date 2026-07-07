@@ -81,17 +81,16 @@ class FirestoreMissionRepository implements MissionRepository {
   });
 
   @override
-  Future<List<ApplicationModel>> getApplicationsForNanny(
-    String nannyId,
-  ) async {
+  Future<List<ApplicationModel>> getApplicationsForNanny(String nannyId) async {
     final snapshot = await _db
         .collection('applications')
         .where('nannyId', isEqualTo: nannyId)
         .get();
-    final applications = snapshot.docs
-        .map((d) => ApplicationModel.fromJson(normalizeDoc(d.data())))
-        .toList()
-      ..sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+    final applications =
+        snapshot.docs
+            .map((d) => ApplicationModel.fromJson(normalizeDoc(d.data())))
+            .toList()
+          ..sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
     return List.unmodifiable(applications);
   }
 
