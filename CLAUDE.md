@@ -97,9 +97,15 @@ référence.
 - Unification visuelle des headers (14 AppBar vs 5 AppPageHeader, sans
   logique de domaine) + consolidation des empty states/badges locaux
   sur les composants centraux — voir audit chantier 7.
-- Déploiement Firebase : `firebase deploy --only functions`
-  (onSosAlertCreated, onApplicationCreated, onApplicationDecided) +
-  règles Firestore pour `sos_alerts`, `applications`, `reviews`.
+- Déploiement Firebase (tout est prêt localement — règles écrites,
+  functions compilées, firebase.json configuré) ; il ne manque que
+  l'authentification :
+  1. `npx firebase-tools login`
+  2. `npx firebase-tools deploy --only firestore:rules --project nounou-express-2112b`
+  3. `npx firebase-tools deploy --only functions --project nounou-express-2112b`
+  Prérequis console (voir backend_config.dart) : Phone Auth activée,
+  empreintes SHA Android, App Check. Ensuite :
+  `flutter run --dart-define=USE_FIREBASE=true`.
 - Onglet « Mes Gardes » nounou : le titre est adapté au rôle mais la
   liste affiche encore les bookings du parent (indistinguable en mode
   démo mono-utilisateur) ; filtrer par `nannyId` à la phase Firebase.
