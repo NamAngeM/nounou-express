@@ -38,6 +38,7 @@ import '../../features/search/screens/map_screen.dart';
 import '../../features/search/screens/search_screen.dart';
 import '../../features/sos/screens/sos_screen.dart';
 import '../../features/splash/screens/splash_screen.dart';
+import '../../features/wallet/screens/nanny_wallet_screen.dart';
 import '../constants/app_constants.dart';
 import 'app_router_observer.dart';
 
@@ -251,7 +252,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           peerName: s.uri.queryParameters['name'] ?? 'Utilisateur',
         ),
       ),
+      // Portefeuille parent : recharge du compte via mobile money.
       GoRoute(path: '/wallet', builder: (c, s) => const WalletScreen()),
+      // Portefeuille nounou : solde des gains, retraits et historique.
+      GoRoute(
+        path: '/earnings',
+        builder: (c, s) => const NannyWalletScreen(),
+      ),
     ],
   );
 });

@@ -156,6 +156,7 @@ class _NannyDashboardScreenState extends ConsumerState<NannyDashboardScreen> {
                 label: "Revenus / mois",
                 icon: Icons.payments_outlined,
                 iconColor: AppColors.success,
+                onTap: () => context.push('/earnings'),
               ),
               StatsCard(
                 value: stats["avgRating"],

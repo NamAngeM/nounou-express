@@ -178,6 +178,20 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
             AppColors.primary,
             onTap: () => context.push('/favorites'),
           ),
+        if (!isNanny)
+          _buildMenuItem(
+            Icons.credit_card,
+            "Paiements",
+            AppColors.primary,
+            onTap: () => context.push('/wallet'),
+          ),
+        if (isNanny)
+          _buildMenuItem(
+            Icons.account_balance_wallet_outlined,
+            "Mes revenus",
+            AppColors.primary,
+            onTap: () => context.push('/earnings'),
+          ),
         _buildMenuItem(
           Icons.notifications_none,
           "Notifications",

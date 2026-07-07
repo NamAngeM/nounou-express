@@ -8,14 +8,17 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_button.dart';
 
-class WalletScreen extends StatefulWidget {
-  const WalletScreen({super.key});
+/// Portefeuille de la nounou : solde des gains, retraits mobile money
+/// et historique. (Le portefeuille parent — recharge — vit dans
+/// lib/features/profile/screens/wallet_screen.dart, route /wallet.)
+class NannyWalletScreen extends StatefulWidget {
+  const NannyWalletScreen({super.key});
 
   @override
-  State<WalletScreen> createState() => _WalletScreenState();
+  State<NannyWalletScreen> createState() => _NannyWalletScreenState();
 }
 
-class _WalletScreenState extends State<WalletScreen> {
+class _NannyWalletScreenState extends State<NannyWalletScreen> {
   /// Solde de démonstration — sera remplacé par le repository wallet
   /// (chantier 4). Centralisé ici pour que l'affichage et la validation
   /// de retrait utilisent la même valeur.
@@ -63,11 +66,8 @@ class _WalletScreenState extends State<WalletScreen> {
         onPressed: () => context.pop(),
       ),
       title: Text(
-        "Mon Portefeuille",
-        style: AppTypography.h4.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.w900,
-        ),
+        "Mes revenus",
+        style: AppTypography.h4.copyWith(color: Colors.white),
       ),
     );
   }

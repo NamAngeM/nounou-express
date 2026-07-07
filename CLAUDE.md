@@ -89,9 +89,11 @@ référence.
 - i18n : les strings sont en dur dans les écrans ; l'extraction doit se
   faire en un seul passage outillé (`flutter gen-l10n` + ARB), pas au
   fil de l'eau.
-- Wallet : doublon d'écrans en cours d'arbitrage (voir
-  `lib/features/profile/screens/wallet_screen.dart` — routé — vs
-  `lib/features/wallet/screens/wallet_screen.dart` — orphelin).
+- Wallet (arbitré) : parent = recharge sur `/wallet`
+  (`profile/screens/wallet_screen.dart`), nounou = revenus/retraits sur
+  `/earnings` (`wallet/screens/nanny_wallet_screen.dart`). Reste côté
+  backend : repository wallet (soldes réels) + paiement des
+  réservations par solde parent.
 - Unification visuelle des headers (14 AppBar vs 5 AppPageHeader, sans
   logique de domaine) + consolidation des empty states/badges locaux
   sur les composants centraux — voir audit chantier 7.

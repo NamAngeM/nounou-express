@@ -9,17 +9,21 @@ class StatsCard extends StatelessWidget {
   final IconData? icon;
   final Color? iconColor;
 
+  /// Rend la carte cliquable (ex: « Revenus / mois » → portefeuille).
+  final VoidCallback? onTap;
+
   const StatsCard({
     super.key,
     required this.value,
     required this.label,
     this.icon,
     this.iconColor,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -48,6 +52,13 @@ class StatsCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+
+    if (onTap == null) return card;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: AppSpacing.cardBorderRadius,
+      child: card,
     );
   }
 }

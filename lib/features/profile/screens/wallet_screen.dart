@@ -124,7 +124,19 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               ),
             ).animate().fadeIn().slideY(begin: 0.1),
 
-            const SizedBox(height: AppSpacing.xxxl),
+            const SizedBox(height: AppSpacing.md),
+
+            // Honnêteté : le solde n'est pas encore accepté au checkout.
+            Text(
+              'Le paiement des réservations avec votre solde arrive '
+              'prochainement. En attendant, réglez en espèces ou mobile '
+              'money au moment de la réservation.',
+              style: AppTypography.small.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.xxl),
 
             // Recharger Section
             Text('Recharger mon compte', style: AppTypography.h3),
