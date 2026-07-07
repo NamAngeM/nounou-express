@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -104,13 +103,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  void _startCall(ConversationModel? conversation) {
-    final name = conversation?.otherUserName;
-    context.push(
-      '/video-call${name == null ? '' : '?name=${Uri.encodeQueryComponent(name)}'}',
-    );
-  }
-
   PreferredSizeWidget _buildAppBar(ConversationModel? conversation) {
     return AppBar(
       titleSpacing: 0,
@@ -155,13 +147,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
         ],
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.videocam_outlined),
-          tooltip: 'Appel vidéo',
-          onPressed: () => _startCall(conversation),
-        ),
-      ],
     );
   }
 

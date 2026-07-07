@@ -13,7 +13,6 @@ import '../../features/booking/screens/booking_screen.dart';
 import '../../features/booking/screens/bookings_list_screen.dart';
 import '../../features/chat/screens/chat_screen.dart';
 import '../../features/chat/screens/conversations_screen.dart';
-import '../../features/chat/screens/video_call_screen.dart';
 import '../../features/home/screens/home_screen.dart';
 import '../../features/home/screens/main_shell.dart';
 import '../../features/legal/screens/privacy_policy_screen.dart';
@@ -244,12 +243,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           hourlyRate:
               double.tryParse(s.uri.queryParameters['rate'] ?? '') ??
               AppConstants.defaultHourlyRate,
-        ),
-      ),
-      GoRoute(
-        path: '/video-call',
-        builder: (c, s) => VideoCallScreen(
-          peerName: s.uri.queryParameters['name'] ?? 'Utilisateur',
         ),
       ),
       // Portefeuille parent : recharge du compte via mobile money.

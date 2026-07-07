@@ -404,13 +404,9 @@ class BookingDetailScreen extends ConsumerWidget {
         booking.status == "À venir") {
       buttons.add(
         ElevatedButton.icon(
-          onPressed: () {
-            final nannyAsync = ref.read(nannyByIdProvider(booking.nannyId));
-            final name = nannyAsync.valueOrNull?.name ?? 'la Nounou';
-            context.push('/video-call?name=$name');
-          },
-          icon: const Icon(Icons.videocam_rounded),
-          label: const Text("Entretien Vidéo"),
+          onPressed: () => context.push('/chat/${booking.nannyId}'),
+          icon: const Icon(Icons.chat_bubble_outline_rounded),
+          label: const Text("Contacter la nounou"),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
