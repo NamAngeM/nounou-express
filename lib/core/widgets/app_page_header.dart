@@ -12,6 +12,11 @@ class AppPageHeader extends StatelessWidget {
   /// Two colors for the header gradient (left→right or top-left→bottom-right).
   final List<Color> gradientColors;
 
+  /// Couleur du texte et des icônes. Blanc par défaut (gradients sombres) ;
+  /// passer une couleur sombre sur les gradients clairs (gold, accent)
+  /// pour tenir le contraste WCAG AA.
+  final Color foregroundColor;
+
   /// Optional action widgets displayed on the right (e.g. IconButtons).
   final List<Widget>? actions;
 
@@ -24,6 +29,7 @@ class AppPageHeader extends StatelessWidget {
     this.subtitle,
     this.icon,
     required this.gradientColors,
+    this.foregroundColor = Colors.white,
     this.actions,
     this.onBack,
   });
@@ -91,13 +97,13 @@ class AppPageHeader extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(9),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.18),
+                      color: foregroundColor.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back_ios_new_rounded,
                       size: 16,
-                      color: Colors.white,
+                      color: foregroundColor,
                     ),
                   ),
                 ),
@@ -107,10 +113,10 @@ class AppPageHeader extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
+                    color: foregroundColor.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, size: 22, color: Colors.white),
+                  child: Icon(icon, size: 22, color: foregroundColor),
                 ),
                 const SizedBox(width: AppSpacing.md),
               ],
@@ -121,14 +127,16 @@ class AppPageHeader extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppTypography.h2.copyWith(color: Colors.white),
+                      style: AppTypography.h2.copyWith(color: foregroundColor),
                     ),
                     if (subtitle != null) ...[
                       const SizedBox(height: 2),
+                      // Pleine opacité : à 75 %, le sous-titre passait sous
+                      // le seuil AA sur la plupart des gradients.
                       Text(
                         subtitle!,
                         style: AppTypography.bodySmall.copyWith(
-                          color: Colors.white.withValues(alpha: 0.75),
+                          color: foregroundColor,
                         ),
                       ),
                     ],

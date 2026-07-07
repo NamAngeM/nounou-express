@@ -14,9 +14,10 @@ abstract final class AppColors {
   // ── Accent — vert du logo ─────────────────────────────────────────────────
   static const Color accent = Color(0xFF3CAB50);
   static const Color accentDark = Color(0xFF2A8A3C);
+  static const Color accentLight = Color(0xFF66C377);
   static const Color accentSurface = Color(0xFFEAF7EC);
 
-  // ── Gold / Orange — cœur du logo ──────────────────────────────────────────
+  // ── Gold / Orange — cœur du logo (décoratif : étoiles, gradients) ─────────
   static const Color gold = Color(0xFFF5871F);
   static const Color goldDark = Color(0xFFE06A10);
   static const Color goldSurface = Color(0xFFFFF3E8);
@@ -24,7 +25,9 @@ abstract final class AppColors {
   // ── Semantic ───────────────────────────────────────────────────────────────
   static const Color success = Color(0xFF3CAB50);
   static const Color successSurface = Color(0xFFEAF7EC);
-  static const Color warning = Color(0xFFF5871F);
+  // Distinct de `gold` : le warning est un TEXTE d'état, il doit tenir
+  // 4,5:1 (WCAG AA) sur warningSurface et sur blanc.
+  static const Color warning = Color(0xFFB25000);
   static const Color warningSurface = Color(0xFFFFF3E8);
   static const Color danger = Color(0xFFE53935);
   static const Color dangerSurface = Color(0xFFFDECEC);
@@ -37,9 +40,13 @@ abstract final class AppColors {
   static const Color borderStrong = Color(0xFFB8BEE8);
 
   // ── Texte ──────────────────────────────────────────────────────────────────
+  // Contrastes WCAG AA sur fond background (#F5F7FF) :
+  // primary ~13:1, secondary ~5,7:1 (texte courant OK),
+  // tertiary ~3,6:1 (réservé aux hints/placeholders et décor, pas au
+  // texte porteur d'information).
   static const Color textPrimary = Color(0xFF1A1F5C);
-  static const Color textSecondary = Color(0xFF6B72B0);
-  static const Color textTertiary = Color(0xFFADB2D8);
+  static const Color textSecondary = Color(0xFF565D9E);
+  static const Color textTertiary = Color(0xFF7A7FB5);
 
   // ── Surfaces sombres ───────────────────────────────────────────────────────
   static const Color darkBackground = Color(0xFF0F1238);

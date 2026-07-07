@@ -85,11 +85,13 @@ class _AvailableMissionsScreenState
                 : 'Libreville · $quartier',
             icon: Icons.work_rounded,
             gradientColors: const [AppColors.goldDark, AppColors.gold],
+            // Gradient clair : texte sombre pour le contraste AA.
+            foregroundColor: AppColors.secondary,
             actions: [
               IconButton(
                 icon: const Icon(
                   Icons.assignment_outlined,
-                  color: Colors.white,
+                  color: AppColors.secondary,
                 ),
                 tooltip: 'Mes candidatures',
                 onPressed: () => context.push('/missions/my-applications'),

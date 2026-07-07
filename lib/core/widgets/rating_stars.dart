@@ -18,7 +18,7 @@ class RatingStars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final stars = Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         final starValue = index + 1;
@@ -32,20 +32,32 @@ class RatingStars extends StatelessWidget {
         }
         final color = icon == Icons.star_outline_rounded
             ? AppColors.border
-            : AppColors.warning;
+            : AppColors.gold;
 
         final Widget star = Icon(icon, size: size, color: color);
 
         if (isInteractive) {
-          return GestureDetector(
-            onTap: () => onRatingChanged?.call(starValue.toDouble()),
-            child: star
-                .animate(key: ValueKey('star_${index}_$rating'))
-                .scale(duration: 200.ms, curve: Curves.easeOutBack),
+          return Semantics(
+            button: true,
+            label: 'Donner $starValue étoile${starValue > 1 ? 's' : ''}',
+            child: GestureDetector(
+              onTap: () => onRatingChanged?.call(starValue.toDouble()),
+              child: star
+                  .animate(key: ValueKey('star_${index}_$rating'))
+                  .scale(duration: 200.ms, curve: Curves.easeOutBack),
+            ),
           );
         }
         return star;
       }),
+    );
+
+    if (isInteractive) return stars;
+    // Lecture d'écran : une note, pas cinq icônes.
+    return Semantics(
+      label: 'Note : ${rating.toStringAsFixed(1)} sur 5',
+      excludeSemantics: true,
+      child: stars,
     );
   }
 }

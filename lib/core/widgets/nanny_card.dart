@@ -36,156 +36,163 @@ class NannyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTap(
-      onTap: () => context.push('/nanny/$nannyId'),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: AppSpacing.cardBorderRadius,
-          boxShadow: AppColors.cardShadow,
-          border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
-        ),
-        child: Row(
-          children: [
-            // ── Avatar with hero ────────────────────────────────────────────
-            Hero(
-              tag: 'nanny_avatar_$nannyId',
-              child: AppAvatar(
-                imageUrl: avatarUrl,
-                name: name,
-                size: 60,
-                showRing: isVerified,
+    return Semantics(
+      button: true,
+      label:
+          '$name, $quartier, note ${rating.toStringAsFixed(1)} sur 5, '
+          '${hourlyRate.toStringAsFixed(0)} ${AppConstants.currency} '
+          'par heure${isVerified ? ', profil vérifié' : ''}',
+      child: ScaleTap(
+        onTap: () => context.push('/nanny/$nannyId'),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: AppSpacing.cardBorderRadius,
+            boxShadow: AppColors.cardShadow,
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
+          ),
+          child: Row(
+            children: [
+              // ── Avatar with hero ────────────────────────────────────────────
+              Hero(
+                tag: 'nanny_avatar_$nannyId',
+                child: AppAvatar(
+                  imageUrl: avatarUrl,
+                  name: name,
+                  size: 60,
+                  showRing: isVerified,
+                ),
               ),
-            ),
 
-            const SizedBox(width: AppSpacing.md),
+              const SizedBox(width: AppSpacing.md),
 
-            // ── Info ────────────────────────────────────────────────────────
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name + badge
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          name,
-                          style: AppTypography.h4,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (isVerified) ...[
-                        const SizedBox(width: AppSpacing.xs),
-                        const AppBadge(type: AppBadgeType.verified),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  // Location
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on_rounded,
-                        size: 13,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 3),
-                      Flexible(
-                        child: Text(
-                          distanceKm != null
-                              ? '$quartier · ${distanceKm!.toStringAsFixed(1)} km'
-                              : quartier,
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  // Rating row
-                  Row(
-                    children: [
-                      RatingStars(rating: rating, size: 13),
-                      const SizedBox(width: AppSpacing.xs),
-                      Text(
-                        rating.toStringAsFixed(1),
-                        style: AppTypography.small.copyWith(
-                          color: AppColors.gold,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      if (reviewCount != null) ...[
-                        Text(
-                          ' ($reviewCount)',
-                          style: AppTypography.small.copyWith(
-                            color: AppColors.textTertiary,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(width: AppSpacing.sm),
-
-            // ── Price + CTA ─────────────────────────────────────────────────
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Rate badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.xs + 2,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradientH,
-                    borderRadius: AppSpacing.chipBorderRadius,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.20),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: RichText(
-                    text: TextSpan(
+              // ── Info ────────────────────────────────────────────────────────
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Name + badge
+                    Row(
                       children: [
-                        TextSpan(
-                          text: hourlyRate.toStringAsFixed(0),
-                          style: AppTypography.buttonLabelSm,
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: AppTypography.h4,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        TextSpan(
-                          text: ' ${AppConstants.currency}',
-                          style: AppTypography.small.copyWith(
-                            color: Colors.white.withValues(alpha: 0.85),
+                        if (isVerified) ...[
+                          const SizedBox(width: AppSpacing.xs),
+                          const AppBadge(type: AppBadgeType.verified),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    // Location
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_rounded,
+                          size: 13,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 3),
+                        Flexible(
+                          child: Text(
+                            distanceKm != null
+                                ? '$quartier · ${distanceKm!.toStringAsFixed(1)} km'
+                                : quartier,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: AppSpacing.sm),
+                    // Rating row
+                    Row(
+                      children: [
+                        RatingStars(rating: rating, size: 13),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          rating.toStringAsFixed(1),
+                          style: AppTypography.small.copyWith(
+                            color: AppColors.gold,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        if (reviewCount != null) ...[
+                          Text(
+                            ' ($reviewCount)',
+                            style: AppTypography.small.copyWith(
+                              color: AppColors.textTertiary,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '/heure',
-                  style: AppTypography.small.copyWith(
-                    color: AppColors.textTertiary,
+              ),
+
+              const SizedBox(width: AppSpacing.sm),
+
+              // ── Price + CTA ─────────────────────────────────────────────────
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Rate badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.xs + 2,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradientH,
+                      borderRadius: AppSpacing.chipBorderRadius,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.20),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: hourlyRate.toStringAsFixed(0),
+                            style: AppTypography.buttonLabelSm,
+                          ),
+                          TextSpan(
+                            text: ' ${AppConstants.currency}',
+                            style: AppTypography.small.copyWith(
+                              color: Colors.white.withValues(alpha: 0.85),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                // Book button
-                _BookButton(nannyId: nannyId),
-              ],
-            ),
-          ],
+                  const SizedBox(height: 2),
+                  Text(
+                    '/heure',
+                    style: AppTypography.small.copyWith(
+                      color: AppColors.textTertiary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  // Book button
+                  _BookButton(nannyId: nannyId),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

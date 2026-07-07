@@ -50,7 +50,9 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
                 ? '$unread non lu${unread > 1 ? 's' : ''}'
                 : 'Toutes vos conversations',
             icon: Icons.chat_bubble_rounded,
-            gradientColors: const [AppColors.accentDark, AppColors.accent],
+            // Gradient clair : texte sombre pour le contraste AA.
+            gradientColors: const [AppColors.accent, AppColors.accentLight],
+            foregroundColor: AppColors.secondary,
           ),
 
           // ── Content ──────────────────────────────────────────────────────
