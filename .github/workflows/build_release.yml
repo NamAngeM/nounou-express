@@ -39,6 +39,17 @@ jobs:
       # Secrets requis (voir docs/KEYSTORE.md) :
       #  - KEYSTORE_BASE64 : le fichier .jks encodé en base64
       #  - KEY_PROPERTIES  : le contenu complet de android/key.properties
+      - name: Vérifier les secrets de signature
+        run: |
+          if [ -z "${{ secrets.KEYSTORE_BASE64 }}" ] || [ -z "${{ secrets.KEY_PROPERTIES }}" ]; then
+            echo "::error::Secrets de signature absents (KEYSTORE_BASE64 et/ou KEY_PROPERTIES)."
+            echo "::error::Ce workflow produit un AAB signé pour le Play Store : keystore obligatoire."
+            echo "::error::Générer le keystore (docs/KEYSTORE.md) puis ajouter les 2 secrets dans"
+            echo "::error::Settings > Secrets and variables > Actions (droits admin requis)."
+            echo "::error::Pour tester sur téléphone SANS keystore : workflow « Build APK de test »."
+            exit 1
+          fi
+
       - name: Decode keystore
         run: |
           mkdir -p keystore
